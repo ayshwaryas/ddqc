@@ -6,5 +6,6 @@ output
 .Rapp.history
 old_code
 .Rproj
+.html
 __pycache__
 

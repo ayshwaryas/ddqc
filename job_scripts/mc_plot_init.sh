@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #$ -l h_vmem=32G
-#$ -pe smp 2
-#$ -binding linear:2
+#$ -pe smp 4
+#$ -binding linear:4
 #$ -j y
 #$ -l h_rt=12:00:00
 #$ -o logs/

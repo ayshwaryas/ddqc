@@ -75,7 +75,9 @@ Output directory structure:
 
 	output/script_name/tissue/res-method-param/!markers.csv - list of DE genes
 
-	output/script_name/tissue/res-method-param/!summary.csv - clustering summary
+	output/script_name/tissue/res-method-param/!clusters.csv - clusters summary
+
+	output/script_name/tissue/res-method-param/!cells.csv - cells summary
 
 	output/script_name/tissue/res-method-param/*.pdf and output/script_name/tissue/filtered_cells_plots/*.pdf - all method specific plots
 
