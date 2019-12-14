@@ -5,7 +5,7 @@ output
 .RHistory
 .Rapp.history
 old_code
-.Rproj
-.html
+*.Rproj
+*.html
 __pycache__
 
