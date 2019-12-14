@@ -6,6 +6,9 @@ output: html_notebook
 ```{r}
 project <- "mc_tm"
 task.id <- 9
+source("../scripts/readers.R")
+source("../scripts/mc_functions.R")
+source("../scripts/fc_plots.R")
 source("local_settings.R")
 ```
 

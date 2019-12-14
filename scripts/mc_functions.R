@@ -3,7 +3,7 @@ tasks.per.tiss <<- 16 #How many different res/methods per one tissue
 
 #plots
 ggsave1 <- function(filename, plot) {
-  ggsave(filename = filename, plot = plot, width = 12, height = 8) #saves plot with custom dimensions 
+  ggsave(filename = filename, plot = plot, width = 14, height = 10) #saves plot with custom dimensions 
 }
 
 GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE points for DimPlot
@@ -41,7 +41,7 @@ DimPlotCluster <- function(obj, lbls, name, reduction) { #DimPlot colored by clu
   return(plot)
 }
 
-generatePlotsByMetric <- function(obj, name, lbls, metric.name, name.suffix, add.dir="") { #different plots for QC metrics
+generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.name, name.suffix, add.dir="", save.log2=TRUE) { #different plots for QC metrics
   #themes and axis labels for plots
   t <- scale_x_discrete(labels=lbls)
   t1 <- scale_y_discrete(labels=lbls)
@@ -55,46 +55,57 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name, name.suffix, add
   l2 <- labs(y=paste0("log2(", metric.name, ")"))
   l3 <- labs(x=metric.name)
   l4 <- labs(x=paste0("log2(", metric.name, ")"))
+  l5 <- labs(y=paste0("Average ", metric.name))
+  l6 <- labs(y=paste0("Average log2(", metric.name, ")"))
+  if (metric.name.seurat == "percent.mt") {
+    a1 <- scale_y_continuous(breaks=seq(0, 100, 5))
+    a2 <- scale_x_continuous(breaks=seq(0, 100, 5))
+  }
+  else {
+    a1 <- NULL
+    a2 <- NULL
+  }
   
-  data <- data.frame(metric=obj[[metric.name]], clusters=obj$seurat_clusters) 
+  data <- data.frame(metric=obj[[metric.name.seurat]], clusters=obj$seurat_clusters) 
   colnames(data) <- c("metric", "clusters") #rename data columns
   data$clusters = with(data, reorder(clusters, -metric, median)) #order data by cluster mean
   
-  #all plots except combined density and tsne/umap are saved in to vesions: no trasformation and log2
+  #all plots except combined density and tsne/umap are saved in to vesions: no trasformation and log2, if save.log2 is true
+  
+  if (save.log2) {
+    #barplot of cluster means
+    ggsave1(filename=paste0(results.dir, add.dir, paste0("bar_mean_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0) %>% group_by(clusters) %>% summarize(metric = mean(log2(metric))), aes(x=clusters, y=log2(metric))) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l6)
+    #boxplot by cluster
+    ggsave1(filename=paste0(results.dir, add.dir, paste0("box_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + l2) 
+    #combined density plots for each cluster
+    ggsave1(filename=paste0(results.dir, add.dir, paste0("density_", name.suffix, ".pdf")), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill=clusters)) + t3 + t4 + t5 + l4)
+    #joyplot by cluster
+    ggsave1(filename=paste0(results.dir, add.dir, paste0("density2_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + l4) 
+    #overall destiny plot
+    ggsave1(filename=paste0(results.dir, add.dir, paste0("density3_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill="red")) + t3 + l4) 
+    #violin plot by cluster
+    ggsave1(filename=paste0(results.dir, add.dir, paste0("violin_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + l2)
+  }
   
   #barplot of cluster means
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("bar_mean_", name.suffix, ".pdf")), plot=ggplot(data %>% group_by(clusters) %>% summarize(metric = mean(metric)), aes(x=clusters, y=metric)) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l1)
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("bar_mean_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0) %>% group_by(clusters) %>% summarize(metric = mean(log2(metric))), aes(x=clusters, y=log2(metric))) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l2)
-  
+  ggsave1(filename=paste0(results.dir, add.dir, paste0("bar_mean_", name.suffix, ".pdf")), plot=ggplot(data %>% group_by(clusters) %>% summarize(metric = mean(metric)), aes(x=clusters, y=metric)) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l5 + a1)
   #boxplot by cluster
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("box_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + l1) 
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("box_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + l2) 
-  
-  #combined density plots for each cluster
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("density_", name.suffix, ".pdf")), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill=clusters)) + t3 + t4 + t5 + l4)
-  
+  ggsave1(filename=paste0(results.dir, add.dir, paste0("box_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + l1 + a1) 
   #joyplot by cluster
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("density2_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + l3) 
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("density2_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + l4) 
-  
+  ggsave1(filename=paste0(results.dir, add.dir, paste0("density2_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + l3 + a2) 
   #overall destiny plot
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("density3_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=metric)) + geom_density(aes(fill="red")) + t3 + l3) 
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("density3_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill="red")) + t3 + l4) 
-  
+  ggsave1(filename=paste0(results.dir, add.dir, paste0("density3_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=metric)) + geom_density(aes(fill="red")) + t3 + l3 + a2) 
   #violin plot by cluster
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("violin_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + l1)
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("violin_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + l2)
-
+  ggsave1(filename=paste0(results.dir, add.dir, paste0("violin_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + l1 + a1)
+  
   #tsne and umap continious dimplots
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("tsne_", name.suffix, ".pdf")), plot=DimPlotContinuous(obj, metric.name, lbls, name, "tsne"))
-  ggsave1(filename=paste0(results.dir, add.dir, paste0("umap_", name.suffix, ".pdf")), plot=DimPlotContinuous(obj, metric.name, lbls, name, "umap"))
+  ggsave1(filename=paste0(results.dir, add.dir, paste0("tsne_", name.suffix, ".pdf")), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "tsne"))
+  ggsave1(filename=paste0(results.dir, add.dir, paste0("umap_", name.suffix, ".pdf")), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "umap"))
   
   #signature scatter plots
   if (grepl("cd", metric.name)) {
     cor1 <- round(cor(obj$percent.mt, data$metric, method = "pearson"), 2)
-    cor2 <- round(cor(log2(obj$percent.mt), log2(data$metric), method = "pearson"), 2)
     ggsave1(filename=paste0(results.dir, add.dir, paste0("/scatter-mito_", name.suffix, ".pdf")), plot=ggplot(data, aes(x=obj$percent.mt, y=metric)) + geom_point() + geom_smooth() + l1 + ggtitle(paste(name, cor1)))
-    ggsave1(filename=paste0(results.dir, add.dir, paste0("/scatter-mito_", name.suffix, "_log.pdf")), plot=ggplot(data, aes(x=log(obj$percent.mt), y=log(metric))) + geom_point() + geom_smooth() + l2 + ggtitle(paste(name, cor1)))
   }
 }
 
@@ -106,15 +117,15 @@ generatePlots <- function(obj, name, cell.types, annotations) { #main plots func
   }
   names(lbls) <- 0:(length(lbls) - 1) #rename labels with cluster #
   
-  generatePlotsByMetric(obj, name, lbls, "nCount_RNA", "count") #nUMI plots
-  generatePlotsByMetric(obj, name, lbls, "nFeature_RNA", "genes") #nGenes plots
-  generatePlotsByMetric(obj, name, lbls, "percent.mt", "mito") #%mito plots
-  generatePlotsByMetric(obj, name, lbls, "percent.rb", "ribo") #%ribo plots
+  generatePlotsByMetric(obj, name, lbls, "nCount_RNA", "Number of UMIS", "count") #nUMI plots
+  generatePlotsByMetric(obj, name, lbls, "nFeature_RNA", "Number of Genes", "genes") #nGenes plots
+  generatePlotsByMetric(obj, name, lbls, "percent.mt", "percent.mt", "mito") #%mito plots
+  generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo") #%ribo plots
   
   #signatures plots
-  generatePlotsByMetric(obj, name, lbls, "cd11", "cd1", "signatures/") 
-  generatePlotsByMetric(obj, name, lbls, "cd21", "cd2", "signatures/")
-  generatePlotsByMetric(obj, name, lbls, "cd31", "cd3", "signatures/")
+  generatePlotsByMetric(obj, name, lbls, "cd11", "cd1", "cd1", "signatures/", save.log2 = FALSE) 
+  generatePlotsByMetric(obj, name, lbls, "cd21", "cd2", "cd2", "signatures/", save.log2 = FALSE)
+  generatePlotsByMetric(obj, name, lbls, "cd31", "cd3", "cd3", "signatures/", save.log2 = FALSE)
   
   #cluster colored dimplots
   ggsave1(filename=paste0(results.dir, "/tsne_clusters.pdf"), plot=DimPlotCluster(obj, lbls, name, "tsne"))
@@ -177,7 +188,7 @@ addCDScores <- function(obj) {
   
   obj <- AddModuleScore(obj, features=list(cd1), name="cd1")
   obj <- AddModuleScore(obj, features=list(cd2), name="cd2")
-  obj <- AddModuleScore(obj, features=list(cd2), name="cd3")
+  obj <- AddModuleScore(obj, features=list(cd3), name="cd3")
   
   return(obj)
 }
@@ -292,7 +303,7 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, filen
   
   cell.types <- NULL
   cell.types2 <- NULL
-  clusters <- NULL
+  cluster.ids <- NULL
   scores <- NULL
   scores2 <- NULL
   score.genes <- NULL
@@ -330,7 +341,7 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, filen
       }
     }
     
-    clusters <- c(clusters, cl) 
+    cluster.ids <- c(cluster.ids, cl) 
     
     if (length(cell.type) == 0) { #if no cell types were found
       cell.types <- c(cell.types, "Unknown")
@@ -377,18 +388,46 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, filen
     }
   }
   if (record.stats) {
-    sm <- paste(filename, sum(scores) / length(clusters), sum(scores2) / length(clusters), sum(cells), round(mean(genes.mean), 3), round(mean(mito.mean), 3), sep=",") #add score summary to the file
-    res <- tibble("cluster" = clusters, "annotation" = annotations[["a1"]], "annotation2" = annotations[["a2"]], "%annotation1" = round(annotations[["p1"]], 3), 
+    sm <- paste(filename, sum(scores) / length(cluster.ids), sum(scores2) / length(cluster.ids), sum(cells), round(mean(genes.mean), 3), round(mean(mito.mean), 3), sep=",") #add score summary to the file
+    clusters <- tibble("cluster" = cluster.ids, "annotation" = annotations[["a1"]], "annotation2" = annotations[["a2"]], "%annotation1" = round(annotations[["p1"]], 3), 
                   "%annotation2" = round(annotations[["p2"]], 3), "cell.type" = cell.types, "cell.type2" = cell.types2, "sum.avg_logFC" = round(scores, 3), 
                   "delta.score" = round(scores2, 3), "cells" = cells, "genes.mean" = round(genes.mean, 3), "genes.median" = round(genes.median, 3), 
                   "mito.mean" = round(mito.mean, 3), "mito.median" = round(mito.median, 3), "markers" = formatted.markers, "score.genes" = score.genes)
-    return(list("res" = res, "sm" = sm, "markers" = markers))
+    return(list("clusters" = clusters, "sm" = sm, "markers" = markers))
   }
   else { #return only cell types and annotations
-    res <- tibble("cluster" = clusters, "annotation" = annotations[["a1"]], "cell.type" = cell.types)
+    res <- tibble("cluster" = cluster.ids, "annotation" = annotations[["a1"]], "cell.type" = cell.types)
     return(res)
   }
 }
+
+
+saveResults <- function(obj, clusters) {
+  if (res == 0.5 && method == "none") { 
+    message("Recording Additional Stats")
+    #record all cells with QC stats into csv for summary plots
+    t <- tibble("tissue" = tissue, "cluster" = obj$seurat_clusters, "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb)
+    write.table(t, paste0(results.dir, "../../stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
+  }
+  
+  message("Writing Results")
+  write(sm, paste0(results.dir, "../score_summary.csv"), append=TRUE)
+  write.csv(clusters, file=paste0(results.dir, "/!clusters.csv"))
+  write.csv(obj.markers, file=paste0(results.dir, "/!markers.csv"))
+  if (check.save()) {
+    saveRDS(obj, file=paste0(robjs.dir, tissue, "-", filename, ".rds"))
+  }
+  
+  all.cells <- colnames(obj)
+  umap <- as.data.frame(Embeddings(obj$umap)[all.cells, c(1, 2)])
+  tsne <- as.data.frame(Embeddings(obj$tsne)[all.cells, c(1, 2)])
+  
+  cells <- data.frame("cell"=all.cells, "cluster"=obj$seurat_clusters, "cell.type"=clusters$cell.type[obj$seurat_clusters], 
+                     "annotation" = clusters$annotation[obj$seurat_clusters], "UMAP_1"=umap$UMAP_1, "UMAP_2"=umap$UMAP_2,
+                     "TSNE_1"=tsne$tSNE_1, "TSNE_2"=tsne$tSNE_2)
+  write.csv(cells, file=paste0(results.dir, "/!cells.csv"))
+}
+
 
 check.save <- function() {
   if (save.res.1 && res == 1 && method == "none") {
@@ -446,27 +485,15 @@ MCMain <- function(obj) {
   
   tmp <- assignCellTypes(obj, obj.markers, getAnnotations(obj), record.stats = TRUE, paste0(tissue, "-", filename)) #assign cell types
   #unpack returned object
-  results <- tmp$res
+  clusters <- tmp$clusters
   sm <- tmp$sm
   obj.markers <- tmp$markers
   
-  generatePlots(obj, paste0(tissue, "_", filename), results$cell.type, results$annotation) #make plots
+  generatePlots(obj, paste0(tissue, "_", filename), clusters$cell.type, clusters$annotation) #make plots
   #generateMarkerPlots(obj, filename)
   
-  if (res == 0.5 && method == "none") { 
-    message("Recording Additional Stats")
-    #record all cells with QC stats into csv for summary plots
-    t <- tibble("tissue" = tissue, "cluster" = obj$seurat_clusters, "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb)
-    write.table(t, paste0(results.dir, "../../stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
-  }
+  saveResults(obj, clusters)
   
-  message("Writing Results")
-  write(sm, paste0(results.dir, "../score_summary.csv"), append=TRUE)
-  write.csv(results, file=paste0(results.dir, "/!summary.csv"))
-  write.csv(obj.markers, file=paste0(results.dir, "/!markers.csv"))
-  if (check.save()) {
-    saveRDS(obj, file=paste0(robjs.dir, tissue, "-", filename, ".rds"))
-  }
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mehtod:", method, "param:", param, "project:", project))
   return(obj)
 }

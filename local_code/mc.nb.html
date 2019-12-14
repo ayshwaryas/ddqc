@@ -228,30 +228,13 @@ summary {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJvamVjdCA8LSBcIm1jX290aGVyXCJcbnRhc2suaWQgPC0gMFxuc291cmNlKFwibG9jYWxfc2V0dGluZ3MuUlwiKVxuYGBgIn0= -->
-<pre class="r"><code>project &lt;- &quot;mc_other&quot;
-task.id &lt;- 0
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJvamVjdCA8LSBcIm1jX3RtXCJcbnRhc2suaWQgPC0gNDBcbnNvdXJjZShcIi4uL3NjcmlwdHMvcmVhZGVycy5SXCIpXG5zb3VyY2UoXCIuLi9zY3JpcHRzL21jX2Z1bmN0aW9ucy5SXCIpXG5zb3VyY2UoXCJsb2NhbF9zZXR0aW5ncy5SXCIpXG5gYGAifQ== -->
+<pre class="r"><code>project &lt;- &quot;mc_tm&quot;
+task.id &lt;- 40
+source(&quot;../scripts/readers.R&quot;)
+source(&quot;../scripts/mc_functions.R&quot;)
 source(&quot;local_settings.R&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZHBseXLigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnN0YXRz4oCZOlxuXG4gICAgZmlsdGVyLCBsYWdcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOmJhc2XigJk6XG5cbiAgICBpbnRlcnNlY3QsIHNldGRpZmYsIHNldGVxdWFsLCB1bmlvblxuXG5cbkF0dGFjaGluZyBwYWNrYWdlOiDigJhnZ3JpZGdlc+KAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdCBpcyBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOmdncGxvdDLigJk6XG5cbiAgICBzY2FsZV9kaXNjcmV0ZV9tYW51YWxcbiJ9 -->
-<pre><code>
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-
-Attaching package: ‘ggridges’
-
-The following object is masked from ‘package:ggplot2’:
-
-    scale_discrete_manual</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
@@ -260,12 +243,12 @@ The following object is masked from ‘package:ggplot2’:
 <pre class="r"><code>tiss &lt;- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBEYXRhIC0gZGF0YXNldDogbWNfb3RoZXIgbWluLmNlbGxzOiAzIG1pbi5mZWF0dXJlczogMTAwXG4ifQ== -->
-<pre><code>Reading Data - dataset: mc_other min.cells: 3 min.features: 100</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBEYXRhIC0gZGF0YXNldDogbWNfdG0gbWluLmNlbGxzOiAzIG1pbi5mZWF0dXJlczogMTAwXG4ifQ== -->
+<pre><code>Reading Data - dataset: mc_tm min.cells: 3 min.features: 100</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CnByb2plY3QgPC0gIm1jX290aGVyIgp0YXNrLmlkIDwtIDAKc291cmNlKCJsb2NhbF9zZXR0aW5ncy5SIikKYGBgCgoKCmBgYHtyfQp0aXNzIDwtIEF1dG9SZWFkZXIocHJvamVjdCwgY2VsbHMuZmlsdGVyLCBmZWF0dXJlcy5maWx0ZXIsIHRhc2tzLnBlci50aXNzKQpvYmogPC0gTUNNYWluKG9iaiA9IHRpc3MpCmBgYA==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CnByb2plY3QgPC0gIm1jX3RtIgp0YXNrLmlkIDwtIDQwCnNvdXJjZSgiLi4vc2NyaXB0cy9yZWFkZXJzLlIiKQpzb3VyY2UoIi4uL3NjcmlwdHMvbWNfZnVuY3Rpb25zLlIiKQpzb3VyY2UoImxvY2FsX3NldHRpbmdzLlIiKQpgYGAKCgoKYGBge3J9CnRpc3MgPC0gQXV0b1JlYWRlcihwcm9qZWN0LCBjZWxscy5maWx0ZXIsIGZlYXR1cmVzLmZpbHRlciwgdGFza3MucGVyLnRpc3MpCm9iaiA8LSBNQ01haW4ob2JqID0gdGlzcykKYGBg</div>
 
 
 

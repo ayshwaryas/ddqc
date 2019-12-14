@@ -58,7 +58,7 @@ R script settings (scripts/settings.R):
 
 	genes.filter - filtering parameter that sets the minimum gene cutoff (100 by default)
 
-	save.res.1 - TRUE/FALSE. Indicates whether all files of resolution 1 and method none should be saved (TRUE by default)
+	save.res.1 - TRUE/FALSE. Indicates whether all files of resolution 1 and method none should be saved (FALSE by default)
 
 Logs:
 	all job logs are located in the logs/ directory. Name structure is %script_name%.o%job_id%.%task_id%

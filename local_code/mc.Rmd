@@ -4,8 +4,10 @@ output: html_notebook
 ---
 
 ```{r}
-project <- "mc_other"
-task.id <- 0
+project <- "mc_tm"
+task.id <- 40
+source("../scripts/readers.R")
+source("../scripts/mc_functions.R")
 source("local_settings.R")
 ```
 

@@ -228,99 +228,100 @@ summary {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJvamVjdCA8LSBcIm1jX3RtXCJcbnRhc2suaWQgPC0gOVxuc291cmNlKFwiLi4vc2NyaXB0cy9tY19mdW5jdGlvbnMuUlwiKVxuc291cmNlKFwiLi4vc2NyaXB0cy9mY19wbG90cy5SXCIpXG5zb3VyY2UoXCIuLi9zY3JpcHRzL3JlYWRlcnMuUlwiKVxuc291cmNlKFwibG9jYWxfc2V0dGluZ3MuUlwiKVxuYGBgIn0= -->
-<pre class="r"><code>project &lt;- &quot;mc_tm&quot;
-task.id &lt;- 9
-source(&quot;../scripts/mc_functions.R&quot;)
-source(&quot;../scripts/fc_plots.R&quot;)
-source(&quot;../scripts/readers.R&quot;)
-source(&quot;local_settings.R&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucHJvamVjdCA8LSBcXG1jX3RtXFxcbnRhc2suaWQgPC0gOVxuc291cmNlKFxcLi4vc2NyaXB0cy9tY19mdW5jdGlvbnMuUlxcKVxuc291cmNlKFxcLi4vc2NyaXB0cy9mY19wbG90cy5SXFwpXG5zb3VyY2UoXFwuLi9zY3JpcHRzL3JlYWRlcnMuUlxcKVxuc291cmNlKFxcbG9jYWxfc2V0dGluZ3MuUlxcKVxuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r project &lt;- _tm<br />
+task.id &lt;- 9 source(../scripts/mc_functions.R) source(../scripts/fc_plots.R) source(../scripts/readers.R) source(_settings.R)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGlzcyA8LSBBdXRvUmVhZGVyKHByb2plY3QsIDMsIDEwMCwgdGFza3MucGVyLnRpc3MpXG5cbmBgYCJ9 -->
-<pre class="r"><code>tiss &lt;- AutoReader(project, 3, 100, tasks.per.tiss)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxudGlzcyA8LSBBdXRvUmVhZGVyKHByb2plY3QsIDMsIDEwMCwgdGFza3MucGVyLnRpc3MpXG5cbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r tiss &lt;- AutoReader(project, 3, 100, tasks.per.tiss)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBEYXRhIC0gZGF0YXNldDogbWNfdG0gbWluLmNlbGxzOiAzIG1pbi5mZWF0dXJlczogMTAwXG4ifQ== -->
 <pre><code>Reading Data - dataset: mc_tm min.cells: 3 min.features: 100</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFza3MucGVyLnJlcyA8LSB0YXNrcy5wZXIudGlzcyAlLyUgMiAjaG93IG1hbnkgZGlmZmVyZW50IG1ldGhvZHMgcGVyIG9uZSByZXNvbHV0aW9uXG5yZXMgPDwtIDAuNSAqICgxICsgKHRhc2suaWQgJSUgdGFza3MucGVyLnRpc3MpICUvJSB0YXNrcy5wZXIucmVzKSAjY2x1c3RlcmluZyByZXNvbHV0aW9uXG5taXRvLmN1dG9mZiA8PC0gc3dpdGNoKHRhc2suaWQgJSUgdGFza3MucGVyLnJlcyArIDEsIDEwMCwgODApICNjdXRvZmYgZm9yIHBlcmNlbnQgbWl0b1xub2JqIDwtIHN1YnNldChvYmosIHBlcmNlbnQubXQgPD0gbWl0by5jdXRvZmYpICNzdWJzZXQgbWl0byBnZW5lc1xuYGBgIn0= -->
-<pre class="r"><code>tasks.per.res &lt;- tasks.per.tiss %/% 2 #how many different methods per one resolution
-res &lt;&lt;- 0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
-mito.cutoff &lt;&lt;- switch(task.id %% tasks.per.res + 1, 100, 80) #cutoff for percent mito
-obj &lt;- subset(obj, percent.mt &lt;= mito.cutoff) #subset mito genes</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxudGFza3MucGVyLnJlcyA8LSB0YXNrcy5wZXIudGlzcyAlLyUgMiAjaG93IG1hbnkgZGlmZmVyZW50IG1ldGhvZHMgcGVyIG9uZSByZXNvbHV0aW9uXG5yZXMgPDwtIDAuNSAqICgxICsgKHRhc2suaWQgJSUgdGFza3MucGVyLnRpc3MpICUvJSB0YXNrcy5wZXIucmVzKSAjY2x1c3RlcmluZyByZXNvbHV0aW9uXG5taXRvLmN1dG9mZiA8PC0gc3dpdGNoKHRhc2suaWQgJSUgdGFza3MucGVyLnJlcyArIDEsIDEwMCwgODApICNjdXRvZmYgZm9yIHBlcmNlbnQgbWl0b1xub2JqIDwtIHN1YnNldChvYmosIHBlcmNlbnQubXQgPD0gbWl0by5jdXRvZmYpICNzdWJzZXQgbWl0byBnZW5lc1xuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r tasks.per.res &lt;- tasks.per.tiss %/% 2 #how many different methods per one resolution res &lt;&lt;- 0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution mito.cutoff &lt;&lt;- switch(task.id %% tasks.per.res + 1, 100, 80) #cutoff for percent mito obj &lt;- subset(obj, percent.mt &lt;= mito.cutoff) #subset mito genes</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gc3Vic2V0KG9iaiwgcGVyY2VudC5tdCA8PSBtaXRvLmN1dG9mZikgOiBvYmplY3QgJ29iaicgbm90IGZvdW5kXG4ifQ== -->
 <pre><code>Error in subset(obj, percent.mt &lt;= mito.cutoff) : object 'obj' not found</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVzc2FnZShwYXN0ZShcIlN0YXJ0aW5nIHRhc2suaWQ6XCIsIHRhc2suaWQsIFwiLSB0aXNzdWU6XCIsIHRpc3N1ZSwgXCJyZXM6XCIsIHJlcywgXCJtaXRvLmN1dG9mZlwiLCBtaXRvLmN1dG9mZiwgXCJwcm9qZWN0OlwiLCBwcm9qZWN0KSlcbmBgYCJ9 -->
-<pre class="r"><code>message(paste(&quot;Starting task.id:&quot;, task.id, &quot;- tissue:&quot;, tissue, &quot;res:&quot;, res, &quot;mito.cutoff&quot;, mito.cutoff, &quot;project:&quot;, project))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubWVzc2FnZShwYXN0ZShcXFN0YXJ0aW5nIHRhc2suaWQ6XFwsIHRhc2suaWQsIFxcLSB0aXNzdWU6XFwsIHRpc3N1ZSwgXFxyZXM6XFwsIHJlcywgXFxtaXRvLmN1dG9mZlxcLCBtaXRvLmN1dG9mZiwgXFxwcm9qZWN0OlxcLCBwcm9qZWN0KSlcbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r message(paste(task.id:, task.id, - tissue:, tissue, :, res, .cutoff, mito.cutoff, :, project))</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiU3RhcnRpbmcgdGFzay5pZDogOSAtIHRpc3N1ZTogS2lkbmV5IHJlczogMC41IG1pdG8uY3V0b2ZmIDgwIHByb2plY3Q6IG1jX3RtXG4ifQ== -->
 <pre><code>Starting task.id: 9 - tissue: Kidney res: 0.5 mito.cutoff 80 project: mc_tm</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlLmRpciA8PC0gcGFzdGUwKHNvdXJjZS5kaXIsIHByb2plY3QsIFwiL1wiLCB0aXNzdWUsIFwiL1wiKSAjZGlyZWN0b3J5IHdoZXJlIGNzdiB3aXRoIGZpbHRlcmVkIGNlbGxzIGFyZSBsb2NhdGVkXG5vdXRwdXQuZGlyIDw8LSBwYXN0ZTAob3V0LmRpciwgXCJvdXRwdXQvXCIsIHByb2plY3QsIFwiL1wiLCB0aXNzdWUsIFwiL2ZpbHRlcmVkX2NlbGxzX3Bsb3RzL1wiKSAjZGlyZWN0b3J5IHdoZXJlIG91dHB1dCB3aWxsIGdvXG5gYGAifQ== -->
-<pre class="r"><code>source.dir &lt;&lt;- paste0(source.dir, project, &quot;/&quot;, tissue, &quot;/&quot;) #directory where csv with filtered cells are located
-output.dir &lt;&lt;- paste0(out.dir, &quot;output/&quot;, project, &quot;/&quot;, tissue, &quot;/filtered_cells_plots/&quot;) #directory where output will go</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc291cmNlLmRpciA8PC0gcGFzdGUwKHNvdXJjZS5kaXIsIHByb2plY3QsIFxcL1xcLCB0aXNzdWUsIFxcL1xcKSAjZGlyZWN0b3J5IHdoZXJlIGNzdiB3aXRoIGZpbHRlcmVkIGNlbGxzIGFyZSBsb2NhdGVkXG5vdXRwdXQuZGlyIDw8LSBwYXN0ZTAob3V0LmRpciwgXFxvdXRwdXQvXFwsIHByb2plY3QsIFxcL1xcLCB0aXNzdWUsIFxcL2ZpbHRlcmVkX2NlbGxzX3Bsb3RzL1xcKSAjZGlyZWN0b3J5IHdoZXJlIG91dHB1dCB3aWxsIGdvXG5gYGBcbmBgYCJ9 -->
+<p><code>r</code>r source.dir &lt;&lt;- paste0(source.dir, project, /, tissue, /) #directory where csv with filtered cells are located output.dir &lt;&lt;- paste0(out.dir, /, project, /, tissue, /filtered_cells_plots/) #directory where output will go</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gcGFzdGUwKG91dC5kaXIsIFwib3V0cHV0L1wiLCBwcm9qZWN0LCBcIi9cIiwgdGlzc3VlLCBcIi9maWx0ZXJlZF9jZWxsc19wbG90cy9cIikgOiBcbiAgb2JqZWN0ICdvdXQuZGlyJyBub3QgZm91bmRcbiJ9 -->
-<pre><code>Error in paste0(out.dir, &quot;output/&quot;, project, &quot;/&quot;, tissue, &quot;/filtered_cells_plots/&quot;) : 
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gcGFzdGUwKG91dC5kaXIsIFxcb3V0cHV0L1xcLCBwcm9qZWN0LCBcXC9cXCwgdGlzc3VlLCBcXC9maWx0ZXJlZF9jZWxsc19wbG90cy9cXCkgOiBcbiAgb2JqZWN0ICdvdXQuZGlyJyBub3QgZm91bmRcbiJ9 -->
+<pre><code>Error in paste0(out.dir, \output/\, project, \/\, tissue, \/filtered_cells_plots/\) : 
   object 'out.dir' not found</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlyLmNyZWF0ZShvdXRwdXQuZGlyLCBzaG93V2FybmluZ3M9RkFMU0UpXG5vYmogPC0gcmVhZEZpbHRlckNzdihvYmopICNhZGQgY2VsbCBjYXRlZ29yaWVzXG5gYGAifQ== -->
-<pre class="r"><code>dir.create(output.dir, showWarnings=FALSE)
-obj &lt;- readFilterCsv(obj) #add cell categories</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZGlyLmNyZWF0ZShvdXRwdXQuZGlyLCBzaG93V2FybmluZ3M9RkFMU0UpXG5vYmogPC0gcmVhZEZpbHRlckNzdihvYmopICNhZGQgY2VsbCBjYXRlZ29yaWVzXG5gYGBcbmBgYCJ9 -->
+<p><code>r</code>r dir.create(output.dir, showWarnings=FALSE) obj &lt;- readFilterCsv(obj) #add cell categories</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBGaWx0ZXJlZCBDZWxsc1xuRXJyb3IgaW4gaXMuZGF0YS5mcmFtZSh4KSA6IG9iamVjdCAnb2JqJyBub3QgZm91bmRcbiJ9 -->
 <pre><code>Reading Filtered Cells
 Error in is.data.frame(x) : object 'obj' not found</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG1wIDwtIGNsdXN0ZXJpemUob2JqLCByZXMsIGNvbXB1dGUucmVkdWN0aW9ucz1UUlVFLCBjb21wdXRlLm1hcmtlcnMgPSBUUlVFKSAjY2x1c3RlciBjZWxsc1xuYGBgIn0= -->
-<pre class="r"><code>tmp &lt;- clusterize(obj, res, compute.reductions=TRUE, compute.markers = TRUE) #cluster cells</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxudG1wIDwtIGNsdXN0ZXJpemUob2JqLCByZXMsIGNvbXB1dGUucmVkdWN0aW9ucz1UUlVFLCBjb21wdXRlLm1hcmtlcnMgPSBUUlVFKSAjY2x1c3RlciBjZWxsc1xuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r tmp &lt;- clusterize(obj, res, compute.reductions=TRUE, compute.markers = TRUE) #cluster cells</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gTm9ybWFsaXplRGF0YShvYmosIG5vcm1hbGl6YXRpb24ubWV0aG9kID0gXCJMb2dOb3JtYWxpemVcIiwgc2NhbGUuZmFjdG9yID0gMTAwMDApIDogXG4gIG9iamVjdCAnb2JqJyBub3QgZm91bmRcbiJ9 -->
-<pre><code>Error in NormalizeData(obj, normalization.method = &quot;LogNormalize&quot;, scale.factor = 10000) : 
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gTm9ybWFsaXplRGF0YShvYmosIG5vcm1hbGl6YXRpb24ubWV0aG9kID0gXFxMb2dOb3JtYWxpemVcXCwgc2NhbGUuZmFjdG9yID0gMTAwMDApIDogXG4gIG9iamVjdCAnb2JqJyBub3QgZm91bmRcbiJ9 -->
+<pre><code>Error in NormalizeData(obj, normalization.method = \LogNormalize\, scale.factor = 10000) : 
   object 'obj' not found</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3VucGFjayByZXR1cm5lZCBvYmplY3RcbiAgb2JqIDwtIHRtcCRvYmpcbmBgYCJ9 -->
-<pre class="r"><code>#unpack returned object
-  obj &lt;- tmp$obj</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI3VucGFjayByZXR1cm5lZCBvYmplY3RcbiAgb2JqIDwtIHRtcCRvYmpcbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r #unpack returned object obj &lt;- tmp$obj</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IG9iamVjdCAndG1wJyBub3QgZm91bmRcbiJ9 -->
 <pre><code>Error: object 'tmp' not found</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxub2JqLm1hcmtlcnMgPC0gdG1wJG1hcmtlcnNcbmBgYCJ9 -->
-<pre class="r"><code>obj.markers &lt;- tmp$markers</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxub2JqLm1hcmtlcnMgPC0gdG1wJG1hcmtlcnNcbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r obj.markers &lt;- tmp$markers</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IG9iamVjdCAndG1wJyBub3QgZm91bmRcbiJ9 -->
 <pre><code>Error: object 'tmp' not found</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVzdWx0cyA8LSBhc3NpZ25DZWxsVHlwZXMob2JqLCBvYmoubWFya2VycywgZ2V0QW5ub3RhdGlvbnMob2JqKSlcbmBgYCJ9 -->
-<pre class="r"><code>results &lt;- assignCellTypes(obj, obj.markers, getAnnotations(obj))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucmVzdWx0cyA8LSBhc3NpZ25DZWxsVHlwZXMob2JqLCBvYmoubWFya2VycywgZ2V0QW5ub3RhdGlvbnMob2JqKSlcbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r results &lt;- assignCellTypes(obj, obj.markers, getAnnotations(obj))</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiQXNzaWduaW5nIENlbGwgVHlwZXNcbkVycm9yIGluIGV2YWwobGhzLCBwYXJlbnQsIHBhcmVudCkgOiBvYmplY3QgJ29iai5tYXJrZXJzJyBub3QgZm91bmRcbiJ9 -->
 <pre><code>Assigning Cell Types
 Error in eval(lhs, parent, parent) : object 'obj.markers' not found</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2VuZXJhdGVGQ1Bsb3RzKG9iaiwgcmVzdWx0cykgI21ha2UgcGxvdHNcbmBgYCJ9 -->
-<pre class="r"><code>generateFCPlots(obj, results) #make plots</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZ2VuZXJhdGVGQ1Bsb3RzKG9iaiwgcmVzdWx0cykgI21ha2UgcGxvdHNcbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r generateFCPlots(obj, results) #make plots</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiTWFraW5nIEZDIFBsb3RzXG5FcnJvciBpbiBnZW5lcmF0ZUZDUGxvdHMob2JqLCByZXN1bHRzKSA6IG9iamVjdCAncmVzdWx0cycgbm90IGZvdW5kXG4ifQ== -->
 <pre><code>Making FC Plots
 Error in generateFCPlots(obj, results) : object 'results' not found</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVzc2FnZShwYXN0ZShcIkZpbmlzaGVkIHRhc2suaWQ6XCIsIHRhc2suaWQsIFwiLSB0aXNzdWU6XCIsIHRpc3N1ZSwgXCJyZXM6XCIsIHJlcywgXCJtaXRvLmN1dG9mZlwiLCBtaXRvLmN1dG9mZiwgXCJwcm9qZWN0OlwiLCBwcm9qZWN0KSlcbmBgYCJ9 -->
-<pre class="r"><code>message(paste(&quot;Finished task.id:&quot;, task.id, &quot;- tissue:&quot;, tissue, &quot;res:&quot;, res, &quot;mito.cutoff&quot;, mito.cutoff, &quot;project:&quot;, project))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubWVzc2FnZShwYXN0ZShcXEZpbmlzaGVkIHRhc2suaWQ6XFwsIHRhc2suaWQsIFxcLSB0aXNzdWU6XFwsIHRpc3N1ZSwgXFxyZXM6XFwsIHJlcywgXFxtaXRvLmN1dG9mZlxcLCBtaXRvLmN1dG9mZiwgXFxwcm9qZWN0OlxcLCBwcm9qZWN0KSlcbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r message(paste(task.id:, task.id, - tissue:, tissue, :, res, .cutoff, mito.cutoff, :, project))</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiRmluaXNoZWQgdGFzay5pZDogOSAtIHRpc3N1ZTogS2lkbmV5IHJlczogMC41IG1pdG8uY3V0b2ZmIDgwIHByb2plY3Q6IG1jX3RtXG4ifQ== -->
 <pre><code>Finished task.id: 9 - tissue: Kidney res: 0.5 mito.cutoff 80 project: mc_tm</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CnByb2plY3QgPC0gIm1jX3RtIgp0YXNrLmlkIDwtIDkKc291cmNlKCJsb2NhbF9zZXR0aW5ncy5SIikKYGBgCgpgYGB7cn0KdGlzcyA8LSBBdXRvUmVhZGVyKHByb2plY3QsIGNlbGxzLmZpbHRlciwgZmVhdHVyZXMuZmlsdGVyLCB0YXNrcy5wZXIudGlzcykKb2JqIDwtIEZDUGxvdHNNYWluKG9iaiA9IHRpc3MpCmBgYA==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CnByb2plY3QgPC0gIm1jX3RtIgp0YXNrLmlkIDwtIDkKc291cmNlKCIuLi9zY3JpcHRzL3JlYWRlcnMuUiIpCnNvdXJjZSgiLi4vc2NyaXB0cy9tY19mdW5jdGlvbnMuUiIpCnNvdXJjZSgiLi4vc2NyaXB0cy9mY19wbG90cy5SIikKc291cmNlKCJsb2NhbF9zZXR0aW5ncy5SIikKYGBgCgpgYGB7cn0KdGlzcyA8LSBBdXRvUmVhZGVyKHByb2plY3QsIGNlbGxzLmZpbHRlciwgZmVhdHVyZXMuZmlsdGVyLCB0YXNrcy5wZXIudGlzcykKb2JqIDwtIEZDUGxvdHNNYWluKG9iaiA9IHRpc3MpCmBgYA==</div>
 
 
 

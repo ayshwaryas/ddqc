@@ -33,11 +33,11 @@ readFilterCsv <- function(obj) {
 
 
 #function that makes filtered cells plots
-generateFCPlots <- function(obj, results) {
+generateFCPlots <- function(obj, clusters) {
   message("Making FC Plots")
   lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
-  for (i in 1:length(results$cell.type)) {
-    lbls <- c(lbls, paste0((i - 1), " ", results$cell.type[i], "\n", results$annotation[i]))
+  for (i in 1:length(clusters$cell.type)) {
+    lbls <- c(lbls, paste0((i - 1), " ", clusters$cell.type[i], "\n", clusters$annotation[i]))
   }
   names(lbls) <- 0:(length(lbls) - 1)  #rename labels with cluster #
   
@@ -101,9 +101,9 @@ FCPlotsMain <- function(obj) {
   #unpack returned object
   obj <- tmp$obj
   obj.markers <- tmp$markers
-  results <- assignCellTypes(obj, obj.markers, getAnnotations(obj))
+  clusters <- assignCellTypes(obj, obj.markers, getAnnotations(obj))
   
-  generateFCPlots(obj, results) #make plots
+  generateFCPlots(obj, clusters) #make plots
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
   return(obj)
 }
