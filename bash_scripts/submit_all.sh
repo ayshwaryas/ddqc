@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ~
+cd ~/method_comparison
 bash_scripts/scheduler.sh mc+mc_plot ebi
 bash_scripts/scheduler.sh mc+mc_plot mca
 bash_scripts/scheduler.sh mc+mc_plot tm

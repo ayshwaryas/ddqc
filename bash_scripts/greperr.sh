@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ~/method_comparison
+
 while getopts j: option
 do
 case "${option}"
@@ -8,5 +10,5 @@ j) JOB=${OPTARG};;
 esac
 done
 
-grep -rn "Error*" ~/logs/*.o$JOB* 
+grep -rn "Error*" logs/*.o$JOB* 
 
