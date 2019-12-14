@@ -1,0 +1,10 @@
+.idea
+output
+.Rproj.user
+.DS_Store
+.RHistory
+.Rapp.history
+old_code
+.Rproj
+__pycache__
+

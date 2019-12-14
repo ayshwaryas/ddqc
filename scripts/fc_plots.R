@@ -1,0 +1,110 @@
+tasks.per.tiss <<- 4 #How many different res/methods per one tissue
+
+
+#function which reads data about filtered cells and categorizes them
+readFilterCsv <- function(obj) {
+  message("Reading Filtered Cells")
+  all.cells = colnames(obj$RNA)
+  cutoff10 <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-cutoff-10/!filtered.csv"))[["cell"]]))}, 
+                       error = function(e) {warning("Cutoff10 filtered cells not found") 
+                        return(all.cells)})
+  zscore2 <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-z_score-2/!filtered.csv"))[["cell"]]))}, 
+                      error = function(e) {warning("Zscore2 filtered cells not found") 
+                        return(all.cells)})
+  MAD <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-mad-2/!filtered.csv"))[["cell"]]))}, 
+                      error = function(e) {warning("MAD filtered cells not found") 
+                        return(all.cells)})
+  
+  #categorize cells
+  color <- list()
+  color[all.cells] <- "Did not pass"
+  color[MAD] <- "MAD only"
+  color[cutoff10] <- "C10 only"
+  color[zscore2] <- "ZSC2 only"
+  color[intersect(MAD, cutoff10)] <- "MAD and C10"
+  color[intersect(MAD, zscore2)] <- "MAD and ZSC2"
+  color[intersect(zscore2, cutoff10)] <- "ZSC2 and C10"
+  color[intersect(MAD, intersect(cutoff10, zscore2))] <- "All"
+  obj[["color"]] <- factor(as.character(color))
+  
+  obj <- obj[,color != "Did not pass"] #filter out cells that did not pass any qc method
+  return(obj)
+}
+
+
+#function that makes filtered cells plots
+generateFCPlots <- function(obj, results) {
+  message("Making FC Plots")
+  lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
+  for (i in 1:length(results$cell.type)) {
+    lbls <- c(lbls, paste0((i - 1), " ", results$cell.type[i], "\n", results$annotation[i]))
+  }
+  names(lbls) <- 0:(length(lbls) - 1)  #rename labels with cluster #
+  
+  #extract UMAP coordinates for plotting
+  cells <- colnames(obj)
+  data <- as.data.frame(Embeddings(obj$umap)[cells, c(1, 2)])
+  data <- data.frame(UMAP_1 = data$UMAP_1, UMAP_2 = data$UMAP_2, cluster = obj$seurat_clusters, color=obj$color, annotation=obj$annotations)
+  
+  t1 <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
+  t2 <- guides(colour = guide_legend(override.aes = list(size=2)))
+  plot.cols <- c("C10 only" = "#D55E00", "MAD and C10" = "#E69F00", "ZSC2 and C10" = "#CC79A7", "MAD only" = "#56B4E9",
+                 "ZSC2 only" = "#0072B2", "MAD and ZSC2" = "#009E73", "All" = "#999999" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
+  
+  plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color)) + geom_point(size = 0.5) + t1 + t2 + scale_fill_manual(values = plot.cols) + scale_color_manual(values = plot.cols) #umap colored by filtering category
+  plot2 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=cluster)) + geom_point(size = 0.5) + t1 + t2 #umap colored by cluster
+  for (cl in levels(obj$seurat_clusters)) { #add labels to plots
+    cluster.umap <- subset(data, cluster == cl)
+    plot1 <- plot1 + annotate("text", x = mean(cluster.umap$UMAP_1), y = mean(cluster.umap$UMAP_2), label = lbls[(as.numeric(cl) + 1)], size = 3, fontface=2)
+    plot2 <- plot2 + annotate("text", x = mean(cluster.umap$UMAP_1), y = mean(cluster.umap$UMAP_2), label = lbls[(as.numeric(cl) + 1)], size = 3, fontface=2)
+  }
+  
+  #create barplot which shows category distribution
+  table.color <- NULL
+  table.cluster <- NULL
+  table.freq <- NULL
+  for (cl in unique(data$cluster)) {
+    data.cluster <- subset(data, cluster == cl)
+    table.tmp <- as.data.frame(table(data.frame(color=factor(data.cluster$color), cluster = as.character(data.cluster$cluster))))
+    table.tmp$Freq <- table.tmp$Freq / sum(table.tmp$Freq)
+    table.color <- c(table.color, as.character(table.tmp$color))
+    table.cluster <- c(table.cluster, as.integer(as.character(table.tmp$cluster)))
+    table.freq <- c(table.freq, as.character(table.tmp$Freq))
+  }
+  data1 <- data.frame(color=table.color, cluster = as.factor(table.cluster), freq=as.double(as.character(table.freq)) * 100)
+  
+  plot3 <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + 
+    scale_fill_manual(values = plot.cols) + scale_x_discrete(labels=lbls) + theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"),  axis.title.x=element_blank())
+  
+  #write plots
+  ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-filterplot.pdf"), plot=plot1)
+  ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-clusterplot.pdf"), plot=plot2)
+  ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-barplot.pdf"), plot=plot3)
+}
+
+
+#main function
+FCPlotsMain <- function(obj) {
+  tasks.per.res <- tasks.per.tiss %/% 2 #how many different methods per one resolution
+  res <<- 0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
+  mito.cutoff <<- switch(task.id %% tasks.per.res + 1, 100, 80) #cutoff for percent mito
+  obj <- subset(obj, percent.mt <= mito.cutoff) #subset mito genes
+  message(paste("Starting task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
+  
+  source.dir <<- paste0(source.dir, project, "/", tissue, "/") #directory where csv with filtered cells are located
+  results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/") #directory where output will go
+  dir.create(results.dir, showWarnings=FALSE)
+  
+  obj <- readFilterCsv(obj) #add cell categories
+  
+  tmp <- clusterize(obj, res, compute.reductions=TRUE, compute.markers = TRUE) #cluster cells
+  #unpack returned object
+  obj <- tmp$obj
+  obj.markers <- tmp$markers
+  results <- assignCellTypes(obj, obj.markers, getAnnotations(obj))
+  
+  generateFCPlots(obj, results) #make plots
+  message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
+  return(obj)
+}
+
