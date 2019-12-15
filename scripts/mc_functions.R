@@ -402,7 +402,7 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, filen
 }
 
 
-saveResults <- function(obj, clusters) {
+saveResults <- function(obj, clusters, obj.markers, sm) {
   if (res == 0.5 && method == "none") { 
     message("Recording Additional Stats")
     #record all cells with QC stats into csv for summary plots
@@ -478,8 +478,8 @@ MCMain <- function(obj) {
   
   tmp <- clusterize(obj, res, compute.reductions = TRUE, compute.markers = TRUE) #cluster cells
   #unpack returned object
-  obj <- tmp$obj
-  obj.markers <- tmp$markers
+  obj <<- tmp$obj
+  obj.markers <<- tmp$markers
   
   obj <- addCDScores(obj)
   
@@ -492,7 +492,7 @@ MCMain <- function(obj) {
   generatePlots(obj, paste0(tissue, "_", filename), clusters$cell.type, clusters$annotation) #make plots
   #generateMarkerPlots(obj, filename)
   
-  saveResults(obj, clusters)
+  saveResults(obj, clusters, obj.markers, sm)
   
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mehtod:", method, "param:", param, "project:", project))
   return(obj)

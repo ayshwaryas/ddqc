@@ -1,4 +1,4 @@
-project <<- Sys.getenv("R_PROJECT")
+project <<- commandArgs(trailingOnly = TRUE)[1]
 task.id <<- as.numeric(Sys.getenv("SGE_TASK_ID")) - 1
 source("scripts/readers.R")
 source("scripts/mc_functions.R")
