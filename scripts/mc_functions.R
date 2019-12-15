@@ -446,7 +446,7 @@ check.save <- function() {
 
 
 #main function
-MCMain <- function(obj) {
+MCMain <- function() {
   tasks.per.res <- tasks.per.tiss %/% 2 #how many different methods per one resolution
   res <<- 0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
   method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "z_score", "cutoff", "cutoff", "outlier", "percentile", "mad") #filtering method
@@ -467,33 +467,32 @@ MCMain <- function(obj) {
   
   message("Filtering Cells")
   if (method == "outlier" || method == "percentile" || method == "mad") {
-    obj <- medianFilter(obj, res, method, param)
+    tiss <<- medianFilter(tiss, res, method, param)
   } 
   if (method == "z_score") {
-    obj <- zScoreFilter(obj, res, param)
+    tiss <<- zScoreFilter(tiss, res, param)
   } 
   if (method == "cutoff") {
-    obj <- cutoffFilter(obj, param)
+    tiss <<- cutoffFilter(tiss, param)
   }
   
-  tmp <- clusterize(obj, res, compute.reductions = TRUE, compute.markers = TRUE) #cluster cells
+  tmp <- clusterize(tiss, res, compute.reductions = TRUE, compute.markers = TRUE) #cluster cells
   #unpack returned object
-  obj <<- tmp$obj
+  tiss <<- tmp$obj
   obj.markers <<- tmp$markers
   
-  obj <- addCDScores(obj)
+  tiss <<- addCDScores(tiss)
   
-  tmp <- assignCellTypes(obj, obj.markers, getAnnotations(obj), record.stats = TRUE, paste0(tissue, "-", filename)) #assign cell types
+  tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss), record.stats = TRUE, paste0(tissue, "-", filename)) #assign cell types
   #unpack returned object
-  clusters <- tmp$clusters
+  clusters <<- tmp$clusters
   sm <- tmp$sm
-  obj.markers <- tmp$markers
+  obj.markers <<- tmp$markers
   
-  generatePlots(obj, paste0(tissue, "_", filename), clusters$cell.type, clusters$annotation) #make plots
+  generatePlots(tiss, paste0(tissue, "_", filename), clusters$cell.type, clusters$annotation) #make plots
   #generateMarkerPlots(obj, filename)
   
-  saveResults(obj, clusters, obj.markers, sm)
+  saveResults(tiss, clusters, obj.markers, sm)
   
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mehtod:", method, "param:", param, "project:", project))
-  return(obj)
 }

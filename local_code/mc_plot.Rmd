@@ -14,5 +14,5 @@ source("local_settings.R")
 
 ```{r}
 tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
-obj <- FCPlotsMain(obj = tiss)
+obj <- FCPlotsMain()
 ```

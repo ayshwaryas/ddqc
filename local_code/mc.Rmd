@@ -15,5 +15,5 @@ source("local_settings.R")
 
 ```{r}
 tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
-obj <- MCMain(obj = tiss)
+MCMain()
 ```

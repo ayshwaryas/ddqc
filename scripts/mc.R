@@ -5,4 +5,4 @@ source("scripts/mc_functions.R")
 source("scripts/settings.R")
 
 tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
-MCMain(tiss)
+MCMain()

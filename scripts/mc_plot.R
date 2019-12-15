@@ -6,4 +6,4 @@ source("scripts/fc_plots.R")
 source("scripts/settings.R")
 
 tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
-FCPlotsMain(tiss)
+FCPlotsMain()

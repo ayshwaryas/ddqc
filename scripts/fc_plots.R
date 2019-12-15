@@ -84,27 +84,26 @@ generateFCPlots <- function(obj, clusters) {
 
 
 #main function
-FCPlotsMain <- function(obj) {
+FCPlotsMain <- function() {
   tasks.per.res <- tasks.per.tiss %/% 2 #how many different methods per one resolution
   res <<- 0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
   mito.cutoff <<- switch(task.id %% tasks.per.res + 1, 100, 80) #cutoff for percent mito
-  obj <- subset(obj, percent.mt <= mito.cutoff) #subset mito genes
+  tiss <<- subset(tiss, percent.mt <= mito.cutoff) #subset mito genes
   message(paste("Starting task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
   
   source.dir <<- paste0(source.dir, project, "/", tissue, "/") #directory where csv with filtered cells are located
   results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/") #directory where output will go
   dir.create(results.dir, showWarnings=FALSE)
   
-  obj <- readFilterCsv(obj) #add cell categories
+  tiss <<- readFilterCsv(tiss) #add cell categories
   
-  tmp <- clusterize(obj, res, compute.reductions=TRUE, compute.markers = TRUE) #cluster cells
+  tmp <- clusterize(tiss, res, compute.reductions=TRUE, compute.markers = TRUE) #cluster cells
   #unpack returned object
-  obj <- tmp$obj
-  obj.markers <- tmp$markers
-  clusters <- assignCellTypes(obj, obj.markers, getAnnotations(obj))
+  tiss <<- tmp$obj
+  obj.markers <<- tmp$markers
+  clusters <<- assignCellTypes(tiss, obj.markers, getAnnotations(tiss))
   
-  generateFCPlots(obj, clusters) #make plots
+  generateFCPlots(tiss, clusters) #make plots
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
-  return(obj)
 }
 
