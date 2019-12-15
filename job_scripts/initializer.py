@@ -5,7 +5,10 @@ from time import gmtime, strftime
 
 
 def submit_command():
-    command = (COMMAND_PREFIX + SCRIPT_PATH[script] + " {}").format(max_task_id, script + "_" + tissue, " ".join(args), project)
+    param = SCRIPT_PARAMETERS[script]
+    command = (COMMAND_PREFIX ).format(max_task_id, param[0], 
+        param[1], param[1], script + "_" + tissue, " ".join(args), 
+        param[2], project)
     print(command)
     result = subprocess.check_output(command, shell=True).decode('UTF-8')
     print(result)
@@ -23,14 +26,17 @@ TISSUE_COUNT = {
     "ts30": 10,
     "other": 7,
 }
-SCRIPT_PATH = {
-    "mc": "job_scripts/mc_init.sh",
-    "mc_plot": "job_scripts/mc_plot_init.sh"
+
+SCRIPT_PARAMETERS = {
+    "mc": [32, 4, "scripts/mc.R"],
+    "mc_plot": [32, 4, "scripts/mc_plot.R"]
 }
 
 TASKS_PER_TISS_MC = 16
 TASKS_PER_TISS_MC_PLOT = 4
-COMMAND_PREFIX = "qsub -t 1-{} -N {} {} "
+dir_path = os.path.dirname(os.path.realpath(__file__))
+COMMAND_PREFIX = "qsub -t 1-{} -l h_vmem={}G -pe smp {} -binding linear:{} -l h_rt=12:00:00 -j y -o logs/ -N {} job_scripts/init.sh " + dir_path + " {} {}"
+
 
 script = sys.argv[1]
 tissue = sys.argv[2]
