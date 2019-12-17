@@ -68,7 +68,7 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   
   data <- data.frame(metric=obj[[metric.name.seurat]], clusters=obj$seurat_clusters) 
   colnames(data) <- c("metric", "clusters") #rename data columns
-  data$clusters = with(data, reorder(clusters, -metric, median)) #order data by cluster mean
+  data$clusters = with(data, reorder(clusters, -metric, median)) #order data by cluster median
   
   #all plots except combined density and tsne/umap are saved in to vesions: no trasformation and log2, if save.log2 is true
   

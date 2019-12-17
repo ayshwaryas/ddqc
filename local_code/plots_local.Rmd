@@ -1,0 +1,12 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+source("plots.R")
+generatePlotsInit()
+```
+
+
