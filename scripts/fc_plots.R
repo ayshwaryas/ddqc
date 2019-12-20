@@ -11,20 +11,20 @@ readFilterCsv <- function(obj) {
   zscore2 <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-z_score-2/!filtered.csv"))[["cell"]]))}, 
                       error = function(e) {warning("Zscore2 filtered cells not found") 
                         return(all.cells)})
-  MAD <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-mad-2/!filtered.csv"))[["cell"]]))}, 
-                      error = function(e) {warning("MAD filtered cells not found") 
+  outlier <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-outlier-0/!filtered.csv"))[["cell"]]))}, 
+                      error = function(e) {warning("Outlier filtered cells not found") 
                         return(all.cells)})
   
   #categorize cells
   color <- list()
   color[all.cells] <- "Did not pass"
-  color[MAD] <- "MAD only"
+  color[outlier] <- "Outlier only"
   color[cutoff10] <- "C10 only"
   color[zscore2] <- "ZSC2 only"
-  color[intersect(MAD, cutoff10)] <- "MAD and C10"
-  color[intersect(MAD, zscore2)] <- "MAD and ZSC2"
+  color[intersect(outlier, cutoff10)] <- "Outlier and C10"
+  color[intersect(outlier, zscore2)] <- "Outlier and ZSC2"
   color[intersect(zscore2, cutoff10)] <- "ZSC2 and C10"
-  color[intersect(MAD, intersect(cutoff10, zscore2))] <- "All"
+  color[intersect(outlier, intersect(cutoff10, zscore2))] <- "All"
   obj[["color"]] <- factor(as.character(color))
   
   obj <- obj[,color != "Did not pass"] #filter out cells that did not pass any qc method
@@ -48,8 +48,8 @@ generateFCPlots <- function(obj, clusters) {
   
   t1 <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
   t2 <- guides(colour = guide_legend(override.aes = list(size=2)))
-  plot.cols <- c("C10 only" = "#D55E00", "MAD and C10" = "#E69F00", "ZSC2 and C10" = "#CC79A7", "MAD only" = "#56B4E9",
-                 "ZSC2 only" = "#0072B2", "MAD and ZSC2" = "#009E73", "All" = "#999999" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
+  plot.cols <- c("C10 only" = "#D55E00", "Outlier and C10" = "#E69F00", "ZSC2 and C10" = "#CC79A7", "Outlier only" = "#56B4E9",
+                 "ZSC2 only" = "#0072B2", "Outlier and ZSC2" = "#009E73", "All" = "#999999" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
   
   plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color)) + geom_point(size = 0.5) + t1 + t2 + scale_fill_manual(values = plot.cols) + scale_color_manual(values = plot.cols) #umap colored by filtering category
   plot2 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=cluster)) + geom_point(size = 0.5) + t1 + t2 #umap colored by cluster
