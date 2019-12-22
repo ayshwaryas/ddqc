@@ -8,4 +8,4 @@ old_code
 *.Rproj
 *.html
 __pycache__
-
+local_code/output.csv

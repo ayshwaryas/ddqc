@@ -129,6 +129,18 @@ ReadEBI <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
+ReadEBI_TM <- function(cells, features, tasks.per.tiss) {
+  tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "Adipose", "Bladder", "Bone_Marrow", "Cerebellum", "Cerebral_Cortex", "Colon", "Diaphragm", "Fat", "Heart_and_Aorta", "Hippocampus", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland", "Pancreas", "Skin", "Spleen", "Striatum", "Thymus", "Tongue", "Trachea")
+  is.human <<- FALSE
+  data.path <<- paste0(data.dir, "ebi_tm/")
+  file <- paste0(data.path, tissue, ".rds")
+  tiss.unfiltered <- readRDS(file)
+  annotations <- tiss.unfiltered$annotations
+  tiss <- CreateSeuratObject(tiss.unfiltered$RNA@counts, min.cells=cells, min.features=features)
+  tiss[["annotations"]] <- annotations
+  return(tiss)
+}
+
 ReadOther <- function(cells, features, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "bipolar_mouse", "colon-epi_human", "colon-fib_human", "colon-imm_human", "kidney_human", "retina_human", "retina_mouse")
   is.human <<- grepl("human", tissue)
@@ -160,6 +172,9 @@ AutoReader <- function(dataset, cells, features, tasks.per.tiss) {
   }
   if (dataset == "other" || dataset == "mc_other") {
     obj <- ReadOther(cells, features, tasks.per.tiss)
+  }
+  if (dataset == "ebi_tm" || dataset=="mc_ebi_tm") {
+    obj <- ReadEBI_TM(cells, features, tasks.per.tiss)
   }
   
   obj[["percent.mt"]] <- PercentageFeatureSet(obj, features=grep("^MT-", rownames(obj$RNA), ignore.case=TRUE))

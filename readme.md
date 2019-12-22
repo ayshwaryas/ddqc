@@ -1,7 +1,6 @@
 Required languages:
 	R-3.5
-	Python3
-	Anaconda3 with umap-learn installed
+	Python3.6 with umap-learn installed
 
 Required R packages:
 	Seurat
@@ -35,7 +34,7 @@ Files in bash_scripts/ directory:
 		Usage: shceduler.sh $script $dataset **args
 			script: the script name, available options: mc (method comparison), mc_plot (filtered cells plots), mc+mc_plot(both comparison and plots, plots will be submitted with -hold_jid)
 			
-			dataset: name of the dataset, available options: ebi, mca, tm, ts24, ts30, other
+			dataset: name of the dataset, available options: ebi, ebi_tm, mca, tm, ts24, ts30, other
 			**args - any additional args passed to qsub (example -hold_jid)
 
 

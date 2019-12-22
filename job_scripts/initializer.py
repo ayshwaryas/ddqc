@@ -20,6 +20,7 @@ def submit_command():
 
 TISSUE_COUNT = {
     "ebi": 13,
+    "ebi_tm": 22,
     "mca": 24,
     "tm": 12,
     "ts24": 13,
