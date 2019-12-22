@@ -9,3 +9,4 @@ old_code
 *.html
 __pycache__
 local_code/output.csv
+local_code/plots

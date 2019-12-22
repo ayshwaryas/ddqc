@@ -66,7 +66,7 @@ generatePlots <- function(results.dir, dataset, project) {
 }
 
 generatePlotsInit <- function() {
-  for (project in c("mc_ebi", "mc_mca", "mc_tm", "mc_ts30")) {
+  for (project in c("mc_ebi", "mc_ebi_tm", "mc_mca", "mc_tm", "mc_ts30")) {
     for(mito.filter in  c(80, 100)) {
       data.path <- paste0(source.dir, project, "/stats_summary.csv")
       results.dir <- paste0(source.dir, "summary_plots/", project, "/mito-", mito.filter, "/")

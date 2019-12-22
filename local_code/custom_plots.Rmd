@@ -1,0 +1,102 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+project <- "mc_tm"
+task.id <- 186 - 16 * 5
+source("../scripts/readers.R")
+source("../scripts/mc_functions.R")
+source("local_settings.R")
+dir.path <- "~/Documents/primes_storage/results/"
+metric.key <- 2
+results.dir <- "plots/"
+```
+
+
+```{r}
+obj <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
+```
+
+```{r}
+tasks.per.res <- tasks.per.tiss %/% 2 #how many different methods per one resolution
+res <<- 0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
+method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "z_score", "cutoff", "cutoff", "outlier", "percentile", "mad") #filtering method
+param <<- switch(task.id %% tasks.per.res + 1, 0, 80, 2, 5, 10, 0, 95, 2) #filtering parameter
+```
+
+```{r}
+dir.path <- paste0(dir.path, project, "/", tissue, "/", res, "-", method, "-", param, "/")
+cells <- read.csv(paste0(dir.path, "!cells.csv"))
+clusters <- read.csv(paste0(dir.path, "!clusters.csv"))
+```
+
+```{r}
+all.cells <- colnames(obj$RNA)
+filtered <- tryCatch({as.character(read.csv(paste0(dir.path, "!filtered.csv"))[["cell"]])}, error = function(e) {return(c())})
+pass <- list()
+pass[all.cells] <- TRUE
+pass[filtered] <- FALSE
+obj[["pass"]] <- as.character(pass)
+  
+obj <- obj[,pass == TRUE] 
+```
+
+
+```{r}
+clst <- cells$cluster
+names(clst) <- cells$cell
+obj$seurat_clusters <- cells$cluster
+annotations <- clusters$annotation
+cell.types <- clusters$cell.type
+```
+
+```{r}
+lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
+for (i in 1:length(cell.types)) {
+  lbls <- c(lbls, paste0((i - 1), " ", cell.types[i], "\n", annotations[i]))
+}
+names(lbls) <- 0:(length(lbls) - 1) #rename labels with cluster #
+```
+
+```{r}
+name <- paste0(tissue, "_", res, "-", method, "-", param)
+metric <- c("nCount_RNA,Number of UMIS,count", "nFeature_RNA,Number of Genes,genes", 
+                   "percent.mt,percent.mt,mito", "percent.rb,percent.rb,ribo")[metric.key]
+metric.name.seurat <- strsplit(metric, ",")[[1]][1]
+metric.name <- strsplit(metric, ",")[[1]][2]
+name.suffix <- strsplit(metric, ",")[[1]][3]
+add.dir <- paste0(name, "_")
+
+t <- scale_x_discrete(labels=lbls)
+t1 <- scale_y_discrete(labels=lbls)
+t2 <- theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"), axis.text.y = element_text(size=10), legend.position="none", axis.title.x=element_blank())
+t3 <- ggtitle(name)
+t4 <- theme(legend.position="none")
+t5 <- facet_wrap(. ~ clusters, ncol=5, labeller = as_labeller(lbls))
+t6 <- stat_summary(fun.y=mean, geom="point", shape=23, fill="blue", size=3)
+t7 <- theme(axis.text.x = element_text(size=10), axis.text.y = element_text(size=10, face="bold"), legend.position="none", axis.title.y=element_blank())
+l1 <- labs(y=metric.name)
+l2 <- labs(y=paste0("log2(", metric.name, ")"))
+l3 <- labs(x=metric.name)
+l4 <- labs(x=paste0("log2(", metric.name, ")"))
+l5 <- labs(y=paste0("Average ", metric.name))
+l6 <- labs(y=paste0("Average log2(", metric.name, ")"))
+if (metric.name.seurat == "percent.mt") {
+  a1 <- scale_y_continuous(breaks=seq(0, 100, 5))
+  a2 <- scale_x_continuous(breaks=seq(0, 100, 5))
+} else {
+  a1 <- NULL
+  a2 <- NULL
+}
+
+data <- data.frame(metric=obj[[metric.name.seurat]], clusters=obj$seurat_clusters) 
+colnames(data) <- c("metric", "clusters") #rename data columns
+data$clusters = with(data, reorder(clusters, -metric, median)) #order data by cluster median
+```
+
+```{r}
+#boxplot by cluster
+ggsave1(filename=paste0(results.dir, add.dir, paste0("box_", name.suffix, "_log.pdf")), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + l2 + geom_hline(yintercept=log2(500), color="red", size=1)) 
+```
