@@ -8,7 +8,7 @@ library(tools)
 
 #PATHS
 data.dir <<- "/broad/hptmp/malperov/data/"
-output.dir <<- "/broad/hptmp/malperov/output/"
+output.dir <<- "/ahg/regevdata/projects/scqc/output/"
 source.dir <<- output.dir
 files.to.save.path <<- "files_to_save.txt"
 
