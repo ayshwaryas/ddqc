@@ -29,8 +29,8 @@ TISSUE_COUNT = {
 }
 
 SCRIPT_PARAMETERS = {
-    "mc": [32, 2, "scripts/mc.R"],
-    "mc_plot": [32, 2, "scripts/mc_plot.R"]
+    "mc": [64, 2, "scripts/mc.R"],
+    "mc_plot": [64, 2, "scripts/mc_plot.R"]
 }
 
 TASKS_PER_TISS_MC = 16
