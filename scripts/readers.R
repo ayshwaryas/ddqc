@@ -153,6 +153,30 @@ ReadOther <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
+ReadOther10X <- function(cells, features, tasks.per.tiss) {
+  tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "adipose", "ASD_snRNAseq", "liver", "skin")
+  is.human <<- TRUE
+  data.path <<- paste0(data.dir, "other/")
+  file <- paste0(data.path, tissue)
+  files <- list.files(path=data.path)
+  tiss <- NULL
+  if (length(files) > 1) {
+    objs <- NULL
+    filenames <- NULL
+    for (file in files) {
+      objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells, min.features = features))
+      filenames <- c(filenames, file)
+    }
+    tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
+  } else {
+    file <- files[1]
+    tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells, min.features = features)
+    tiss <- RenameCells(tiss, add.cell.id = file)
+  }
+  tiss[["annotations"]] <- "Unknown"
+  return(tiss)
+}
+
 AutoReader <- function(dataset, cells, features, tasks.per.tiss) {
   message(paste("Reading Data - dataset:", dataset, "min.cells:", cells, "min.features:", features))
   if (dataset == "tabula_muris" || dataset == "mc_tm" || dataset == "tm") {
@@ -171,6 +195,9 @@ AutoReader <- function(dataset, cells, features, tasks.per.tiss) {
     obj <- ReadEBI(cells, features, tasks.per.tiss)
   }
   if (dataset == "other" || dataset == "mc_other") {
+    obj <- ReadOther(cells, features, tasks.per.tiss)
+  }
+  if (dataset == "other_10X" || dataset == "mc_other_10X") {
     obj <- ReadOther(cells, features, tasks.per.tiss)
   }
   if (dataset == "ebi_tm" || dataset=="mc_ebi_tm") {
