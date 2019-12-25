@@ -10,3 +10,4 @@ old_code
 __pycache__
 local_code/output.csv
 local_code/plots
+scripts/local_settings.R

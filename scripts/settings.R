@@ -10,7 +10,6 @@ library(tools)
 data.dir <<- "/broad/hptmp/malperov/data/"
 output.dir <<- "/ahg/regevdata/projects/scqc/output/"
 source.dir <<- output.dir
-files.to.save.path <<- "files_to_save.txt"
 
 #FILTERING
 cells.filter <<- 3

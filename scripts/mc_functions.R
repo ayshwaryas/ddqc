@@ -434,7 +434,7 @@ check.save <- function() {
     return(TRUE)
   }
   return(tryCatch({
-      files.to.save <- read.table(files.to.save.path)
+      files.to.save <- read.table("files_to_save.txt")
       for (file in files.to.save$V1) {
         if (tolower(paste(project, tissue, res, method, param, sep="-")) == tolower(file)) {
           return(TRUE)

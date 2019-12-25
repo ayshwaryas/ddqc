@@ -1,5 +1,3 @@
-source("local_settings.R")
-
 ggsave1 <- function(filename, plot) {
   ggsave(filename = filename, plot = plot, width = 14, height = 10) #saves plot with custom dimensions 
 }

@@ -8,7 +8,8 @@ project <- "mc_tm"
 task.id <- 40
 source("../scripts/readers.R")
 source("../scripts/mc_functions.R")
-source("local_settings.R")
+source("../scripts/settings.R")
+source("../scripts/local_settings.R")
 ```
 
 

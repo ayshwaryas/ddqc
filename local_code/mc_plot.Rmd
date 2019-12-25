@@ -9,7 +9,8 @@ task.id <- 9
 source("../scripts/readers.R")
 source("../scripts/mc_functions.R")
 source("../scripts/fc_plots.R")
-source("local_settings.R")
+source("../scripts/settings.R")
+source("../scripts/local_settings.R")
 ```
 
 ```{r}

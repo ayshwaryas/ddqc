@@ -8,7 +8,8 @@ Required R packages:
 	dplyr
 	ggridges
 
-***Only files from bash_scripts/ directory should be run***
+
+***Only files from bash_scripts/ directory should be run. Before running them, cd to project root directory***
 
 
 Files in job_scripts/ are for scheduling jobs:
@@ -50,8 +51,6 @@ R script settings (scripts/settings.R):
 	output.dir - absolute path of output location
 	
 	source.dir - is used by fc_plots, should be the same as output.dir	
-
-	files.to.save.path - relative path of the file with saving instructions (files_to_save.txt by default)
 
 	cells.filter - filtering parameter that indicates minimum number of cells in which gene should be present (3 by default)
 
