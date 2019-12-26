@@ -17,6 +17,6 @@ if (res == 0.5 && method == "none") {
   tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
   message("Recording Additional Stats")
   #record all cells with QC stats into csv for summary plots
-  t <- tibble("tissue" = tissue, "cluster" = obj$seurat_clusters, "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb)
+  t <- tibble("tissue" = tissue, "nCount_RNA" = tiss$nCount_RNA, "nFeature_RNA" = tiss$nFeature_RNA, "percent.mt" = tiss$percent.mt, "percent.rb" = tiss$percent.rb)
   write.table(t, paste0(results.dir, "../../stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
 }
