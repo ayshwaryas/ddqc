@@ -11,11 +11,11 @@ method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "z_score", "cu
 param <<- switch(task.id %% tasks.per.res + 1, 0, 80, 2, 5, 10, 0, 95, 2) #filtering parameter
 
 if (res == 0.5 && method == "none") { 
+  message("Recording Additional Stats")
   filename <- paste0(res, "-", method, "-", param)
   robjs.dir <<- paste0(output.dir, "robjs/", project, "/") #directory for saving R objects
   results.dir <<- paste0(output.dir, project, "/", tissue, "/", filename, "/") #directory for saving all other output
   tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
-  message("Recording Additional Stats")
   #record all cells with QC stats into csv for summary plots
   t <- tibble("tissue" = tissue, "nCount_RNA" = tiss$nCount_RNA, "nFeature_RNA" = tiss$nFeature_RNA, "percent.mt" = tiss$percent.mt, "percent.rb" = tiss$percent.rb)
   write.table(t, paste0(results.dir, "../../stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
