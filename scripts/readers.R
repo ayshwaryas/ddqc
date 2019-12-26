@@ -198,7 +198,7 @@ AutoReader <- function(dataset, cells, features, tasks.per.tiss) {
     obj <- ReadOther(cells, features, tasks.per.tiss)
   }
   if (dataset == "other_10X" || dataset == "mc_other_10X") {
-    obj <- ReadOther(cells, features, tasks.per.tiss)
+    obj <- ReadOther10X(cells, features, tasks.per.tiss)
   }
   if (dataset == "ebi_tm" || dataset=="mc_ebi_tm") {
     obj <- ReadEBI_TM(cells, features, tasks.per.tiss)
