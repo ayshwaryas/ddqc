@@ -156,8 +156,7 @@ ReadOther <- function(cells, features, tasks.per.tiss) {
 ReadOther10X <- function(cells, features, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "adipose", "ASD_snRNAseq", "liver", "skin")
   is.human <<- TRUE
-  data.path <<- paste0(data.dir, "other/")
-  file <- paste0(data.path, tissue, "/")
+  data.path <<- paste0(data.dir, "other/", tissue, "/")
   files <- list.files(path=data.path)
   tiss <- NULL
   if (length(files) > 1) {
