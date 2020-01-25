@@ -3,7 +3,7 @@ tasks.per.tiss <<- 16 #How many different res/methods per one tissue
 
 #plots
 ggsave1 <- function(filename, plot) {
-  ggsave(filename = filename, plot = plot, width = 14, height = 10) #saves plot with custom dimensions 
+  ggsave(filename = filename, plot = plot + theme_cowplot(12), width = 14, height = 10) #saves plot with custom dimensions 
 }
 
 GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE points for DimPlot

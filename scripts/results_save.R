@@ -17,6 +17,9 @@ if (res == 0.5 && method == "none") {
   robjs.dir <<- paste0(output.dir, "robjs/", project, "/") #directory for saving R objects
   results.dir <<- paste0(output.dir, project, "/") #directory for saving all other output
   #record all cells with QC stats into csv for summary plots
-  t <- tibble("tissue" = tissue, "nCount_RNA" = tiss$nCount_RNA, "nFeature_RNA" = tiss$nFeature_RNA, "percent.mt" = tiss$percent.mt, "percent.rb" = tiss$percent.rb)
-  write.table(t, paste0(results.dir, "stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
+  #t <- tibble("tissue" = tissue, "nCount_RNA" = tiss$nCount_RNA, "nFeature_RNA" = tiss$nFeature_RNA, "percent.mt" = tiss$percent.mt, "percent.rb" = tiss$percent.rb)
+  #write.table(t, paste0(results.dir, "stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
+  genes <- sort(grep("^MT-", rownames(tiss$RNA), ignore.case=TRUE, value = TRUE))
+  t <- tibble("dataset"=project, "tissue"=tissue, "mito.genes"=genes)
+  write.table(t, paste0(output.dir, "mito.csv"), sep=",", append=TRUE, col.names=FALSE)
 }
