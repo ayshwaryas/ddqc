@@ -1,5 +1,10 @@
 ggsave1 <- function(filename, plot) {
-  ggsave(filename = filename, plot = plot, width = 14, height = 10) #saves plot with custom dimensions 
+  no_bkg <- theme(axis.line = element_line(colour = "black"),
+                  panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(),
+                  panel.border = element_blank(),
+                  panel.background = element_blank()) 
+  ggsave(filename = filename, plot = plot + no_bkg, width = 14, height = 10) #saves plot with custom dimensions 
 }
 
 generatePlots <- function(results.dir, dataset, project) {
@@ -64,7 +69,7 @@ generatePlots <- function(results.dir, dataset, project) {
 }
 
 generatePlotsInit <- function() {
-  for (project in c("mc_ebi", "mc_ebi_tm", "mc_mca", "mc_tm", "mc_ts30")) {
+  for (project in c("human", "mc_ebi", "mc_ebi_tm", "mc_mca", "mc_tm", "mc_ts30")) {
     for(mito.filter in  c(80, 100)) {
       data.path <- paste0(source.dir, project, "/stats_summary.csv")
       results.dir <- paste0(source.dir, "summary_plots/", project, "/mito-", mito.filter, "/")
@@ -72,8 +77,19 @@ generatePlotsInit <- function() {
       dir.create(paste0(source.dir, "summary_plots/", project), showWarnings = FALSE)
       dir.create(results.dir, showWarnings = FALSE)
       
-      dataset <- as.data.frame(read.csv(data.path, header = FALSE))
-      colnames(dataset) <- c("#", "tissue", "cluster", "nCount_RNA", "nFeature_RNA", "percent.mt", "percent.rb")
+      if (project == "human") {
+        d1 <- as.data.frame(read.csv(paste0(source.dir, "../ss_other.csv"), header = FALSE))
+        d2 <- as.data.frame(read.csv(paste0(source.dir, "../ss_other_10X.csv"), header = FALSE))
+        colnames(d1) <- c("#", "tissue", "nCount_RNA", "nFeature_RNA", "percent.mt", "percent.rb")
+        colnames(d2) <- c("#", "tissue", "nCount_RNA", "nFeature_RNA", "percent.mt", "percent.rb")
+        dataset <- full_join(d1, d2)
+        dataset <- subset(dataset, !grepl("mouse", tissue))
+        
+      }
+      else {
+        dataset <- as.data.frame(read.csv(data.path, header = FALSE))
+        colnames(dataset) <- c("#", "tissue", "cluster", "nCount_RNA", "nFeature_RNA", "percent.mt", "percent.rb")
+      }
       dataset <- subset(dataset, percent.mt < mito.filter)
       generatePlots(results.dir, dataset, paste0(project, "-", mito.filter))
     }
