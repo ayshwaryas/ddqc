@@ -27,6 +27,7 @@ TISSUE_COUNT = {
     "ts30": 10,
     "other": 7,
     "other_10X": 4,
+    "test": 1,
 }
 
 SCRIPT_PARAMETERS = {

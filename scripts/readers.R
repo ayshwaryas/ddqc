@@ -176,6 +176,34 @@ ReadOther10X <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
+ReadKBTest <- function(cells, features, tasks.per.tiss) {
+  tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "kidney_test")
+  is.human <<- TRUE
+  data.path <<- paste0(data.dir, "kb_test", tissue, "/")
+  files <- list.dirs(path=data.path)
+  tiss <- NULL
+  if (length(files) > 1) {
+    objs <- NULL
+    filenames <- NULL
+    for (file in files) {
+      objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells, min.features = features))
+      filenames <- c(filenames, file)
+    }
+    tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
+  } else {
+    file <- files[1]
+    tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells, min.features = features)
+    tiss <- RenameCells(tiss, add.cell.id = file)
+  }
+  
+  annotations <- read.csv(file= paste0(data.dir, "tabula_muris/droplet/", "annotations_droplet.csv"), header=TRUE, sep=",")
+  annotations.cell.type <- as.character(annotations[["cell_ontology_class"]])
+  names(annotations.cell.type) <- as.character(annotations[["cell"]])
+  tiss[["annotations"]] <- annotations.cell.type
+  tiss$annotations[is.na(tiss$annotations)] <- "Unknown"
+  return(tiss)
+}
+
 AutoReader <- function(dataset, cells, features, tasks.per.tiss) {
   message(paste("Reading Data - dataset:", dataset, "min.cells:", cells, "min.features:", features))
   if (dataset == "tabula_muris" || dataset == "mc_tm" || dataset == "tm") {
