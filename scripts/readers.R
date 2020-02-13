@@ -230,6 +230,9 @@ AutoReader <- function(dataset, cells, features, tasks.per.tiss) {
   if (dataset == "ebi_tm" || dataset=="mc_ebi_tm") {
     obj <- ReadEBI_TM(cells, features, tasks.per.tiss)
   }
+  if (dataset == "kb_test" || dataset=="mc_kb_test") {
+    obj <- ReadKBTest(cells, features, tasks.per.tiss)
+  }
   
   obj[["percent.mt"]] <- PercentageFeatureSet(obj, features=grep("^MT-", rownames(obj$RNA), ignore.case=TRUE))
   obj[["percent.rb"]] <- PercentageFeatureSet(obj, features=grep("^(RPL)|(RPS)", rownames(obj$RNA), ignore.case=TRUE))
