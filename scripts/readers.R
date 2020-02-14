@@ -179,7 +179,7 @@ ReadOther10X <- function(cells, features, tasks.per.tiss) {
 ReadKBTest <- function(cells, features, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "kidney_test")
   is.human <<- TRUE
-  data.path <<- paste0(data.dir, "kb_test", tissue, "/")
+  data.path <<- paste0(data.dir, "kb_test", "/")
   files <- list.dirs(path=data.path)
   tiss <- NULL
   if (length(files) > 1) {
