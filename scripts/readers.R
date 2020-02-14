@@ -180,7 +180,7 @@ ReadKBTest <- function(cells, features, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "kidney_test")
   is.human <<- TRUE
   data.path <<- paste0(data.dir, "kb_test", "/")
-  files <- list.dirs(path=data.path)
+  files <- "counts_unfiltered/"
   tiss <- NULL
   if (length(files) > 1) {
     objs <- NULL
