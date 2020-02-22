@@ -2,6 +2,7 @@ directory <<- commandArgs(trailingOnly = TRUE)[1]
 source("/home/unix/malperov/method_comparison/scripts/settings.R")
 source("/home/unix/malperov/method_comparison/scripts/local_settings.R")
 library(readr)
+library(Matrix)
 
 data.path <- paste0(data.dir, directory, "/counts_unfiltered/")
 output.path <- paste0(data.dir, "results/", directory, ".rds")
