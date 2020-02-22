@@ -4,8 +4,8 @@ source("/home/unix/malperov/method_comparison/scripts/local_settings.R")
 library(readr)
 library(Matrix)
 
-data.path <- paste0(data.dir, directory, "/counts_unfiltered/")
-output.path <- paste0(data.dir, "results/", directory, ".rds")
+data.path <- paste0(data.dir, "kb_test/", directory, "/counts_unfiltered/")
+output.path <- paste0(data.dir, "kb_test/results/", directory, ".rds")
 
 mtx <- t(readMM(paste0(data.path, "matrix.mtx")))
 genes=read_tsv(paste0(data.path, "genes.tsv"), col_names=F)
