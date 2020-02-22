@@ -14,5 +14,5 @@ rownames(mtx)=genes$X1
 colnames(mtx)=barcodes$X1
 tiss.kb <- CreateSeuratObject(mtx) 
 
-saveRDS(tiss, output.path)
+saveRDS(tiss.kb, output.path)
 
