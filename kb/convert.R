@@ -1,6 +1,6 @@
 directory <<- commandArgs(trailingOnly = TRUE)[1]
-source("scripts/settings.R")
-source("scripts/local_settings.R")
+source("/home/unix/malperov/method_comparison/scripts/settings.R")
+source("/home/unix/malperov/method_comparison/scripts/local_settings.R")
 library(readr)
 
 data.path <- paste0(data.dir, directory, "/counts_unfiltered/")
