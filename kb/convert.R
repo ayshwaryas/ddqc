@@ -12,7 +12,6 @@ genes=read_tsv(paste0(data.path, "cells_x_genes.genes.txt"), col_names=F)
 barcodes=read_tsv(paste0(data.path, "cells_x_genes.barcodes.txt"), col_names=F)
 rownames(mtx)=genes$X1
 colnames(mtx)=barcodes$X1
-tiss.kb <- CreateSeuratObject(mtx) 
+tiss.kb <- CreateSeuratObject(mtx)
 
 saveRDS(tiss.kb, output.path)
-

@@ -1,0 +1,69 @@
+---
+title: "10X_P4_5"
+output: html_notebook
+---
+
+```{r}
+source("../scripts/settings.R")
+source("../scripts/local_settings.R")
+library(readr)
+```
+
+```{r}
+# Load the tiss dataset
+
+tissue <- "Kidney"
+data.path <- paste0("~/Downloads/", tissue, "/")
+files <- list.files(path=data.path)
+tiss.kb <- NULL
+objs <- NULL
+for (file in files) {
+  objs <- c(objs, CreateSeuratObject(readRDS(paste0(data.path, file))$RNA@counts, min.cells=cells.filter, min.features=features.filter))
+}
+tiss.kb <- merge(x = objs[[1]], y = objs[2:length(objs)], project = tissue)
+
+```
+```{r}
+data.path <- paste0(data.dir, "tabula_muris/droplet/")
+files <- list.files(path=data.path, pattern=tissue)
+tiss <- NULL
+objs <- NULL
+for (file in files) {
+  objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells.filter, min.features = features.filter))
+}
+tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], project = tissue)
+```
+
+```{r}
+# calculate and visualise persent mito
+tiss.kb[["percent.mt"]] <- PercentageFeatureSet(tiss.kb, features=grep("^MT-", rownames(tiss.kb$RNA), ignore.case=TRUE))
+VlnPlot(object = tiss.kb, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), group.by="orig.ident", ncol = 3)
+FeatureScatter(tiss.kb, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+```
+```{r}
+# calculate and visualise persent mito
+tiss[["percent.mt"]] <- PercentageFeatureSet(tiss, features=grep("^MT-", rownames(tiss$RNA), ignore.case=TRUE))
+VlnPlot(object = tiss, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), group.by="orig.ident", ncol = 3)
+FeatureScatter(tiss, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+```
+
+```{r}
+common <- intersect(colnames(tiss.kb$RNA), colnames(tiss$RNA))
+data <- data.frame("cells" = common, "genes.S3" = log2(subset(tiss, cells=common)$nFeature_RNA), "genes.KB" = log2(subset(tiss.kb, cells=common)$nFeature_RNA))
+cor1 <- round(cor(data$genes.KB, data$genes.S3, method = "pearson"), 4)
+ggplot(data, aes(x=genes.KB, y=genes.S3)) + geom_point() + geom_smooth() + ggtitle(cor1)
+cat(paste(length(tiss$nFeature_RNA), length(tiss.kb$nFeature_RNA), length(data$cells)))
+```
+```{r}
+common <- intersect(colnames(tiss.kb$RNA), colnames(tiss$RNA))
+data <- data.frame("cells" = common, "UMIs.S3" = log2(subset(tiss, cells=common)$nCount_RNA), "UMIs.KB" = log2(subset(tiss.kb, cells=common)$nCount_RNA))
+cor1 <- round(cor(data$UMIs.KB, data$UMIs.S3, method = "pearson"), 4)
+ggplot(data, aes(x=UMIs.KB, y=UMIs.S3)) + geom_point() + geom_smooth() + ggtitle(cor1)
+cat(paste(length(tiss$nFeature_RNA), length(tiss.kb$nFeature_RNA), length(data$cells)))
+```
+```{r}
+unique.S3 <- setdiff(colnames(tiss$RNA), colnames(tiss.kb$RNA))
+tiss.S3.only <- subset(tiss, cells=unique.S3)
+VlnPlot(object = tiss.S3.only, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), group.by="orig.ident", ncol = 3)
+FeatureScatter(tiss.S3.only, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+```
