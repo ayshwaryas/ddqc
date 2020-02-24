@@ -13,14 +13,16 @@ library(readr)
 # Load the tiss dataset
 
 tissue <- "Kidney"
-data.path <- paste0("~/Downloads/", tissue, "/")
+data.path <- paste0(data.dir, "kb_test/results/", tissue, "/")
 files <- list.files(path=data.path)
 tiss.kb <- NULL
 objs <- NULL
+filenames <- NULL
 for (file in files) {
   objs <- c(objs, CreateSeuratObject(readRDS(paste0(data.path, file))$RNA@counts, min.cells=cells.filter, min.features=features.filter))
+  filenames <- c(filenames, strsplit(file, "\\.")[[1]][1])
 }
-tiss.kb <- merge(x = objs[[1]], y = objs[2:length(objs)], project = tissue)
+tiss.kb <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
 
 ```
 ```{r}
@@ -28,10 +30,12 @@ data.path <- paste0(data.dir, "tabula_muris/droplet/")
 files <- list.files(path=data.path, pattern=tissue)
 tiss <- NULL
 objs <- NULL
+filenames <- NULL
 for (file in files) {
   objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells.filter, min.features = features.filter))
+  filenames <- c(filenames, (strsplit(file, "-")[[1]][[2]]))
 }
-tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], project = tissue)
+tiss <-  merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
 ```
 
 ```{r}

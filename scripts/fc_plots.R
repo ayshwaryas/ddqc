@@ -1,4 +1,4 @@
-tasks.per.tiss <<- 4 #How many different res/methods per one tissue
+tasks.per.tiss <<- 2 #How many different res/methods per one tissue
 
 
 #function which reads data about filtered cells and categorizes them
@@ -85,8 +85,8 @@ generateFCPlots <- function(obj, clusters) {
 
 #main function
 FCPlotsMain <- function() {
-  tasks.per.res <- tasks.per.tiss %/% 2 #how many different methods per one resolution
-  res <<- 0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
+  tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
+  res <<- 1 #0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
   mito.cutoff <<- switch(task.id %% tasks.per.res + 1, 100, 80) #cutoff for percent mito
   tiss <<- subset(tiss, percent.mt <= mito.cutoff) #subset mito genes
   message(paste("Starting task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))

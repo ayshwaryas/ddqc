@@ -1,4 +1,4 @@
-tasks.per.tiss <<- 16 #How many different res/methods per one tissue
+tasks.per.tiss <<- 8 #How many different res/methods per one tissue
 
 
 #plots
@@ -407,7 +407,7 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, filen
 }
 
 
-saveResults <- function(obj, clusters, obj.markers, sm) {
+saveResults <- function(obj, filename, clusters, obj.markers, sm) {
   if (res == 0.5 && method == "none") { 
     message("Recording Additional Stats")
     #record all cells with QC stats into csv for summary plots
@@ -419,9 +419,6 @@ saveResults <- function(obj, clusters, obj.markers, sm) {
   write(sm, paste0(results.dir, "../score_summary.csv"), append=TRUE)
   write.csv(clusters, file=paste0(results.dir, "/!clusters.csv"))
   write.csv(obj.markers, file=paste0(results.dir, "/!markers.csv"))
-  if (check.save()) {
-    saveRDS(obj, file=paste0(robjs.dir, tissue, "-", filename, ".rds"))
-  }
   
   all.cells <- colnames(obj)
   umap <- as.data.frame(Embeddings(obj$umap)[all.cells, c(1, 2)])
@@ -431,6 +428,10 @@ saveResults <- function(obj, clusters, obj.markers, sm) {
                      "annotation" = clusters$annotation[obj$seurat_clusters], "UMAP_1"=umap$UMAP_1, "UMAP_2"=umap$UMAP_2,
                      "TSNE_1"=tsne$tSNE_1, "TSNE_2"=tsne$tSNE_2)
   write.csv(cells, file=paste0(results.dir, "/!cells.csv"))
+  
+  if (check.save()) {
+    saveRDS(obj, file=paste0(robjs.dir, tissue, "-", filename, ".rds"))
+  }
 }
 
 
@@ -452,8 +453,8 @@ check.save <- function() {
 
 #main function
 MCMain <- function() {
-  tasks.per.res <- tasks.per.tiss %/% 2 #how many different methods per one resolution
-  res <<- 0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
+  tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
+  res <<- 1 #0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
   method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "z_score", "cutoff", "cutoff", "outlier", "percentile", "mad") #filtering method
   param <<- switch(task.id %% tasks.per.res + 1, 0, 80, 2, 5, 10, 0, 95, 2) #filtering parameter
   message(paste("Starting task.id:", task.id, "- tissue:", tissue, "res:", res, "mehtod:", method, "param:", param, "project:", project))
@@ -497,7 +498,7 @@ MCMain <- function() {
   generatePlots(tiss, paste0(tissue, "_", filename), clusters$cell.type, clusters$annotation) #make plots
   #generateMarkerPlots(obj, filename)
   
-  saveResults(tiss, clusters, obj.markers, sm)
+  saveResults(tiss, filename, clusters, obj.markers, sm)
   
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mehtod:", method, "param:", param, "project:", project))
 }
