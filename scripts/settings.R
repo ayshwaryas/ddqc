@@ -8,7 +8,7 @@ library(tools)
 
 
 #PATHS
-data.dir <<- "/broad/hptmp/malperov/data/"
+data.dir <<- "/ahg/regevdata/projects/scqc/data/"
 output.dir <<- "/ahg/regevdata/projects/scqc/output/"
 source.dir <<- output.dir
 
