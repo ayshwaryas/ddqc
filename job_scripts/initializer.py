@@ -31,12 +31,12 @@ TISSUE_COUNT = {
 }
 
 SCRIPT_PARAMETERS = {
-    "mc": [100, 1, "scripts/mc.R"],
-    "mc_plot": [100, 1, "scripts/mc_plot.R"]
+    "mc": [150, 1, "scripts/mc.R"],
+    "mc_plot": [150, 1, "scripts/mc_plot.R"]
 }
 
-TASKS_PER_TISS_MC = 16
-TASKS_PER_TISS_MC_PLOT = 4
+TASKS_PER_TISS_MC = 8
+TASKS_PER_TISS_MC_PLOT = 2
 dir_path = os.path.dirname(os.path.realpath(__file__))[:os.path.dirname(os.path.realpath(__file__)).rfind("/")]
 COMMAND_PREFIX = "qsub -t 1-{} -l h_vmem={}G -pe smp {} -binding linear:{} -l h_rt=72:00:00 -j y -o logs/ -N {} {} job_scripts/init.sh " + dir_path + " {} {}"
 
