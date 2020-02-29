@@ -14,7 +14,7 @@ ReadTabulaMuris <- function(cells, features, tasks.per.tiss) {
     tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
   } else {
     file <- files[1]
-    tiss <- CreateSeuratObject((data.dir = paste0(data.path, file)), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells, min.features = features)
+    tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells, min.features = features)
     tiss <- RenameCells(tiss, add.cell.id = (strsplit(file, "-")[[1]][[2]]))
   }
   
