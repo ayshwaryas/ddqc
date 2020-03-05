@@ -28,6 +28,8 @@ TISSUE_COUNT = {
     "other": 7,
     "other_10X": 4,
     "kb_tm": 2,
+    "PanglaoDB": 5,
+    
 }
 
 SCRIPT_PARAMETERS = {
@@ -36,7 +38,7 @@ SCRIPT_PARAMETERS = {
 }
 
 TASKS_PER_TISS_MC = 8
-TASKS_PER_TISS_MC_PLOT = 2
+TASKS_PER_TISS_MC_PLOT = 1
 dir_path = os.path.dirname(os.path.realpath(__file__))[:os.path.dirname(os.path.realpath(__file__)).rfind("/")]
 COMMAND_PREFIX = "qsub -t 1-{} -l h_vmem={}G -pe smp {} -binding linear:{} -l h_rt=72:00:00 -j y -o logs/ -N {} {} job_scripts/init.sh " + dir_path + " {} {}"
 
