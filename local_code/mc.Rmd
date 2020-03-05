@@ -5,8 +5,9 @@ output: html_notebook
 
 ```{r}
 project <- "mc_tm"
-task.id <- 40
+task.id <- 18
 source("../scripts/readers.R")
+source("../scripts/filters.R")
 source("../scripts/mc_functions.R")
 source("../scripts/settings.R")
 source("../scripts/local_settings.R")

@@ -1,4 +1,4 @@
-ReadTabulaMuris <- function(cells, features, tasks.per.tiss) {
+ReadTabulaMuris <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "Bladder", "Heart_and_Aorta", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland", "Marrow", "Spleen", "Thymus", "Tongue", "Trachea")
   is.human <<- FALSE
   data.path <<- paste0(data.dir, "tabula_muris/droplet/")
@@ -8,13 +8,13 @@ ReadTabulaMuris <- function(cells, features, tasks.per.tiss) {
     objs <- NULL
     filenames <- NULL
     for (file in files) {
-      objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells, min.features = features))
+      objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells.filter, min.features = features.filter))
       filenames <- c(filenames, (strsplit(file, "-")[[1]][[2]]))
     }
     tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
   } else {
     file <- files[1]
-    tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells, min.features = features)
+    tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells.filter, min.features = features.filter)
     tiss <- RenameCells(tiss, add.cell.id = (strsplit(file, "-")[[1]][[2]]))
   }
   
@@ -26,7 +26,7 @@ ReadTabulaMuris <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
-ReadTabulaSenis24 <- function(cells, features, tasks.per.tiss) {
+ReadTabulaSenis24 <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "Bladder", "Bm", "Gat",  "Heart", "Hepatocyctes", "Kidney", "Mat", "Muscle", "Pancrease", "Scat", "Spleen", "Thymus", "Tongue")
   is.human <<- FALSE
   data.path <<- paste0(data.dir, "tabula_senis/10X/24_month/")
@@ -36,13 +36,13 @@ ReadTabulaSenis24 <- function(cells, features, tasks.per.tiss) {
     objs <- NULL
     filenames <- NULL
     for (file in files) {
-      objs <- c(objs, CreateSeuratObject(counts = Read10X_h5(file = paste0(data.path, file, "/raw_gene_bc_matrices_h5.h5")), project = file, min.cells = cells, min.features = features))
+      objs <- c(objs, CreateSeuratObject(counts = Read10X_h5(file = paste0(data.path, file, "/raw_gene_bc_matrices_h5.h5")), project = file, min.cells = cells.filter, min.features = features.filter))
       filenames <- c(filenames, file)
     }
     tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
   } else {
     file <- files[1]
-    tiss <- CreateSeuratObject(counts = Read10X_h5(file = paste0(data.path, file, "/raw_gene_bc_matrices_h5.h5")), project = file, min.cells = cells, min.features = features)
+    tiss <- CreateSeuratObject(counts = Read10X_h5(file = paste0(data.path, file, "/raw_gene_bc_matrices_h5.h5")), project = file, min.cells = cells.filter, min.features = features.filter)
     tiss <- RenameCells(tiss, add.cell.id = file)
   }
   
@@ -55,7 +55,7 @@ ReadTabulaSenis24 <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
-ReadTabulaSenis30 <- function(cells, features, tasks.per.tiss) {
+ReadTabulaSenis30 <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "Fat", "Heart_and_Aorta", "Kidney", "Large_Intestine", "Limb_Muscle", "Liver", "Lung", "Marrow", "Pancreas", "Spleen")
   is.human <<- FALSE
   data.path <<- paste0(data.dir, "tabula_senis/10X/30_month/")
@@ -65,13 +65,13 @@ ReadTabulaSenis30 <- function(cells, features, tasks.per.tiss) {
     objs <- NULL
     filenames <- NULL
     for (file in files) {
-      objs <- c(objs, CreateSeuratObject(counts = Read10X_h5(file = paste0(data.path, file, "/raw_gene_bc_matrices_h5.h5")), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells, min.features = features))
+      objs <- c(objs, CreateSeuratObject(counts = Read10X_h5(file = paste0(data.path, file, "/raw_gene_bc_matrices_h5.h5")), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells.filter, min.features = features.filter))
       filenames <- c(filenames, (strsplit(file, "-")[[1]][[2]]))
     }
     tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
   } else {
     file <- files[1]
-    tiss <- CreateSeuratObject(counts = Read10X_h5(file = paste0(data.path, file, "/raw_gene_bc_matrices_h5.h5")), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells, min.features = features)
+    tiss <- CreateSeuratObject(counts = Read10X_h5(file = paste0(data.path, file, "/raw_gene_bc_matrices_h5.h5")), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells.filter, min.features = features.filter)
     tiss <- RenameCells(tiss, add.cell.id = (strsplit(file, "-")[[1]][[2]]))
   }
   
@@ -84,7 +84,7 @@ ReadTabulaSenis30 <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
-ReadMouseCellAtlas <- function(cells, features, tasks.per.tiss) {
+ReadMouseCellAtlas <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "Bladder", "BoneMarrow", "Brain", "Kidney", "Liver", "Lung", "MammaryGland.Involution", "MammaryGland.Lactation", "MammaryGland.Pregnancy", "MammaryGland.Virgin", "MesenchymalStemCells", "Muscle", "Ovary", "Pancreas", "PeripheralBlood", "Placenta", "Prostate", "SmallIntestine", "Spleen", "Stomach", "Testis", "Thymus", "TrophoblastStemCells", "Uterus")
   is.human <<- FALSE
   data.path <<- paste0(data.dir, "mca/")
@@ -93,12 +93,12 @@ ReadMouseCellAtlas <- function(cells, features, tasks.per.tiss) {
   if (length(files) > 1) {
     objs <- NULL
     for (file in files) {
-      objs <- c(objs, CreateSeuratObject(counts = read.table(paste0(data.path, file)), min.cells = cells, min.features = features))
+      objs <- c(objs, CreateSeuratObject(counts = read.table(paste0(data.path, file)), min.cells = cells.filter, min.features = features.filter))
     }
     tiss <- merge(x = objs[[1]], y = objs[2:length(objs)])
     rm(objs)
   } else {
-    tiss <- CreateSeuratObject(counts = read.table(paste0(data.path, files[[1]])), min.cells = cells, min.features = features)
+    tiss <- CreateSeuratObject(counts = read.table(paste0(data.path, files[[1]])), min.cells = cells.filter, min.features = features.filter)
   }
   
   annotations <- read.csv(file= paste0(data.path, "MCA_CellAssignments.csv"), header=TRUE, sep=",")
@@ -109,12 +109,12 @@ ReadMouseCellAtlas <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
-ReadEBI <- function(cells, features, tasks.per.tiss) {
+ReadEBI <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "E-ENAD-21-breast_epithelial1", "E-ENAD-27-islet", "E-GEOD-81547-pancreas", "E-GEOD-81608-islet2", "E-GEOD-83139-pancreatic_endocrine", "E-GEOD-86618-lung_epithelial", "E-GEOD-89232-dendritic_cells", "E-GEOD-130148-lung", "E-MTAB-6386-B_cells", "E-MTAB-6653-lung_carcinomas", "E-MTAB-6701-fetal-maternal_interface", "E-CURD-6-bone_marrow", "E-MTAB-7316-retina")
   is.human <<- TRUE
   data.path <<- paste0(data.dir, "ebi/")
   file <- list.files(path=data.path, pattern=tissue)[1]
-  tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), project = tissue, min.cells = cells, min.features = features)
+  tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), project = tissue, min.cells = cells.filter, min.features = features.filter)
   annotations <- read.csv(file=paste0(data.path, file, "/annotations.tsv"), sep="\t", header=TRUE)
   ind <- which(grepl("cell.*type", colnames(annotations)), TRUE)
   if (length(ind) > 0) {
@@ -129,31 +129,31 @@ ReadEBI <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
-ReadEBI_TM <- function(cells, features, tasks.per.tiss) {
+ReadEBI_TM <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "Adipose", "Bladder", "Bone_Marrow", "Cerebellum", "Cerebral_Cortex", "Colon", "Diaphragm", "Fat", "Heart_and_Aorta", "Hippocampus", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland", "Pancreas", "Skin", "Spleen", "Striatum", "Thymus", "Tongue", "Trachea")
   is.human <<- FALSE
   data.path <<- paste0(data.dir, "ebi_tm/")
   file <- paste0(data.path, tissue, ".rds")
   tiss.unfiltered <- readRDS(file)
   annotations <- tiss.unfiltered$annotations
-  tiss <- CreateSeuratObject(tiss.unfiltered$RNA@counts, min.cells=cells, min.features=features)
+  tiss <- CreateSeuratObject(tiss.unfiltered$RNA@counts, min.cells=cells.filter, min.features=features.filter)
   tiss[["annotations"]] <- annotations
   return(tiss)
 }
 
-ReadOther <- function(cells, features, tasks.per.tiss) {
+ReadOther <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "bipolar_mouse", "colon-epi_human", "colon-fib_human", "colon-imm_human", "kidney_human", "retina_human", "retina_mouse")
   is.human <<- grepl("human", tissue)
   data.path <<- paste0(data.dir, "other/")
   file <- paste0(data.path, tissue, ".rds")
   tiss.unfiltered <- readRDS(file)
   annotations <- tiss.unfiltered$annotations
-  tiss <- CreateSeuratObject(tiss.unfiltered$RNA@counts, min.cells=cells, min.features=features)
+  tiss <- CreateSeuratObject(tiss.unfiltered$RNA@counts, min.cells=cells.filter, min.features=features.filter)
   tiss[["annotations"]] <- annotations
   return(tiss)
 }
 
-ReadOther10X <- function(cells, features, tasks.per.tiss) {
+ReadOther10X <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "adipose", "ASD_snRNAseq", "liver", "skin")
   is.human <<- TRUE
   data.path <<- paste0(data.dir, "other/", tissue, "/")
@@ -163,20 +163,20 @@ ReadOther10X <- function(cells, features, tasks.per.tiss) {
     objs <- NULL
     filenames <- NULL
     for (file in files) {
-      objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells, min.features = features))
+      objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells.filter, min.features = features.filter))
       filenames <- c(filenames, file)
     }
     tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
   } else {
     file <- files[1]
-    tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells, min.features = features)
+    tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells.filter, min.features = features.filter)
     tiss <- RenameCells(tiss, add.cell.id = file)
   }
   tiss[["annotations"]] <- "Unknown"
   return(tiss)
 }
 
-ReadKB_TM <- function(cells, features, tasks.per.tiss) {
+ReadKB_TM <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "Kidney", "Trachea")
   is.human <<- FALSE
   data.path <<- paste0(data.dir, "kb_test/results/", tissue, "/")
@@ -186,13 +186,13 @@ ReadKB_TM <- function(cells, features, tasks.per.tiss) {
     objs <- NULL
     filenames <- NULL
     for (file in files) {
-      objs <- c(objs, CreateSeuratObject(readRDS(paste0(data.path, file))$RNA@counts, min.cells=cells, min.features=features))
+      objs <- c(objs, CreateSeuratObject(readRDS(paste0(data.path, file))$RNA@counts, min.cells=cells.filter, min.features=features.filter))
       filenames <- c(filenames, strsplit(file, "\\.")[[1]][1])
     }
     tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
   } else {
     file <- files[1]
-    tiss <- CreateSeuratObject(readRDS(paste0(data.path, file))$RNA@counts, min.cells=cells, min.features=features)
+    tiss <- CreateSeuratObject(readRDS(paste0(data.path, file))$RNA@counts, min.cells=cells.filter, min.features=features.filter)
     tiss <- RenameCells(tiss, add.cell.id = strsplit(file, "\\.")[[1]][1])
   }
   
@@ -204,34 +204,69 @@ ReadKB_TM <- function(cells, features, tasks.per.tiss) {
   return(tiss)
 }
 
-AutoReader <- function(dataset, cells, features, tasks.per.tiss) {
-  message(paste("Reading Data - dataset:", dataset, "min.cells:", cells, "min.features:", features))
+ReadPanglaoDB <- function(cells.filter, features.filter, tasks.per.tiss) {
+  tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "Lung_Epithelial", "Mammary_Gland", "Pancreatic_Islets", "Prostate", "Testis")
+  is.human <<- TRUE
+  data.path <<- paste0(data.dir, "PanglaoDB/")
+  files <- list.files(path=data.path, pattern=tissue)
+  tiss <- NULL
+  if (length(files) > 1) {
+    objs <- NULL
+    filenames <- NULL
+    for (file in files) {
+      load(paste0(data.path, file))
+      gene.names <- rownames(sm)
+      gene.names <- sapply(strsplit(gene.names, "_ENSG"), first)
+      rownames(sm) <- gene.names
+      objs <- c(objs, CreateSeuratObject(counts = sm, project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells.filter, min.features = features.filter))
+      filenames <- c(filenames, (strsplit(file, "-")[[1]][[2]]))
+    }
+    tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
+  } else {
+    file <- files[1]
+    load(paste0(data.path, file))
+    gene.names <- rownames(sm)
+    gene.names <- sapply(strsplit(gene.names, "_ENSG"), first)
+    rownames(sm) <- gene.names
+    tiss <- CreateSeuratObject(counts = sm, project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells.filter, min.features = features.filter)
+    tiss <- RenameCells(tiss, add.cell.id = (strsplit(file, "-")[[1]][[2]]))
+  }
+  
+  tiss$annotations <- "Unknown"
+  return(tiss)
+}
+
+AutoReader <- function(dataset, cells.filter, features.filter, tasks.per.tiss) {
+  message(paste("Reading Data - dataset:", dataset, "min.cells:", cells.filter, "min.features:", features.filter))
   if (dataset == "tabula_muris" || dataset == "mc_tm" || dataset == "tm") {
-    obj <- ReadTabulaMuris(cells, features, tasks.per.tiss)
+    obj <- ReadTabulaMuris(cells.filter, features.filter, tasks.per.tiss)
   }
   if (dataset == "tabula_senis24" || dataset == "mc_ts24" || dataset == "ts24") {
-    obj <- ReadTabulaSenis24(cells, features, tasks.per.tiss)
+    obj <- ReadTabulaSenis24(cells.filter, features.filter, tasks.per.tiss)
   }
   if (dataset == "tabula_senis30" || dataset == "mc_ts30"|| dataset == "ts30") {
-    obj <- ReadTabulaSenis30(cells, features, tasks.per.tiss)
+    obj <- ReadTabulaSenis30(cells.filter, features.filter, tasks.per.tiss)
   }
   if (dataset == "mca"|| dataset == "mc_mca") {
-    obj <- ReadMouseCellAtlas(cells, features, tasks.per.tiss)
+    obj <- ReadMouseCellAtlas(cells.filter, features.filter, tasks.per.tiss)
   }
   if (dataset == "ebi"|| dataset == "mc_ebi") {
-    obj <- ReadEBI(cells, features, tasks.per.tiss)
+    obj <- ReadEBI(cells.filter, features.filter, tasks.per.tiss)
   }
   if (dataset == "other" || dataset == "mc_other") {
-    obj <- ReadOther(cells, features, tasks.per.tiss)
+    obj <- ReadOther(cells.filter, features.filter, tasks.per.tiss)
   }
   if (dataset == "other_10X" || dataset == "mc_other_10X") {
-    obj <- ReadOther10X(cells, features, tasks.per.tiss)
+    obj <- ReadOther10X(cells.filter, features.filter, tasks.per.tiss)
   }
   if (dataset == "ebi_tm" || dataset=="mc_ebi_tm") {
-    obj <- ReadEBI_TM(cells, features, tasks.per.tiss)
+    obj <- ReadEBI_TM(cells.filter, features.filter, tasks.per.tiss)
   }
   if (dataset == "kb_tm" || dataset=="mc_kb_tm") {
-    obj <- ReadKB_TM(cells, features, tasks.per.tiss)
+    obj <- ReadKB_TM(cells.filter, features.filter, tasks.per.tiss)
+  }
+  if (dataset == "PanglaoDB" || dataset=="mc_PanglaoDB") {
+    obj <- ReadPanglaoDB(cells.filter, features.filter, tasks.per.tiss)
   }
   
   obj[["percent.mt"]] <- PercentageFeatureSet(obj, features=grep("^MT-", rownames(obj$RNA), ignore.case=TRUE))

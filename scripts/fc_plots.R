@@ -1,19 +1,24 @@
-tasks.per.tiss <<- 2 #How many different res/methods per one tissue
+tasks.per.tiss <<- 1 #How many different res/methods per one tissue
+
+readFilterCsvMethod <- function(method) {
+  filtered.cells <- NULL
+  for (metric in c("counts", "genes", "mito", "ribo")) {
+    filtered.cells <- c(filtered.cells, tryCatch({
+      as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric, ".csv"))[["cell"]])}, 
+                                                 error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
+  }
+  return(filtered.cells)
+}
 
 
 #function which reads data about filtered cells and categorizes them
 readFilterCsv <- function(obj) {
   message("Reading Filtered Cells")
   all.cells = colnames(obj$RNA)
-  cutoff10 <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-cutoff-10/!filtered.csv"))[["cell"]]))}, 
-                       error = function(e) {warning("Cutoff10 filtered cells not found") 
-                        return(all.cells)})
-  zscore2 <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-z_score-2/!filtered.csv"))[["cell"]]))}, 
-                      error = function(e) {warning("Zscore2 filtered cells not found") 
-                        return(all.cells)})
-  outlier <- tryCatch({setdiff(all.cells, as.character(read.csv(paste0(source.dir, res, "-outlier-0/!filtered.csv"))[["cell"]]))}, 
-                      error = function(e) {warning("Outlier filtered cells not found") 
-                        return(all.cells)})
+  
+  cutoff10 <- setdiff(all.cells, readFilterCsvMethod("cutoff-10"))
+  zscore2 <- setdiff(all.cells, readFilterCsvMethod("z_score-2"))
+  outlier <- setdiff(all.cells, readFilterCsvMethod("outlier-0"))
   
   #categorize cells
   color <- list()
@@ -77,9 +82,10 @@ generateFCPlots <- function(obj, clusters) {
     scale_fill_manual(values = plot.cols) + scale_x_discrete(labels=lbls) + theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"),  axis.title.x=element_blank())
   
   #write plots
+  n.clusters <- length(unique(obj$seurat_clusters))
   ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-filterplot.pdf"), plot=plot1)
   ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-clusterplot.pdf"), plot=plot2)
-  ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-barplot.pdf"), plot=plot3)
+  ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-barplot.pdf"), plot=plot3, n.clusters=n.clusters)
 }
 
 
@@ -87,7 +93,7 @@ generateFCPlots <- function(obj, clusters) {
 FCPlotsMain <- function() {
   tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
   res <<- 1 #0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
-  mito.cutoff <<- switch(task.id %% tasks.per.res + 1, 100, 80) #cutoff for percent mito
+  mito.cutoff <<- 80 #switch(task.id %% tasks.per.res + 1, 100, 80) #cutoff for percent mito
   tiss <<- subset(tiss, percent.mt <= mito.cutoff) #subset mito genes
   message(paste("Starting task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
   
@@ -104,6 +110,8 @@ FCPlotsMain <- function() {
   clusters <<- assignCellTypes(tiss, obj.markers, getAnnotations(tiss))
   
   generateFCPlots(tiss, clusters) #make plots
+  
+  saveResults(tiss, clusters, obj.markers)
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
 }
 
