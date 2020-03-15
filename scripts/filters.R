@@ -10,18 +10,18 @@ adaptiveFilter.counts <- function(obj, res, method, param) {
     cluster <- subset(obj, idents = cl)
     co <- 0
     if (method == "percentile") { #percentile filtering
-      co <-  quantile(cluster$nCount_RNA, probs = param / 100)
+      co <-  quantile(cluster$nCount_RNA, probs = (1 - param / 100))
     }
     if (method == "outlier") { #outlier filtering (> Q3 + 1.5IQR)
       q1 <- summary(cluster$nCount_RNA)[[2]]
       q3 <- summary(cluster$nCount_RNA)[[5]]
-      co <- q3 + 1.5 * (q3 - q1)
+      co <- q1 - 1.5 * (q3 - q1)
     }
     if (method == "mad") { #Median absolute deviations filtering 
-      co <- median(nCount_RNA) + param * mad(cluster$nCount_RNA)
+      co <- median(obj$nCount_RNA) - param * mad(cluster$nCount_RNA)
     }
     if (method == "z_score") {
-      co <-  mean(cluster$nCount_RNA) + param * sd(cluster$nCount_RNA)
+      co <-  mean(cluster$nCount_RNA) - param * sd(cluster$nCount_RNA)
     }
     tmp_qc.pass <- (cluster$nCount_RNA <= co)
     names(tmp_qc.pass) <- colnames(cluster$RNA)
@@ -39,11 +39,11 @@ adaptiveFilter.counts <- function(obj, res, method, param) {
 
 cutoffFilter.counts <- function(obj, param) { #filter cells with %counts > param
   tryCatch({ #record filtered cells
-    filtered.cells <- colnames(subset(obj, nCount_RNA > param))
+    filtered.cells <- colnames(subset(obj, nCount_RNA < param))
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "nCount_RNA" = obj$nCount_RNA[filtered.cells])
     write.csv(d, paste0(results.dir, "/!filtered_counts.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  obj <- subset(obj, nCount_RNA <= param) #filter out the cells
+  obj <- subset(obj, nCount_RNA >= param) #filter out the cells
   return(obj)
 }
 
@@ -116,7 +116,7 @@ adaptiveFilter.mito <- function(obj, res, method, param) {
       co <- q3 + 1.5 * (q3 - q1)
     }
     if (method == "mad") { #Median absolute deviations filtering 
-      co <- median(percent.mt) + param * mad(cluster$percent.mt)
+      co <- median(obj$percent.mt) + param * mad(cluster$percent.mt)
     }
     if (method == "z_score") {
       co <-  mean(cluster$percent.mt) + param * sd(cluster$percent.mt)
@@ -163,7 +163,7 @@ adaptiveFilter.ribo <- function(obj, res, method, param) {
       co <- q3 + 1.5 * (q3 - q1)
     }
     if (method == "mad") { #Median absolute deviations filtering 
-      co <- median(percent.rb) + param * mad(cluster$percent.rb)
+      co <- median(obj$percent.rb) + param * mad(cluster$percent.rb)
     }
     if (method == "z_score") {
       co <-  mean(cluster$percent.rb) + param * sd(cluster$percent.rb)
