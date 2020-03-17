@@ -419,7 +419,7 @@ MCMain <- function(do.counts=TRUE, do.genes=TRUE, do.mito=TRUE, do.ribo=TRUE) {
   dir.create(paste0(output.dir, "robjs/"), showWarnings=FALSE)
   dir.create(robjs.dir, showWarnings=FALSE)
   
-  filterCells(obj, method, param, do.counts, do.genes, do.mito, do.ribo)
+  tiss <<- filterCells(tiss, method, param, do.counts, do.genes, do.mito, do.ribo)
   
   tmp <- clusterize(tiss, res, compute.reductions = TRUE, compute.markers = TRUE) #cluster cells
   #unpack returned object

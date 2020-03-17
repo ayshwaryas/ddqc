@@ -33,8 +33,7 @@ adaptiveFilter.counts <- function(obj, res, method, param) {
     d <- tibble("cell" = filtered.cells, "annotation" = original$annotations[filtered.cells], "nCount_RNA" = original$nCount_RNA[filtered.cells])
     write.csv(d, paste0(results.dir, "!filtered_counts.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  original <- subset(original, qc.pass == TRUE) #filter out the cells
-  return(original)
+  return(qc.pass)
 }
 
 cutoffFilter.counts <- function(obj, param) { #filter cells with %counts > param
@@ -44,8 +43,7 @@ cutoffFilter.counts <- function(obj, param) { #filter cells with %counts > param
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "nCount_RNA" = obj$nCount_RNA[filtered.cells])
     write.csv(d, paste0(results.dir, "!filtered_counts.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  obj <- subset(obj, qc.pass == TRUE) #filter out the cells
-  return(obj)
+  return(qc.pass)
 }
 
 
@@ -86,8 +84,7 @@ adaptiveFilter.genes <- function(obj, res, method, param) {
     d <- tibble("cell" = filtered.cells, "annotation" = original$annotations[filtered.cells], "nFeature_RNA" = original$nFeature_RNA[filtered.cells])
     write.csv(d, paste0(results.dir, "!filtered_genes.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  original <- subset(original, qc.pass == TRUE) #filter out the cells
-  return(original)
+  return(qc.pass)
 }
 
 cutoffFilter.genes <- function(obj, param1, param2) { #filter cells by nFeature_RNA
@@ -97,8 +94,7 @@ cutoffFilter.genes <- function(obj, param1, param2) { #filter cells by nFeature_
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "nFeature_RNA" = obj$nFeature_RNA[filtered.cells])
     write.csv(d, paste0(results.dir, "!filtered_genes.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  obj <- subset(obj, qc.pass == TRUE) #filter out the cells
-  return(obj)
+  return(qc.pass)
 }
 
 #//////// %Mito ///////////
@@ -133,8 +129,7 @@ adaptiveFilter.mito <- function(obj, res, method, param) {
     d <- tibble("cell" = filtered.cells, "annotation" = original$annotations[filtered.cells], "percent.mt" = original$percent.mt[filtered.cells])
     write.csv(d, paste0(results.dir, "!filtered_mito.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  original <- subset(original, qc.pass == TRUE) #filter out the cells
-  return(original)
+  return(qc.pass)
 }
 
 cutoffFilter.mito <- function(obj, param) { #filter cells with %mito > param
@@ -144,8 +139,7 @@ cutoffFilter.mito <- function(obj, param) { #filter cells with %mito > param
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "percent.mt" = obj$percent.mt[filtered.cells])
     write.csv(d, paste0(results.dir, "!filtered_mito.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  obj <- subset(obj, qc.pass == TRUE) #filter out the cells
-  return(obj)
+  return(qc.pass)
 }
 
 
@@ -181,8 +175,7 @@ adaptiveFilter.ribo <- function(obj, res, method, param) {
     d <- tibble("cell" = filtered.cells, "annotation" = original$annotations[filtered.cells], "percent.rb" = original$percent.rb[filtered.cells])
     write.csv(d, paste0(results.dir, "!filtered_ribo.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  original <- subset(original, qc.pass == TRUE) #filter out the cells
-  return(original)
+  return(qc.pass)
 }
 
 cutoffFilter.ribo <- function(obj, param) { #filter cells with %ribo > param
@@ -192,47 +185,51 @@ cutoffFilter.ribo <- function(obj, param) { #filter cells with %ribo > param
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "percent.rb" = obj$percent.rb[filtered.cells])
     write.csv(d, paste0(results.dir, "!filtered_ribo.csv"))
   }, error = function(e) NULL) #in case none of the cells were filtered
-  obj <- subset(obj, qc.pass == TRUE) #filter out the cells
-  return(obj)
+  return(qc.pass)
 }
 
 
 filterCells <- function(obj, method, param, do.counts, do.genes, do.mito, do.ribo) {
   message("Filtering Cells")
   
+  obj[["qc.pass"]] <- TRUE
+  
   if (do.counts) {
     if (method == "outlier" || method == "percentile" || method == "mad" || method == "z_score") {
-      tiss <<- adaptiveFilter.counts(tiss, res, method, param)
+      obj$qc.pass <- obj$qc.pass & adaptiveFilter.counts(obj, res, method, param)
     } 
     if (method == "cutoff" && param < 20) {
-      tiss <<- cutoffFilter.counts(tiss, 500)
+      obj$qc.pass <- obj$qc.pass & cutoffFilter.counts(obj, 500)
     }
   }
   
   if (do.genes) {
     if (method == "outlier" || method == "percentile" || method == "mad" || method == "z_score") {
-      tiss <<- adaptiveFilter.genes(tiss, res, method, param)
+      obj$qc.pass <- obj$qc.pass & adaptiveFilter.genes(obj, res, method, param)
     } 
     if (method == "cutoff" && param < 20) {
-      tiss <<- cutoffFilter.genes(tiss, 200, 2500)
+      obj$qc.pass <- obj$qc.pass & cutoffFilter.genes(obj, 200, 2500)
     }
   }
   
   if (do.mito) {
     if (method == "outlier" || method == "percentile" || method == "mad" || method == "z_score") {
-      tiss <<- adaptiveFilter.mito(tiss, res, method, param)
+      obj$qc.pass <- obj$qc.pass & adaptiveFilter.mito(obj, res, method, param)
     } 
     if (method == "cutoff") {
-      tiss <<- cutoffFilter.mito(tiss, param)
+      obj$qc.pass <- obj$qc.pass & cutoffFilter.mito(obj, param)
     }
   }
   
   if (do.ribo) {
     if (method == "outlier" || method == "percentile" || method == "mad" || method == "z_score") {
-      tiss <<- adaptiveFilter.ribo(tiss, res, method, param)
+      obj$qc.pass <- obj$qc.pass & adaptiveFilter.ribo(obj, res, method, param)
     } 
     if (method == "cutoff") {
-      tiss <<- cutoffFilter.ribo(tiss, 100)
+      obj$qc.pass <- obj$qc.pass & cutoffFilter.ribo(obj, 100)
     }
   }
+  
+  obj <- subset(obj, qc.pass == TRUE)
+  return(obj)
 }
