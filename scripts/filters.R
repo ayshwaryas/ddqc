@@ -37,7 +37,8 @@ adaptiveFilter.counts <- function(obj, res, method, param) {
 }
 
 cutoffFilter.counts <- function(obj, param) { #filter cells with %counts > param
-  obj[["qc.pass"]] <- (obj$nCount_RNA >= param)
+  qc.pass <- obj$nCount_RNA >= param
+  obj[["qc.pass"]] <- qc.pass
   tryCatch({ #record filtered cells
     filtered.cells <- colnames(subset(obj, qc.pass == FALSE))
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "nCount_RNA" = obj$nCount_RNA[filtered.cells])
@@ -88,7 +89,8 @@ adaptiveFilter.genes <- function(obj, res, method, param) {
 }
 
 cutoffFilter.genes <- function(obj, param1, param2) { #filter cells by nFeature_RNA
-  obj[["qc.pass"]] <- (obj$nFeature_RNA >= param1 & obj$nFeature_RNA <= param2)
+  qc.pass <- (obj$nFeature_RNA >= param1 & obj$nFeature_RNA <= param2)
+  obj[["qc.pass"]] <- qc.pass
   tryCatch({ #record filtered cells
     filtered.cells <- colnames(subset(obj, qc.pass == FALSE))
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "nFeature_RNA" = obj$nFeature_RNA[filtered.cells])
@@ -133,7 +135,8 @@ adaptiveFilter.mito <- function(obj, res, method, param) {
 }
 
 cutoffFilter.mito <- function(obj, param) { #filter cells with %mito > param
-  obj[["qc.pass"]] <- (obj$percent.mt <= param)
+  qc.pass <- (obj$percent.mt <= param)
+  obj[["qc.pass"]] <- qc.pass
   tryCatch({ #record filtered cells
     filtered.cells <- colnames(subset(obj, qc.pass == FALSE))
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "percent.mt" = obj$percent.mt[filtered.cells])
@@ -179,7 +182,8 @@ adaptiveFilter.ribo <- function(obj, res, method, param) {
 }
 
 cutoffFilter.ribo <- function(obj, param) { #filter cells with %ribo > param
-  obj[["qc.pass"]] <- (obj$percent.rb <= param)
+  qc.pass <- (obj$percent.rb <= param)
+  obj[["qc.pass"]] <- qc.pass
   tryCatch({ #record filtered cells
     filtered.cells <- colnames(subset(obj, qc.pass == FALSE))
     d <- tibble("cell" = filtered.cells, "annotation" = obj$annotations[filtered.cells], "percent.rb" = obj$percent.rb[filtered.cells])
