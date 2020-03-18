@@ -2,7 +2,7 @@ tasks.per.tiss <<- 1 #How many different res/methods per one tissue
 
 readFilterCsvMethod <- function(method) {
   filtered.cells <- NULL
-  for (metric in c("counts")) {#c("counts", "genes", "mito", "ribo")) {
+  for (metric in c("ribo")) {#c("counts", "genes", "mito", "ribo")) {
     filtered.cells <- c(filtered.cells, tryCatch({
       as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric, ".csv"))[["cell"]])}, 
                                                  error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
@@ -16,7 +16,7 @@ readFilterCsv <- function(obj) {
   message("Reading Filtered Cells")
   all.cells = colnames(obj$RNA)
   
-  cutoff10 <- setdiff(all.cells, readFilterCsvMethod("cutoff-10"))
+  cutoff10 <- c()#setdiff(all.cells, readFilterCsvMethod("cutoff-10"))
   zscore2 <- setdiff(all.cells, readFilterCsvMethod("z_score-2"))
   mad <- setdiff(all.cells, readFilterCsvMethod("mad-2"))
   

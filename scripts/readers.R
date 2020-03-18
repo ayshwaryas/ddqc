@@ -177,7 +177,7 @@ ReadOther10X <- function(cells.filter, features.filter, tasks.per.tiss) {
     ann <- read.csv(paste0(data.path, "annotations.csv"))
     annotations <- ann$x
     names(annotations) <- ann$X
-    tiss$annotations <- annotationss
+    tiss$annotations <- annotations
     tiss$annotations[is.na(tiss$annotations)] <- "Unknown"
   }
   return(tiss)
