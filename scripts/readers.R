@@ -166,17 +166,16 @@ ReadOther10X <- function(cells.filter, features.filter, tasks.per.tiss) {
       objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells.filter, min.features = features.filter))
       filenames <- c(filenames, file)
     }
-    tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)
+    tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], project = tissue)
   } else {
     file <- files[1]
     tiss <- CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), min.cells = cells.filter, min.features = features.filter)
-    tiss <- RenameCells(tiss, add.cell.id = file)
   }
   tiss[["annotations"]] <- "Unknown"
   if (tissue == "adipose" || tissue == "liver") {
     ann <- read.csv(paste0(data.path, "annotations.csv"))
-    annotations <- ann$x
-    names(annotations) <- ann$X
+    annotations <- as.character(ann$x)
+    names(annotations) <- as.character(ann$X)
     tiss$annotations <- annotations
     tiss$annotations[is.na(tiss$annotations)] <- "Unknown"
   }

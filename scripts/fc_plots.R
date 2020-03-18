@@ -16,7 +16,7 @@ readFilterCsv <- function(obj) {
   message("Reading Filtered Cells")
   all.cells = colnames(obj$RNA)
   
-  cutoff10 <- c()#setdiff(all.cells, readFilterCsvMethod("cutoff-10"))
+  cutoff10 <- setdiff(all.cells, readFilterCsvMethod("cutoff-10"))
   zscore2 <- setdiff(all.cells, readFilterCsvMethod("z_score-2"))
   mad <- setdiff(all.cells, readFilterCsvMethod("mad-2"))
   
