@@ -173,6 +173,13 @@ ReadOther10X <- function(cells.filter, features.filter, tasks.per.tiss) {
     tiss <- RenameCells(tiss, add.cell.id = file)
   }
   tiss[["annotations"]] <- "Unknown"
+  if (tissue == "adipose" || tissue == "liver") {
+    ann <- read.csv(paste0(data.path, tissue, ".csv"))
+    annotations <- ann$x
+    names(annotations) <- ann$X
+    tiss$annotations <- annotationss
+    tiss$annotations[is.na(tiss$annotations)] <- "Unknown"
+  }
   return(tiss)
 }
 
