@@ -157,7 +157,7 @@ ReadOther10X <- function(cells.filter, features.filter, tasks.per.tiss) {
   tissue <<- switch(1 + (task.id %/% tasks.per.tiss), "adipose", "ASD_snRNAseq", "liver", "skin")
   is.human <<- TRUE
   data.path <<- paste0(data.dir, "other/", tissue, "/")
-  files <- list.files(path=data.path)
+  files <- list.files(path=data.path, pattern = tissue)
   tiss <- NULL
   if (length(files) > 1) {
     objs <- NULL
@@ -174,7 +174,7 @@ ReadOther10X <- function(cells.filter, features.filter, tasks.per.tiss) {
   }
   tiss[["annotations"]] <- "Unknown"
   if (tissue == "adipose" || tissue == "liver") {
-    ann <- read.csv(paste0(data.path, tissue, ".csv"))
+    ann <- read.csv(paste0(data.path, "annotations.csv"))
     annotations <- ann$x
     names(annotations) <- ann$X
     tiss$annotations <- annotationss
