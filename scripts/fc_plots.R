@@ -1,8 +1,15 @@
-tasks.per.tiss <<- 1 #How many different res/methods per one tissue
+tasks.per.tiss <<- 5 #How many different res/methods per one tissue
 
-readFilterCsvMethod <- function(method) {
+readFilterCsvMethod <- function(method, metric) {
   filtered.cells <- NULL
-  for (metric in c("ribo")) {#c("counts", "genes", "mito", "ribo")) {
+  if (metric == "all") {
+    for (metric1 in c("counts", "genes", "mito", "ribo")) {
+      filtered.cells <- c(filtered.cells, tryCatch({
+        as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric1, ".csv"))[["cell"]])}, 
+        error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
+    }
+  }
+  else {
     filtered.cells <- c(filtered.cells, tryCatch({
       as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric, ".csv"))[["cell"]])}, 
                                                  error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
@@ -12,13 +19,13 @@ readFilterCsvMethod <- function(method) {
 
 
 #function which reads data about filtered cells and categorizes them
-readFilterCsv <- function(obj) {
+readFilterCsv <- function(obj, metric) {
   message("Reading Filtered Cells")
   all.cells = colnames(obj$RNA)
   
-  cutoff10 <- setdiff(all.cells, readFilterCsvMethod("cutoff-10"))
-  zscore2 <- setdiff(all.cells, readFilterCsvMethod("z_score-2"))
-  mad <- setdiff(all.cells, readFilterCsvMethod("mad-2"))
+  cutoff10 <- setdiff(all.cells, readFilterCsvMethod("cutoff-10", metric))
+  zscore2 <- setdiff(all.cells, readFilterCsvMethod("z_score-2", metric))
+  mad <- setdiff(all.cells, readFilterCsvMethod("mad-2", metric))
   
   #categorize cells
   color <- list()
@@ -83,9 +90,9 @@ generateFCPlots <- function(obj, clusters) {
   
   #write plots
   n.clusters <- length(unique(obj$seurat_clusters))
-  ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-filterplot.pdf"), plot=plot1)
-  ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-clusterplot.pdf"), plot=plot2)
-  ggsave1(filename = paste0(results.dir, res, "-", mito.cutoff, "-barplot.pdf"), plot=plot3, n.clusters=n.clusters)
+  ggsave1(filename = paste0(results.dir, res, "-filterplot.pdf"), plot=plot1)
+  ggsave1(filename = paste0(results.dir, res, "-clusterplot.pdf"), plot=plot2)
+  ggsave1(filename = paste0(results.dir, res, "-barplot.pdf"), plot=plot3, n.clusters=n.clusters)
 }
 
 
@@ -93,15 +100,15 @@ generateFCPlots <- function(obj, clusters) {
 FCPlotsMain <- function() {
   tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
   res <<- 1 #0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
-  mito.cutoff <<- 80 #switch(task.id %% tasks.per.res + 1, 100, 80) #cutoff for percent mito
-  tiss <<- subset(tiss, percent.mt <= mito.cutoff) #subset mito genes
-  message(paste("Starting task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
+  metric <<- switch(task.id %% tasks.per.res + 1, "counts", "genes", "mito", "ribo", "all")
+  message(paste("Starting task.id:", task.id, "- tissue:", tissue, "res:", res, "metric:", metric, "project:", project))
   
   source.dir <<- paste0(source.dir, project, "/", tissue, "/") #directory where csv with filtered cells are located
-  results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/") #directory where output will go
+  results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/", metric, "/") #directory where output will go
+  dir.create(paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/"), showWarnings=FALSE)
   dir.create(results.dir, showWarnings=FALSE)
   
-  tiss <<- readFilterCsv(tiss) #add cell categories
+  tiss <<- readFilterCsv(tiss, metric) #add cell categories
   
   tmp <- clusterize(tiss, res, compute.reductions=TRUE, compute.markers = TRUE) #cluster cells
   #unpack returned object
@@ -112,6 +119,6 @@ FCPlotsMain <- function() {
   generateFCPlots(tiss, clusters) #make plots
   
   saveResults(tiss, clusters, obj.markers)
-  message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "mito.cutoff", mito.cutoff, "project:", project))
+  message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "metric:", metric, "project:", project))
 }
 
