@@ -7,4 +7,4 @@ source("scripts/settings.R")
 source("scripts/local_settings.R")
 
 tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
-MCMain(TRUE, TRUE)
+MCMain()
