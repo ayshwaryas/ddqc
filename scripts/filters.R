@@ -1,12 +1,7 @@
 #filter methods
 
 
-trueMAD <- function(x) {
-  return(median(abs(x - median(x))))
-}
-
-
-filterCounts <- function(obj, res, method, param) {
+filterCounts <- function(obj, res, method, threshold) {
   obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   qc.pass <- NULL
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
@@ -18,13 +13,13 @@ filterCounts <- function(obj, res, method, param) {
       co <- q1 - 1.5 * (q3 - q1)
     }
     if (method == "mad") { #Median absolute deviations filtering 
-      co <- median(cluster$nCount_RNA) - param * trueMAD(cluster$nCount_RNA)
+      co <- median(cluster$nCount_RNA) - threshold * mad(cluster$nCount_RNA)
     }
     if (method == "z_score") {
-      co <-  mean(cluster$nCount_RNA) - param * sd(cluster$nCount_RNA)
+      co <-  mean(cluster$nCount_RNA) - threshold * sd(cluster$nCount_RNA)
     }
     if (method == "cutoff") {
-      co <- param
+      co <- threshold
     }
     tmp_qc.pass <- (cluster$nCount_RNA >= co)
     names(tmp_qc.pass) <- colnames(cluster$RNA)
@@ -40,7 +35,7 @@ filterCounts <- function(obj, res, method, param) {
 }
 
 
-filterGenes <- function(obj, res, method, param) {
+filterGenes <- function(obj, res, method, threshold) {
   obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   qc.pass <- NULL
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
@@ -54,16 +49,16 @@ filterGenes <- function(obj, res, method, param) {
       upper.co <- q3 + 1.5 * (q3 - q1)
     }
     if (method == "mad") { #Median absolute deviations filtering 
-      lower.co <- median(cluster$nFeature_RNA) - param * trueMAD(cluster$nFeature_RNA)
-      upper.co <- median(cluster$nFeature_RNA) + param * trueMAD(cluster$nFeature_RNA)
+      lower.co <- median(cluster$nFeature_RNA) - threshold * mad(cluster$nFeature_RNA)
+      upper.co <- median(cluster$nFeature_RNA) + threshold * mad(cluster$nFeature_RNA)
     }
     if (method == "z_score") {
-      lower.co <- mean(cluster$nFeature_RNA) - param * sd(cluster$nFeature_RNA)
-      upper.co <- mean(cluster$nFeature_RNA) + param * sd(cluster$nFeature_RNA)
+      lower.co <- mean(cluster$nFeature_RNA) - threshold * sd(cluster$nFeature_RNA)
+      upper.co <- mean(cluster$nFeature_RNA) + threshold * sd(cluster$nFeature_RNA)
     }
     if (method == "cutoff") {
-      lower.co <- param
-      upper.co <- param * 10
+      lower.co <- threshold
+      upper.co <- threshold * 10
     }
     tmp_qc.pass <- (cluster$nFeature_RNA >= lower.co & cluster$nFeature_RNA <= upper.co) 
     names(tmp_qc.pass) <- colnames(cluster$RNA)
@@ -79,7 +74,7 @@ filterGenes <- function(obj, res, method, param) {
 }
 
 
-filterMito <- function(obj, res, method, param) {
+filterMito <- function(obj, res, method, threshold) {
   obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   qc.pass <- NULL
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
@@ -91,13 +86,13 @@ filterMito <- function(obj, res, method, param) {
       co <- q3 + 1.5 * (q3 - q1)
     }
     if (method == "mad") { #Median absolute deviations filtering 
-      co <- median(cluster$percent.mt) + param * trueMAD(cluster$percent.mt)
+      co <- median(cluster$percent.mt) + threshold * mad(cluster$percent.mt)
     }
     if (method == "z_score") {
-      co <-  mean(cluster$percent.mt) + param * sd(cluster$percent.mt)
+      co <- mean(cluster$percent.mt) + threshold * sd(cluster$percent.mt)
     }
     if (method == "cutoff") {
-      co <- param
+      co <- threshold
     }
     tmp_qc.pass <- (cluster$percent.mt <= co)
     names(tmp_qc.pass) <- colnames(cluster$RNA)
@@ -113,7 +108,7 @@ filterMito <- function(obj, res, method, param) {
 }
 
 
-filterRibo <- function(obj, res, method, param) {
+filterRibo <- function(obj, res, method, threshold) {
   obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   qc.pass <- NULL
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
@@ -125,13 +120,13 @@ filterRibo <- function(obj, res, method, param) {
       co <- q3 + 1.5 * (q3 - q1)
     }
     if (method == "mad") { #Median absolute deviations filtering 
-      co <- median(cluster$percent.rb) + param * trueMAD(cluster$percent.rb)
+      co <- median(cluster$percent.rb) + threshold * mad(cluster$percent.rb)
     }
     if (method == "z_score") {
-      co <-  mean(cluster$percent.rb) + param * sd(cluster$percent.rb)
+      co <-  mean(cluster$percent.rb) + threshold * sd(cluster$percent.rb)
     }
     if (method == "cutoff") {
-      co <- param
+      co <- threshold
     }
     tmp_qc.pass <- (cluster$percent.rb <= co)
     names(tmp_qc.pass) <- colnames(cluster$RNA)
@@ -147,47 +142,60 @@ filterRibo <- function(obj, res, method, param) {
 }
 
 
-filterCells <- function(obj, method, param, do.counts, do.genes, do.mito, do.ribo) {
+filterCells <- function(obj, method, threshold, do.counts, do.genes, do.mito, do.ribo) {
+  if (method == "none") {
+    return(obj)
+  }
   message("Filtering Cells")
-  
-  obj[["qc.pass"]] <- TRUE
   
   if (do.counts) {
     if (method == "cutoff") {
-      obj$qc.pass <- obj$qc.pass & filterCounts(obj, res, method, 500)
+      obj$counts.qc.pass <- filterCounts(obj, res, method, 500)
     }
     else {
-      obj$qc.pass <- obj$qc.pass & filterCounts(obj, res, method, param)
+      obj$counts.qc.pass <- filterCounts(obj, res, method, threshold)
     } 
+  }
+  else {
+    obj$counts.qc.pass <- TRUE
   }
   
   if (do.genes) {
     if (method == "cutoff") {
-      obj$qc.pass <- obj$qc.pass & filterGenes(obj, res, method, 250)
+      obj$genes.qc.pass <- filterGenes(obj, res, method, 250)
     }
     else {
-      obj$qc.pass <- obj$qc.pass & filterGenes(obj, res, method, param)
+      obj$genes.qc.pass <- filterGenes(obj, res, method, threshold)
     } 
+  }
+  else {
+    obj$genes.qc.pass <- TRUE
   }
   
   if (do.mito) {
     if (method == "cutoff") {
-      obj$qc.pass <- obj$qc.pass & filterMito(obj, res, method, param)
+      obj$mito.qc.pass <- filterMito(obj, res, method, threshold)
     }
     else {
-      obj$qc.pass <- obj$qc.pass & filterMito(obj, res, method, param)
+      obj$mito.qc.pass <- filterMito(obj, res, method, threshold)
     } 
+  }
+  else {
+    obj$mito.qc.pass <- TRUE
   }
   
   if (do.ribo) {
     if (method == "cutoff") {
-      obj$qc.pass <- obj$qc.pass & filterRibo(obj, res, method, 100)
+      obj$ribo.qc.pass <- filterRibo(obj, res, method, 100)
     }
     else {
-      obj$qc.pass <- obj$qc.pass & filterRibo(obj, res, method, param)
+      obj$ribo.qc.pass <- filterRibo(obj, res, method, threshold)
     } 
   }
+  else {
+    obj$ribo.qc.pass <- TRUE
+  }
   
-  obj <- subset(obj, qc.pass == TRUE)
+  obj <- subset(obj, counts.qc.pass == TRUE & genes.qc.pass == TRUE & mito.qc.pass == TRUE & ribo.qc.pass == TRUE)
   return(obj)
 }
