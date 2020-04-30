@@ -5,43 +5,45 @@ output: html_notebook
 
 ```{r}
 project <- "mc_tm"
-task.id <- 186 - 16 * 5
+task.id <- 11
 source("../scripts/readers.R")
 source("../scripts/mc_functions.R")
 source("../scripts/fc_plots.R")
 source("../scripts/settings.R")
 source("../scripts/local_settings.R")
-dir.path <- "~/Documents/primes_storage/results/"
-metric.key <- 2
-results.dir <- "plots/"
 ```
-
 
 ```{r}
 tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
 ```
 
 ```{r}
-tasks.per.res <- tasks.per.tiss %/% 2 #how many different methods per one resolution
-res <<- 0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
-method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "z_score", "cutoff", "cutoff", "outlier", "percentile", "mad") #filtering method
-param <<- switch(task.id %% tasks.per.res + 1, 0, 80, 2, 5, 10, 0, 95, 2) #filtering parameter
+tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
+res <<- 1
+method <<- switch(task.id %% tasks.per.res + 1, "none", "z_score", "cutoff", "outlier", "mad") #filtering method
+param <<- switch(task.id %% tasks.per.res + 1, 0, 2, 10, 0, 2) #filtering parameter
 ```
 
 ```{r}
-source.dir <<- paste0(source.dir, project, "/", tissue, "/")
-dir.path <- paste0(dir.path, project, "/", tissue, "/", res, "-", method, "-", param, "/")
-cells <- read.csv(paste0(dir.path, "!cells.csv"))
-clusters <- read.csv(paste0(dir.path, "!clusters.csv"))
+target.cl <- 3
+source.dir <- paste0(source.dir, project, "/", tissue, "/", res, "-", method, "-", param, "/")
+
+task.name <- paste(tissue, res, method, target.cl, sep = "-")
+results.dir <- paste0(output.dir, "plots/", task.name, "/")
+dir.create(paste0(output.dir, "plots/"), showWarnings = FALSE)
+dir.create(results.dir, showWarnings = FALSE)
+
+cells <- read.csv(paste0(source.dir, "!cells.csv"))
+clusters <- read.csv(paste0(source.dir, "!clusters.csv"))
 ```
 
 ```{r}
 all.cells <- colnames(tiss$RNA)
-filtered <- readFilterCsvMethod(method, "all")
+filtered <- unique(readFilterCsvMethod("", "all", full.path=TRUE))
 pass <- list()
 pass[all.cells] <- TRUE
-pass[filtered] <- FALSE
-tiss[["pass"]] <- as.character(pass)
+pass[intersect(all.cells, filtered)] <- FALSE
+tiss[["pass"]] <- factor(as.character(pass))
   
 tiss <- tiss[,pass == TRUE] 
 ```
@@ -56,24 +58,21 @@ cell.types <- clusters$cell.type
 ```
 
 ```{r}
-target.cl <- 0
-tiss <- subset(tiss, seurat_clusters == cl)
-```
+cluster.obj <- subset(tiss, seurat_clusters == target.cl)
 
-```{r}
-tmp <- clusterize(tiss, res, compute.reductions = TRUE, compute.markers = TRUE) #cluster cells
+tmp <- clusterize(cluster.obj, res, compute.reductions = TRUE, compute.markers = TRUE) #cluster cells
 #unpack returned object
-tiss <<- tmp$obj
+cluster.obj <<- tmp$obj
 obj.markers <<- tmp$markers
 
 
-tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss), record.stats = TRUE) #assign cell types
+tmp <- assignCellTypes(cluster.obj, obj.markers, getAnnotations(cluster.obj), record.stats = TRUE) #assign cell types
 #unpack returned object
 clusters <<- tmp$clusters
 obj.markers <<- tmp$markers
 
-generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation, sig.plots = TRUE) #make plots
+generatePlots(cluster.obj, task.name, clusters$cell.type, clusters$annotation, sig.plots = FALSE) #make plots
 
-saveResults(tiss, clusters, obj.markers, mc_specific=TRUE)
+saveResults(cluster.obj, clusters, obj.markers, mc_specific=FALSE)
 ```
 

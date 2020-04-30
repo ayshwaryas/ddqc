@@ -3,6 +3,7 @@ tasks.per.tiss <<- 5 #How many different res/methods per one tissue
 
 #plots
 ggsave1 <- function(filename, plot, n.clusters=30) {
+  n.clusters <- max(10, n.clusters)
   no_bkg <- theme(axis.line = element_line(colour = "black"),
                   panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank(),
@@ -373,10 +374,10 @@ saveResults <- function(obj, clusters, obj.markers, mc_specific=FALSE, sm=NA) {
       #record all cells with QC stats into csv for summary plots
       t <- tibble("tissue" = tissue, "cluster" = obj$seurat_clusters, "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb)
       write.table(t, paste0(results.dir, "../../stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
+      
+      sm <- paste(task.name, sm, sep=",")
+      write(sm, paste0(results.dir, "../score_summary.csv"), append=TRUE)
     }
-    
-    sm <- paste(task.name, sm, sep=",")
-    write(sm, paste0(results.dir, "../score_summary.csv"), append=TRUE)
     
     if (check.save()) {
       saveRDS(obj, file=paste0(robjs.dir, task.name, ".rds"))

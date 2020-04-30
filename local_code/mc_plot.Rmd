@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 project <- "mc_tm"
-task.id <- 2
+task.id <- 10
 source("../scripts/readers.R")
 source("../scripts/mc_functions.R")
 source("../scripts/fc_plots.R")

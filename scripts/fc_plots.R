@@ -1,12 +1,18 @@
 tasks.per.tiss <<- 5 #How many different res/methods per one tissue
 
-readFilterCsvMethod <- function(method, metric) {
+readFilterCsvMethod <- function(method, metric, full.path=FALSE) {
   filtered.cells <- NULL
   if (metric == "all") {
     for (metric1 in c("counts", "genes", "mito", "ribo")) {
+      if (full.path) {
+        filtered.cells <- c(filtered.cells, tryCatch({
+          as.character(read.csv(paste0(source.dir, "!filtered_", metric1, ".csv"))[["cell"]])}, 
+          error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
+      } else {
       filtered.cells <- c(filtered.cells, tryCatch({
         as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric1, ".csv"))[["cell"]])}, 
         error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
+      }
     }
   }
   else {
@@ -122,12 +128,15 @@ FCPlotsMain <- function() {
   #unpack returned object
   tiss <<- tmp$obj
   obj.markers <<- tmp$markers
-  clusters <<- assignCellTypes(tiss, obj.markers, getAnnotations(tiss))
+  tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss), record.stats = TRUE) #assign cell types
+  #unpack returned object
+  clusters <<- tmp$clusters
+  obj.markers <<- tmp$markers
   
   generateFCPlots(tiss, clusters)
   #generatePlots(tiss, "", clusters$cell.type, clusters$annotation, sig.plots = FALSE) #make plots
   
-  saveResults(tiss, clusters, obj.markers)
+  saveResults(tiss, clusters, obj.markers, mc_specific=FALSE)
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "metric:", metric, "project:", project))
 }
 
