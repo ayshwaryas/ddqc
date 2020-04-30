@@ -1,0 +1,79 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+project <- "mc_tm"
+task.id <- 186 - 16 * 5
+source("../scripts/readers.R")
+source("../scripts/mc_functions.R")
+source("../scripts/fc_plots.R")
+source("../scripts/settings.R")
+source("../scripts/local_settings.R")
+dir.path <- "~/Documents/primes_storage/results/"
+metric.key <- 2
+results.dir <- "plots/"
+```
+
+
+```{r}
+tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
+```
+
+```{r}
+tasks.per.res <- tasks.per.tiss %/% 2 #how many different methods per one resolution
+res <<- 0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
+method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "z_score", "cutoff", "cutoff", "outlier", "percentile", "mad") #filtering method
+param <<- switch(task.id %% tasks.per.res + 1, 0, 80, 2, 5, 10, 0, 95, 2) #filtering parameter
+```
+
+```{r}
+source.dir <<- paste0(source.dir, project, "/", tissue, "/")
+dir.path <- paste0(dir.path, project, "/", tissue, "/", res, "-", method, "-", param, "/")
+cells <- read.csv(paste0(dir.path, "!cells.csv"))
+clusters <- read.csv(paste0(dir.path, "!clusters.csv"))
+```
+
+```{r}
+all.cells <- colnames(tiss$RNA)
+filtered <- readFilterCsvMethod(method, "all")
+pass <- list()
+pass[all.cells] <- TRUE
+pass[filtered] <- FALSE
+tiss[["pass"]] <- as.character(pass)
+  
+tiss <- tiss[,pass == TRUE] 
+```
+
+
+```{r}
+clst <- cells$cluster
+names(clst) <- cells$cell
+tiss$seurat_clusters <- cells$cluster
+annotations <- clusters$annotation
+cell.types <- clusters$cell.type
+```
+
+```{r}
+target.cl <- 0
+tiss <- subset(tiss, seurat_clusters == cl)
+```
+
+```{r}
+tmp <- clusterize(tiss, res, compute.reductions = TRUE, compute.markers = TRUE) #cluster cells
+#unpack returned object
+tiss <<- tmp$obj
+obj.markers <<- tmp$markers
+
+
+tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss), record.stats = TRUE) #assign cell types
+#unpack returned object
+clusters <<- tmp$clusters
+obj.markers <<- tmp$markers
+
+generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation, sig.plots = TRUE) #make plots
+
+saveResults(tiss, clusters, obj.markers, mc_specific=TRUE)
+```
+

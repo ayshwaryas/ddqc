@@ -63,8 +63,8 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   l5 <- labs(y=paste0("Average ", metric.name))
   l6 <- labs(y=paste0("Average log2(", metric.name, ")"))
   if (metric.name.seurat == "percent.mt") {
-    a1 <- scale_y_continuous(breaks=seq(0, 100, 5))
-    a2 <- scale_x_continuous(breaks=seq(0, 100, 5))
+    a1 <- scale_y_continuous(breaks=seq(0, 80, 5))
+    a2 <- scale_x_continuous(breaks=seq(0, 80, 5))
   }
   else {
     a1 <- NULL
@@ -72,6 +72,10 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   }
   
   n.clusters <- length(unique(obj$seurat_clusters))
+  plot.cols <- scales::hue_pal(c = 100, l = 65, h.start = 0)(n.clusters)
+  names(plot.cols) <- 0:(n.clusters - 1)
+  c1 <- scale_fill_manual(values = plot.cols) 
+  c2 <- scale_color_manual(values = plot.cols)
   
   data <- data.frame(metric=obj[[metric.name.seurat]], clusters=obj$seurat_clusters) 
   colnames(data) <- c("metric", "clusters") #rename data columns
@@ -83,29 +87,29 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   
   if (save.log2) {
     #barplot of cluster means
-    ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0) %>% group_by(clusters) %>% summarize(metric = mean(log2(metric))), aes(x=clusters, y=log2(metric))) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l6, n.clusters = n.clusters)
+    ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0) %>% group_by(clusters) %>% summarize(metric = mean(log2(metric))), aes(x=clusters, y=log2(metric))) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + c1 + c2 + l6, n.clusters = n.clusters)
     #boxplot by cluster
-    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + l2, n.clusters = n.clusters) 
+    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters) 
     #combined density plots for each cluster
-    ggsave1(filename=paste0(name.prefix, "density_", name.suffix, ".pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill=clusters)) + t3 + t4 + t5 + l4, n.clusters = n.clusters)
+    ggsave1(filename=paste0(name.prefix, "density_", name.suffix, ".pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill=clusters)) + t3 + t4 + t5 + c1 + c2 + l4, n.clusters = n.clusters)
     #joyplot by cluster
-    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + l4, n.clusters = n.clusters) 
+    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l4, n.clusters = n.clusters) 
     #overall destiny plot
     ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill="red")) + t3 + l4, n.clusters = n.clusters) 
     #violin plot by cluster
-    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + l2, n.clusters = n.clusters)
+    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters)
   }
   
   #barplot of cluster means
-  ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, ".pdf"), plot=ggplot(data %>% group_by(clusters) %>% summarize(metric = mean(metric)), aes(x=clusters, y=metric)) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l5 + a1, n.clusters = n.clusters)
+  ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, ".pdf"), plot=ggplot(data %>% group_by(clusters) %>% summarize(metric = mean(metric)), aes(x=clusters, y=metric)) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l5 + c1 + c2 + a1, n.clusters = n.clusters)
   #boxplot by cluster
-  ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + l1 + a1, n.clusters = n.clusters) 
+  ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters) 
   #joyplot by cluster
-  ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + l3 + a2, n.clusters = n.clusters) 
+  ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l3 + a2, n.clusters = n.clusters) 
   #overall destiny plot
   ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric)) + geom_density(aes(fill="red")) + t3 + l3 + a2, n.clusters = n.clusters) 
   #violin plot by cluster
-  ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + l1 + a1, n.clusters = n.clusters)
+  ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters)
   
   #tsne and umap continious dimplots
   ggsave1(filename=paste0(name.prefix, "tsne_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "tsne"))
@@ -118,7 +122,7 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   }
 }
 
-generatePlots <- function(obj, name, cell.types, annotations) { #main plots function
+generatePlots <- function(obj, name, cell.types, annotations, sig.plots) { #main plots function
   message("Making Plots")
   lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
   for (i in 1:length(cell.types)) {
@@ -131,10 +135,12 @@ generatePlots <- function(obj, name, cell.types, annotations) { #main plots func
   generatePlotsByMetric(obj, name, lbls, "percent.mt", "percent.mt", "mito") #%mito plots
   generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo") #%ribo plots
   
-  #signatures plots
-  generatePlotsByMetric(obj, name, lbls, "cd11", "cd1", "cd1", "signatures/", save.log2 = FALSE) 
-  generatePlotsByMetric(obj, name, lbls, "cd21", "cd2", "cd2", "signatures/", save.log2 = FALSE)
-  generatePlotsByMetric(obj, name, lbls, "cd31", "cd3", "cd3", "signatures/", save.log2 = FALSE)
+  if (sig.plots) {
+    #signatures plots
+    generatePlotsByMetric(obj, name, lbls, "cd11", "cd1", "cd1", "signatures/", save.log2 = FALSE) 
+    generatePlotsByMetric(obj, name, lbls, "cd21", "cd2", "cd2", "signatures/", save.log2 = FALSE)
+    generatePlotsByMetric(obj, name, lbls, "cd31", "cd3", "cd3", "signatures/", save.log2 = FALSE)
+  }
   
   #cluster colored dimplots
   ggsave1(filename=paste0(results.dir, "/tsne_clusters.pdf"), plot=DimPlotCluster(obj, lbls, name, "tsne"))
@@ -434,7 +440,7 @@ MCMain <- function() {
   sm <- tmp$sm
   obj.markers <<- tmp$markers
   
-  generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation) #make plots
+  generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation, sig.plots = TRUE) #make plots
   #generateMarkerPlots(obj, filename)
   
   saveResults(tiss, clusters, obj.markers, mc_specific=TRUE, sm=sm)

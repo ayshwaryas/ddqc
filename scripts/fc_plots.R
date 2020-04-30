@@ -53,6 +53,13 @@ generateFCPlots <- function(obj, clusters) {
   }
   names(lbls) <- 0:(length(lbls) - 1)  #rename labels with cluster #
   
+  name <- paste0(res, "-", metric, "-", tissue)
+  
+  generatePlotsByMetric(obj, name, lbls, "nCount_RNA", "Number of UMIS", "count", "additional_plots/") #nUMI plots
+  generatePlotsByMetric(obj, name, lbls, "nFeature_RNA", "Number of Genes", "genes", "additional_plots/") #nGenes plots
+  generatePlotsByMetric(obj, name, lbls, "percent.mt", "percent.mt", "mito", "additional_plots/") #%mito plots
+  generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo", "additional_plots/") #%ribo plots
+  
   #extract UMAP coordinates for plotting
   cells <- colnames(obj)
   data <- as.data.frame(Embeddings(obj$umap)[cells, c(1, 2)])
@@ -107,6 +114,7 @@ FCPlotsMain <- function() {
   results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/", metric, "/") #directory where output will go
   dir.create(paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/"), showWarnings=FALSE)
   dir.create(results.dir, showWarnings=FALSE)
+  dir.create(paste0(results.dir, "additional_plots/"), showWarnings=FALSE)
   
   tiss <<- readFilterCsv(tiss, metric) #add cell categories
   
@@ -116,7 +124,8 @@ FCPlotsMain <- function() {
   obj.markers <<- tmp$markers
   clusters <<- assignCellTypes(tiss, obj.markers, getAnnotations(tiss))
   
-  generateFCPlots(tiss, clusters) #make plots
+  generateFCPlots(tiss, clusters)
+  #generatePlots(tiss, "", clusters$cell.type, clusters$annotation, sig.plots = FALSE) #make plots
   
   saveResults(tiss, clusters, obj.markers)
   message(paste("Finished task.id:", task.id, "- tissue:", tissue, "res:", res, "metric:", metric, "project:", project))

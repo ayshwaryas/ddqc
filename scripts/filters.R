@@ -41,26 +41,21 @@ filterGenes <- function(obj, res, method, threshold) {
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
     cluster <- subset(obj, idents = cl)
     lower.co <- 0
-    upper.co <- 0
     if (method == "outlier") { #outlier filtering (> Q3 + 1.5IQR)
       q1 <- summary(cluster$nFeature_RNA)[[2]]
       q3 <- summary(cluster$nFeature_RNA)[[5]]
       lower.co <- q1 - 1.5 * (q3 - q1)
-      upper.co <- q3 + 1.5 * (q3 - q1)
     }
     if (method == "mad") { #Median absolute deviations filtering 
       lower.co <- median(cluster$nFeature_RNA) - threshold * mad(cluster$nFeature_RNA)
-      upper.co <- median(cluster$nFeature_RNA) + threshold * mad(cluster$nFeature_RNA)
     }
     if (method == "z_score") {
       lower.co <- mean(cluster$nFeature_RNA) - threshold * sd(cluster$nFeature_RNA)
-      upper.co <- mean(cluster$nFeature_RNA) + threshold * sd(cluster$nFeature_RNA)
     }
     if (method == "cutoff") {
       lower.co <- threshold
-      upper.co <- threshold * 10
     }
-    tmp_qc.pass <- (cluster$nFeature_RNA >= lower.co & cluster$nFeature_RNA <= upper.co) 
+    tmp_qc.pass <- (cluster$nFeature_RNA >= lower.co) 
     names(tmp_qc.pass) <- colnames(cluster$RNA)
     qc.pass <- c(qc.pass, tmp_qc.pass)
   }

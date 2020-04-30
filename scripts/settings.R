@@ -15,10 +15,10 @@ source.dir <<- output.dir
 #FILTERING
 cells.filter <<- 3
 features.filter <<- 100
-do.counts <<- TRUE
-do.genes <<- TRUE
+do.counts <<- FALSE
+do.genes <<- FALSE
 do.mito <<- TRUE
-do.ribo <<- TRUE
+do.ribo <<- FALSE
 
 #OTHER
 save.res.1 <<- FALSE #saveRDS of res 1 automatically
