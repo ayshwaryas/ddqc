@@ -10,7 +10,7 @@ library(tools)
 #PATHS
 data.dir <<- "/ahg/regevdata/projects/scqc/data/"
 output.dir <<- "/ahg/regevdata/projects/scqc/output/"
-source.dir <<- output.dir
+source.dir.prefix <<- output.dir
 
 #FILTERING
 cells.filter <<- 3

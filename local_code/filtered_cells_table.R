@@ -6,8 +6,8 @@ source("scripts/local_settings.R")
 tasks.per.tiss <<- 1
 
 
-project <- "mc_other_10X"
-task.id <- 2
+project <- "mc_tm"
+task.id <- 11
 
 
 readFilterCsvMethod <- function(method, all.cells) {
@@ -28,7 +28,7 @@ readFilterCsvMethod <- function(method, all.cells) {
 }
 
 
-#obj <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
+obj <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
 
 tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
 res <<- 1 #0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution

@@ -1,4 +1,4 @@
-tasks.per.tiss <<- 5 #How many different res/methods per one tissue
+tasks.per.tiss <<- 1 #How many different res/methods per one tissue
 
 readFilterCsvMethod <- function(method, metric, full.path=FALSE) {
   filtered.cells <- NULL
@@ -31,17 +31,17 @@ readFilterCsv <- function(obj, metric) {
   
   cutoff10 <- setdiff(all.cells, readFilterCsvMethod("cutoff-10", metric))
   zscore2 <- setdiff(all.cells, readFilterCsvMethod("z_score-2", metric))
-  mad <- setdiff(all.cells, readFilterCsvMethod("mad-2", metric))
+  mad <- setdiff(all.cells, readFilterCsvMethod("outlier-0", metric))
   
   #categorize cells
   color <- list()
   color[all.cells] <- "Did not pass"
   color[mad] <- "MAD2 only"
   color[cutoff10] <- "C10 only"
-  color[zscore2] <- "ZSC2 only"
+  color[zscore2] <- "Outlier only"
   color[intersect(mad, cutoff10)] <- "MAD2 and C10"
-  color[intersect(mad, zscore2)] <- "MAD2 and ZSC2"
-  color[intersect(zscore2, cutoff10)] <- "ZSC2 and C10"
+  color[intersect(mad, zscore2)] <- "MAD2 and Outlier"
+  color[intersect(zscore2, cutoff10)] <- "Outlier and C10"
   color[intersect(mad, intersect(cutoff10, zscore2))] <- "All"
   obj[["color"]] <- factor(as.character(color))
   
@@ -73,8 +73,8 @@ generateFCPlots <- function(obj, clusters) {
   
   t1 <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
   t2 <- guides(colour = guide_legend(override.aes = list(size=2)))
-  plot.cols <- c("C10 only" = "#D55E00", "MAD2 and C10" = "#E69F00", "ZSC2 and C10" = "#CC79A7", "MAD2 only" = "#56B4E9",
-                 "ZSC2 only" = "#0072B2", "MAD2 and ZSC2" = "#009E73", "All" = "#999999" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
+  plot.cols <- c("C10 only" = "#D55E00", "MAD2 and C10" = "#E69F00", "Outlier and C10" = "#CC79A7", "MAD2 only" = "#56B4E9",
+                 "Outlier only" = "#0072B2", "MAD2 and Outlier" = "#009E73", "All" = "#000000" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
   
   plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color)) + geom_point(size = 0.5) + t1 + t2 + scale_fill_manual(values = plot.cols) + scale_color_manual(values = plot.cols) #umap colored by filtering category
   plot2 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=cluster)) + geom_point(size = 0.5) + t1 + t2 #umap colored by cluster
@@ -113,10 +113,10 @@ generateFCPlots <- function(obj, clusters) {
 FCPlotsMain <- function() {
   tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
   res <<- 1 #0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
-  metric <<- switch(task.id %% tasks.per.res + 1, "counts", "genes", "mito", "ribo", "all")
+  metric <<- "all" #switch(task.id %% tasks.per.res + 1, "counts", "genes", "mito", "ribo", "all")
   message(paste("Starting task.id:", task.id, "- tissue:", tissue, "res:", res, "metric:", metric, "project:", project))
   
-  source.dir <<- paste0(source.dir, project, "/", tissue, "/") #directory where csv with filtered cells are located
+  source.dir <<- paste0(source.dir.prefix, project, "/", tissue, "/") #directory where csv with filtered cells are located
   results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/", metric, "/") #directory where output will go
   dir.create(paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/"), showWarnings=FALSE)
   dir.create(results.dir, showWarnings=FALSE)

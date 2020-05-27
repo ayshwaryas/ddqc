@@ -4,8 +4,8 @@ output: html_notebook
 ---
 
 ```{r}
-project <- "mc_tm"
-task.id <- 11
+project <<- "mc_tm"
+task.id <<- 56
 source("../scripts/readers.R")
 source("../scripts/mc_functions.R")
 source("../scripts/fc_plots.R")
@@ -14,65 +14,73 @@ source("../scripts/local_settings.R")
 ```
 
 ```{r}
-tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
-```
-
-```{r}
-tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
-res <<- 1
-method <<- switch(task.id %% tasks.per.res + 1, "none", "z_score", "cutoff", "outlier", "mad") #filtering method
-param <<- switch(task.id %% tasks.per.res + 1, 0, 2, 10, 0, 2) #filtering parameter
-```
-
-```{r}
-target.cl <- 3
-source.dir <- paste0(source.dir, project, "/", tissue, "/", res, "-", method, "-", param, "/")
-
-task.name <- paste(tissue, res, method, target.cl, sep = "-")
-results.dir <- paste0(output.dir, "plots/", task.name, "/")
-dir.create(paste0(output.dir, "plots/"), showWarnings = FALSE)
-dir.create(results.dir, showWarnings = FALSE)
-
-cells <- read.csv(paste0(source.dir, "!cells.csv"))
-clusters <- read.csv(paste0(source.dir, "!clusters.csv"))
-```
-
-```{r}
-all.cells <- colnames(tiss$RNA)
-filtered <- unique(readFilterCsvMethod("", "all", full.path=TRUE))
-pass <- list()
-pass[all.cells] <- TRUE
-pass[intersect(all.cells, filtered)] <- FALSE
-tiss[["pass"]] <- factor(as.character(pass))
+subcluster <- function(target.cl, n.pieces, tsne.perplexity, min.pval) {
+  tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
+  res <<- 1
+  method <<- switch(task.id %% tasks.per.res + 1, "none", "z_score", "cutoff", "outlier", "mad") #filtering method
+  param <<- switch(task.id %% tasks.per.res + 1, 0, 2, 10, 0, 2) #filtering parameter
   
-tiss <- tiss[,pass == TRUE] 
+  source.dir <<- paste0(source.dir.prefix, project, "/", tissue, "/", res, "-", method, "-", param, "/")
+
+  task.name <<- paste(tissue, res, method, param, target.cl, sep = "-")
+  results.dir <<- paste0(output.dir, "plots/", task.name, "/")
+  dir.create(paste0(output.dir, "plots/"), showWarnings = FALSE)
+  dir.create(results.dir, showWarnings = FALSE)
+  
+  cells <- read.csv(paste0(source.dir, "!cells.csv"))
+  clusters <- read.csv(paste0(source.dir, "!clusters.csv"))  
+  
+  all.cells <- colnames(tiss$RNA)
+  filtered <- unique(readFilterCsvMethod("", "all", full.path=TRUE))
+  pass <- list()
+  pass[all.cells] <- TRUE
+  pass[intersect(all.cells, filtered)] <- FALSE
+  tiss[["pass"]] <<- factor(as.character(pass))
+    
+  tiss <<- tiss[,pass == TRUE] 
+  
+  clst <- cells$cluster
+  names(clst) <- cells$cell
+  tiss$old_clusters <<- cells$cluster
+  annotations <- clusters$annotation
+  cell.types <- clusters$cell.type
+  
+  cluster.obj <<- subset(tiss, old_clusters == target.cl)
+  
+  tmp <- clusterize(cluster.obj, res, compute.reductions = TRUE, compute.markers = TRUE, n.pieces = n.pieces, tsne.perplexity = tsne.perplexity) #cluster cells
+  #unpack returned object
+  cluster.obj <<- tmp$obj
+  obj.markers <<- tmp$markers
+  
+  tmp <- assignCellTypes(cluster.obj, obj.markers, getAnnotations(cluster.obj), record.stats = TRUE, min.pval = min.pval) #assign cell types
+  #unpack returned object
+  clusters <<- tmp$clusters
+  obj.markers <<- tmp$markers
+  
+  generatePlots(cluster.obj, task.name, clusters$cell.type, clusters$annotation, sig.plots = FALSE) #make plots
+  generateMarkerPlots(cluster.obj, obj.markers %>% group_by(cluster) %>% top_n(n = 9, wt = avg_logFC))
+  
+  saveResults(cluster.obj, clusters, obj.markers, mc_specific=FALSE)
+  
+  print(cell.types[target.cl])
+}
 ```
 
 
 ```{r}
-clst <- cells$cluster
-names(clst) <- cells$cell
-tiss$seurat_clusters <- cells$cluster
-annotations <- clusters$annotation
-cell.types <- clusters$cell.type
+tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
+bkp <- tiss
 ```
 
+
 ```{r}
-cluster.obj <- subset(tiss, seurat_clusters == target.cl)
-
-tmp <- clusterize(cluster.obj, res, compute.reductions = TRUE, compute.markers = TRUE) #cluster cells
-#unpack returned object
-cluster.obj <<- tmp$obj
-obj.markers <<- tmp$markers
-
-
-tmp <- assignCellTypes(cluster.obj, obj.markers, getAnnotations(cluster.obj), record.stats = TRUE) #assign cell types
-#unpack returned object
-clusters <<- tmp$clusters
-obj.markers <<- tmp$markers
-
-generatePlots(cluster.obj, task.name, clusters$cell.type, clusters$annotation, sig.plots = FALSE) #make plots
-
-saveResults(cluster.obj, clusters, obj.markers, mc_specific=FALSE)
+tiss <- bkp
+target.cl <- 5
+too.little.cells <- TRUE
+if (too.little.cells) {
+  subcluster(target.cl, n.pieces=10, tsne.perplexity=10, min.pval=1.01)
+} else {
+  subcluster(target.cl, n.pieces=50, tsne.perplexity=30, min.pval=0.05)
+}
 ```
 

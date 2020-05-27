@@ -1,4 +1,4 @@
-tasks.per.tiss <<- 5 #How many different res/methods per one tissue
+tasks.per.tiss <<- 4 #How many different res/methods per one tissue
 
 
 #plots
@@ -88,29 +88,29 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   
   if (save.log2) {
     #barplot of cluster means
-    ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0) %>% group_by(clusters) %>% summarize(metric = mean(log2(metric))), aes(x=clusters, y=log2(metric))) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + c1 + c2 + l6, n.clusters = n.clusters)
+    #ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0) %>% group_by(clusters) %>% summarize(metric = mean(log2(metric))), aes(x=clusters, y=log2(metric))) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + c1 + c2 + l6, n.clusters = n.clusters)
     #boxplot by cluster
     ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters) 
     #combined density plots for each cluster
-    ggsave1(filename=paste0(name.prefix, "density_", name.suffix, ".pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill=clusters)) + t3 + t4 + t5 + c1 + c2 + l4, n.clusters = n.clusters)
+    #ggsave1(filename=paste0(name.prefix, "density_", name.suffix, ".pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill=clusters)) + t3 + t4 + t5 + c1 + c2 + l4, n.clusters = n.clusters)
     #joyplot by cluster
     ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l4, n.clusters = n.clusters) 
     #overall destiny plot
-    ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill="red")) + t3 + l4, n.clusters = n.clusters) 
+    #ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill="red")) + t3 + l4, n.clusters = n.clusters) 
     #violin plot by cluster
-    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters)
+    #ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters)
   }
   
   #barplot of cluster means
-  ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, ".pdf"), plot=ggplot(data %>% group_by(clusters) %>% summarize(metric = mean(metric)), aes(x=clusters, y=metric)) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l5 + c1 + c2 + a1, n.clusters = n.clusters)
+  #ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, ".pdf"), plot=ggplot(data %>% group_by(clusters) %>% summarize(metric = mean(metric)), aes(x=clusters, y=metric)) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l5 + c1 + c2 + a1, n.clusters = n.clusters)
   #boxplot by cluster
   ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters) 
   #joyplot by cluster
   ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l3 + a2, n.clusters = n.clusters) 
   #overall destiny plot
-  ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric)) + geom_density(aes(fill="red")) + t3 + l3 + a2, n.clusters = n.clusters) 
+  #ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric)) + geom_density(aes(fill="red")) + t3 + l3 + a2, n.clusters = n.clusters) 
   #violin plot by cluster
-  ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters)
+  #ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters)
   
   #tsne and umap continious dimplots
   ggsave1(filename=paste0(name.prefix, "tsne_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "tsne"))
@@ -146,33 +146,35 @@ generatePlots <- function(obj, name, cell.types, annotations, sig.plots) { #main
   #cluster colored dimplots
   ggsave1(filename=paste0(results.dir, "/tsne_clusters.pdf"), plot=DimPlotCluster(obj, lbls, name, "tsne"))
   ggsave1(filename=paste0(results.dir, "/umap_clusters.pdf"), plot=DimPlotCluster(obj, lbls, name, "umap"))
-  
 }
 
-generateMarkerPlots <- function(obj, top5, name) { #generate plots of top marker genes. Does not work properly
-  top5 <- obj.markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_logFC)
-  dir.create(paste0(results.dir, name, "/marker_plots/"), showWarnings = FALSE)
-  for (c in unique(top5$cluster)) {
-    ggsave1(filename=paste0(results.dir, name, "/marker_plots/", c, "-violin.pdf"), plot=VlnPlot(obj, features = subset(top5, subset = cluster == c)$gene, pt.size = 0.25))
-    ggsave1(filename=paste0(results.dir, name, "/marker_plots/", c, "-scatter.pdf"), plot=FeaturePlot(obj, features = subset(top5, subset = cluster == c)$gene, pt.size = 0.25))
+generateMarkerPlots <- function(obj, top.markers) { #generate plots of top marker genes. Does not work properly
+  dir.create(paste0(results.dir, "/marker_plots/"), showWarnings = FALSE)
+  n.clusters <- length(unique(obj$seurat_clusters))
+  for (cl in unique(top.markers$cluster)) {
+    features <- subset(top.markers, cluster == cl)$gene
+    ggsave1(filename=paste0(results.dir, "/marker_plots/", cl, "-violin.pdf"), plot=VlnPlot(obj, features = features, pt.size = 0.25), n.clusters=n.clusters)
+    ggsave1(filename=paste0(results.dir, "/marker_plots/", cl, "-scatter.pdf"), plot=FeaturePlot(obj, features = features, pt.size = 0.25))
+    ggsave1(filename=paste0(results.dir, "/marker_plots/", cl, "-dot.pdf"), plot=DotPlot(obj, features = features))  
+    message(paste("Cluster", cl, "marker plots finished"))
   }
 }
 
 
 #clustering & finding markers 
-clusterize <- function(obj, res, compute.reductions=TRUE, compute.markers=TRUE) { #function that will perform standart clustering procedures. If compute.markers == TRUE will compute DE genes. If compute.reductions = TRUE will calculate TSNE and UMAP
+clusterize <- function(obj, res, compute.reductions=TRUE, compute.markers=TRUE, n.pieces=50, tsne.perplexity=30) { #function that will perform standart clustering procedures. If compute.markers == TRUE will compute DE genes. If compute.reductions = TRUE will calculate TSNE and UMAP
   obj <- NormalizeData(obj, normalization.method = "LogNormalize", scale.factor = 10000)
   obj <- FindVariableFeatures(obj, selection.method = "vst", nfeatures = 2000)
   all.genes <- rownames(x = obj)
   obj <- ScaleData(obj, features = all.genes)
-  obj <- RunPCA(obj, features = VariableFeatures(obj))
+  obj <- RunPCA(obj, npcs=n.pieces)
   
-  obj <- FindNeighbors(obj, dims = 1:50)
+  obj <- FindNeighbors(obj, dims = 1:n.pieces)
   obj <- FindClusters(obj, resolution = res)
   
   if (compute.reductions) {
-    obj <- RunUMAP(obj, dims = 1:50)
-    obj <- tryCatch({RunTSNE(obj, dims = 1:50, check_duplicates = FALSE)}, error = function(e) {RunTSNE(obj, dims = 1:10, check_duplicates = FALSE)})
+    obj <- RunUMAP(obj, dims = 1:n.pieces)
+    obj <- RunTSNE(obj, dims = 1:n.pieces, check_duplicates = FALSE, perplexity = tsne.perplexity)
   }
   
   if (compute.markers) {
@@ -243,13 +245,13 @@ getAnnotations <- function(obj) { #calculate most common annotations in each clu
   return(list("a1" = cluster.labels, "a2" = cluster.labels2, "p1" = percents1, "p2" = percents2))
 }
 
-assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE) { #function that assigns cell types based on marker genes using gene to cell.type dictionary
+assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, min.pval=0.05) { #function that assigns cell types based on marker genes using gene to cell.type dictionary
   message("Assigning Cell Types")
   genes <- read.csv(paste0(data.dir, "markers.tsv"), sep="\t") #read cell type markers
   genes <- data.frame(genes)
   genes <- select(genes, official.gene.symbol, cell.type, organ)
   
-  markers <- markers %>% group_by(cluster) %>% filter(avg_logFC > 0, p_val_adj < 0.05) #leave only markers that have positive fold change and pval < 0.05
+  markers <- markers %>% group_by(cluster) %>% filter(avg_logFC > 0, p_val_adj < min.pval) #leave only markers that have positive fold change and pval < 0.05
   markers <- markers[order(markers$cluster, -markers$avg_logFC),]
   
   cell.types <- NULL
@@ -364,7 +366,10 @@ saveResults <- function(obj, clusters, obj.markers, mc_specific=FALSE, sm=NA) {
   tsne <- as.data.frame(Embeddings(obj$tsne)[all.cells, c(1, 2)])
   
   cells <- data.frame("cell"=all.cells, "cluster"=obj$seurat_clusters, "cell.type"=clusters$cell.type[obj$seurat_clusters], 
-                     "annotation" = clusters$annotation[obj$seurat_clusters], "UMAP_1"=umap$UMAP_1, "UMAP_2"=umap$UMAP_2,
+                      "cell.type2"=clusters$cell.type2[obj$seurat_clusters], 
+                      "annotation" = clusters$annotation[obj$seurat_clusters], "annotation2" = clusters$annotation2[obj$seurat_clusters],
+                      "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb, 
+                      "UMAP_1"=umap$UMAP_1, "UMAP_2"=umap$UMAP_2,
                      "TSNE_1"=tsne$tSNE_1, "TSNE_2"=tsne$tSNE_2)
   write.csv(cells, file=paste0(results.dir, "/!cells.csv"))
   
@@ -406,7 +411,7 @@ check.save <- function() {
 MCMain <- function() {
   tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
   res <<- 1 #0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
-  method <<- switch(task.id %% tasks.per.res + 1, "none", "z_score", "cutoff", "outlier", "mad") #filtering method
+  method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "outlier", "mad") #filtering method
   param <<- switch(task.id %% tasks.per.res + 1, 0, 2, 10, 0, 2) #filtering parameter
   info.msg <- paste0("task.id:", task.id, " - tissue:", tissue, " res:", res, " mehtod:", method, " param:", param, 
                      " project:", project, " do.counts:", do.counts, " do.genes:", do.genes, " do.mito:", do.mito,
@@ -442,7 +447,7 @@ MCMain <- function() {
   obj.markers <<- tmp$markers
   
   generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation, sig.plots = TRUE) #make plots
-  #generateMarkerPlots(obj, filename)
+  # sgenerateMarkerPlots(tiss, obj.markers %>% group_by(cluster) %>% top_n(n = 9, wt = avg_logFC))
   
   saveResults(tiss, clusters, obj.markers, mc_specific=TRUE, sm=sm)
   
