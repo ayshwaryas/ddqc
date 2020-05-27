@@ -98,7 +98,7 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
     #overall destiny plot
     #ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill="red")) + t3 + l4, n.clusters = n.clusters) 
     #violin plot by cluster
-    #ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters)
+    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters)
   }
   
   #barplot of cluster means
@@ -110,7 +110,7 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   #overall destiny plot
   #ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric)) + geom_density(aes(fill="red")) + t3 + l3 + a2, n.clusters = n.clusters) 
   #violin plot by cluster
-  #ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters)
+  ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters)
   
   #tsne and umap continious dimplots
   ggsave1(filename=paste0(name.prefix, "tsne_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "tsne"))
@@ -446,7 +446,7 @@ MCMain <- function() {
   sm <- tmp$sm
   obj.markers <<- tmp$markers
   
-  generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation, sig.plots = TRUE) #make plots
+  generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation, sig.plots = FALSE) #make plots
   # sgenerateMarkerPlots(tiss, obj.markers %>% group_by(cluster) %>% top_n(n = 9, wt = avg_logFC))
   
   saveResults(tiss, clusters, obj.markers, mc_specific=TRUE, sm=sm)

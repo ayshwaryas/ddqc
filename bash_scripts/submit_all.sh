@@ -7,5 +7,4 @@ bash_scripts/scheduler.sh mc+mc_plot ts30
 bash_scripts/scheduler.sh mc+mc_plot other
 bash_scripts/scheduler.sh mc+mc_plot ebi_tm
 bash_scripts/scheduler.sh mc+mc_plot other_10X
-bash_scripts/scheduler.sh mc+mc_plot kb_tm
 bash_scripts/scheduler.sh mc+mc_plot PanglaoDB
