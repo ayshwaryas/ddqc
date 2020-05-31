@@ -2,7 +2,6 @@
 
 
 filterCounts <- function(obj, res, method, threshold) {
-  obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   qc.pass <- NULL
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
     cluster <- subset(obj, idents = cl)
@@ -36,7 +35,6 @@ filterCounts <- function(obj, res, method, threshold) {
 
 
 filterGenes <- function(obj, res, method, threshold) {
-  obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   qc.pass <- NULL
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
     cluster <- subset(obj, idents = cl)
@@ -70,7 +68,6 @@ filterGenes <- function(obj, res, method, threshold) {
 
 
 filterMito <- function(obj, res, method, threshold) {
-  obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   qc.pass <- NULL
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
     cluster <- subset(obj, idents = cl)
@@ -104,7 +101,6 @@ filterMito <- function(obj, res, method, threshold) {
 
 
 filterRibo <- function(obj, res, method, threshold) {
-  obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   qc.pass <- NULL
   for (cl in levels(obj$seurat_clusters)) { #for each cluster calculate which cells passed QC
     cluster <- subset(obj, idents = cl)
@@ -143,6 +139,7 @@ filterCells <- function(obj, method, threshold, do.counts, do.genes, do.mito, do
   }
   message("Filtering Cells")
   
+  obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   if (do.counts) {
     if (method == "cutoff") {
       obj$counts.qc.pass <- filterCounts(obj, res, method, 500)
