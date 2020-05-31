@@ -412,7 +412,7 @@ MCMain <- function() {
   tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
   res <<- 1 #0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
   method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "outlier", "mad") #filtering method
-  param <<- switch(task.id %% tasks.per.res + 1, 0, 2, 10, 0, 2) #filtering parameter
+  param <<- switch(task.id %% tasks.per.res + 1, 0, 10, 0, 2) #filtering parameter
   info.msg <- paste0("task.id:", task.id, " - tissue:", tissue, " res:", res, " mehtod:", method, " param:", param, 
                      " project:", project, " do.counts:", do.counts, " do.genes:", do.genes, " do.mito:", do.mito,
                      " do.ribo:", do.ribo)
