@@ -1,0 +1,149 @@
+```{r}
+source("../scripts/settings.R")
+source("../scripts/local_settings.R")
+```
+
+```{r}
+cap.first <- function(x) {
+  paste(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)), sep="")
+}
+
+split.special <- function(x) {
+  x <- last(strsplit(x, "-")[[1]])
+  x <- strsplit(x, "\\.")[[1]][[1]]
+  x <- gsub("_|mouse|human|[0-9]", "", x)
+  
+  if (x == "epi" || x == "fib" || x == "imm") {
+    return("Colon")
+  }
+  
+  if (grepl("lung", x, ignore.case = TRUE)) {
+    return("Lung")
+  }
+  
+  if (grepl("pancrea", x, ignore.case = TRUE)) {
+    return("Pancreas")
+  }
+  
+  if (grepl("marrow", x, ignore.case = TRUE)) {
+    return("BoneMarrow")
+  }
+  
+  if (grepl("bipolar", x, ignore.case = TRUE)) {
+    return("Retina")
+  }
+  
+  return(cap.first(x))
+}
+```
+
+
+
+```{r}
+plotMeanMito <- function(dataset) {
+  summ <- dataset %>% group_by(ptissue) %>% summarise(mean.percent.mt = mean(percent.mt), sd.percent.mt = sd(percent.mt))
+  summ$tissue <- sapply(as.character(summ$ptissue), split.special)
+  tissue.max <- summ %>% group_by(tissue) %>% summarize(sort.key=max(mean.percent.mt))
+  summ=summ%>%left_join(tissue.max, by="tissue")
+  summ <- summ %>% arrange(desc(sort.key), desc(mean.percent.mt))
+  summ$ptissue <- factor(summ$ptissue, levels=unique(as.character(summ$ptissue)))
+  
+  plot <- ggplot(summ, aes(x=ptissue, y=mean.percent.mt)) + geom_point(aes(color=tissue), shape=18, size=5)
+  err <- geom_errorbar(aes(ymin=mean.percent.mt-sd.percent.mt, ymax=mean.percent.mt+sd.percent.mt), width=.1)
+  t <- theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"), axis.text.y = element_text(size=10), axis.title.x=element_blank())
+  ggsave(filename = "plots/mean_mito_err.png", plot = plot + err + t, width = 30, height = 10)
+  ggsave(filename = "plots/mean_mito.png", plot = plot + t, width = 30, height = 10)
+}
+```
+
+
+```{r}
+plotMedianMito <- function(dataset) {
+  summ <- dataset %>% group_by(ptissue) %>% summarise(median.percent.mt = median(percent.mt), iqr.percent.mt = IQR(percent.mt))
+  summ$tissue <- sapply(as.character(summ$ptissue), split.special)
+  
+  tissue.max <- summ %>% group_by(tissue) %>% summarize(sort.key=max(median.percent.mt))
+  summ=summ%>%left_join(tissue.max, by="tissue")
+  summ <- summ %>% arrange(desc(sort.key), desc(median.percent.mt))
+  
+  summ$ptissue <- factor(summ$ptissue, levels=unique(as.character(summ$ptissue)))
+  
+  plot <- ggplot(summ, aes(x=ptissue, y=median.percent.mt)) + geom_point(aes(color=tissue), shape=18, size=5)
+  err <- geom_errorbar(aes(ymin=median.percent.mt-iqr.percent.mt, ymax=median.percent.mt+iqr.percent.mt), width=.1)
+  t <- theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"), axis.text.y = element_text(size=10), axis.title.x=element_blank())
+  ggsave(filename = "plots/median_mito_err.png", plot = plot + err + t, width = 30, height = 10)
+  ggsave(filename = "plots/median_mito.png", plot = plot + t, width = 30, height = 10)
+
+}
+```
+
+```{r}
+plotMeanGenes <- function(dataset) {
+  dataset$nFeature_RNA <- log2(dataset$nFeature_RNA)
+  summ <- dataset %>% group_by(ptissue) %>% summarise(mean.nFeature_RNA = mean(nFeature_RNA), sd.nFeature_RNA = sd(nFeature_RNA))
+  summ$tissue <- sapply(as.character(summ$ptissue), split.special)
+  
+  tissue.max <- summ %>% group_by(tissue) %>% summarize(sort.key=max(mean.nFeature_RNA))
+  summ=summ%>%left_join(tissue.max, by="tissue")
+  summ <- summ %>% arrange(desc(sort.key), desc(mean.nFeature_RNA))
+  
+  summ$ptissue <- factor(summ$ptissue, levels=unique(as.character(summ$ptissue)))
+  
+  plot <- ggplot(summ, aes(x=ptissue, y=mean.nFeature_RNA)) + geom_point(aes(color=tissue), shape=18, size=5)
+  err <- geom_errorbar(aes(ymin=mean.nFeature_RNA-sd.nFeature_RNA, ymax=mean.nFeature_RNA+sd.nFeature_RNA), width=.1)
+  t <- theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"), axis.text.y = element_text(size=10), axis.title.x=element_blank())
+  ggsave(filename = "plots/mean_genes_err.png", plot = plot + err + t, width = 30, height = 10)
+  ggsave(filename = "plots/mean_genes.png", plot = plot + t, width = 30, height = 10)
+}
+```
+
+```{r}
+plotMedianGenes <- function(dataset) {
+  dataset$nFeature_RNA <- log2(dataset$nFeature_RNA)
+  summ <- dataset %>% group_by(ptissue) %>% summarise(median.nFeature_RNA = median(nFeature_RNA), iqr.nFeature_RNA = IQR(nFeature_RNA))
+  summ$tissue <- sapply(as.character(summ$ptissue), split.special)
+  
+  tissue.max <- summ %>% group_by(tissue) %>% summarize(sort.key=max(median.nFeature_RNA))
+  summ=summ%>%left_join(tissue.max, by="tissue")
+  summ <- summ %>% arrange(desc(sort.key), desc(median.nFeature_RNA))
+  
+  summ$ptissue <- factor(summ$ptissue, levels=unique(as.character(summ$ptissue)))
+
+  plot <- ggplot(summ, aes(x=ptissue, y=median.nFeature_RNA)) + geom_point(aes(color=tissue), shape=18, size=5)
+  err <- geom_errorbar(aes(ymin=median.nFeature_RNA-iqr.nFeature_RNA, ymax=median.nFeature_RNA+iqr.nFeature_RNA), width=.1)
+  t <- theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"), axis.text.y = element_text(size=10), axis.title.x=element_blank())
+  ggsave(filename = "plots/median_genes_err.png", plot = plot + err + t, width = 30, height = 10)
+  ggsave(filename = "plots/mean_genes.png", plot = plot + t, width = 30, height = 10)
+}
+```
+
+
+
+```{r}
+dataset <- NULL
+for (project in c("mc_other", "mc_ebi", "mc_ebi_tm", "mc_mca", "mc_tm", "mc_ts30")) {
+    data.path <- paste0(source.dir, project, "/stats_summary.csv")
+
+    ds <- as.data.frame(read.csv(data.path, header = FALSE))
+    colnames(ds) <- c("#", "tissue", "cluster", "nCount_RNA", "nFeature_RNA", "percent.mt", "percent.rb")
+    ds[["project"]] <- project
+    ds[["ptissue"]] <- paste0(project, "-", ds$tissue)
+    
+    if (is.null(dataset)) {
+      dataset <- ds
+    }
+    else {
+      dataset <- full_join(dataset, ds)
+  }
+}
+```
+
+```{r}
+plotMeanMito(dataset)
+plotMedianMito(dataset)
+plotMeanGenes(dataset)
+plotMedianGenes(dataset)
+```
+
+
+

@@ -15,11 +15,21 @@ ggsave1 <- function(filename, plot, n.clusters=30) {
 GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE points for DimPlot
   cells <- colnames(obj)
   if (reduction == "umap") {
-    data <- as.data.frame(Embeddings(obj$umap)[cells, c(1, 2)])
+    if (!exists("data.from.pg")) {
+      data <- as.data.frame(Embeddings(obj$umap)[cells, c(1, 2)])
+    }
+    else {
+      data <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
+    }
     data <- data.frame(axis1 = data$UMAP_1, axis2 = data$UMAP_2, color = obj[[metric.name]], cluster = obj$seurat_clusters)
   }
   if (reduction == "tsne") {
-    data <- as.data.frame(Embeddings(obj$tsne)[cells, c(1, 2)])
+    if (!exists("data.from.pg")) {
+      data <- data <- as.data.frame(Embeddings(obj$tsne)[cells, c(1, 2)])
+    }
+    else {
+      data <- data.frame(tSNE_1 = obj$tsne1, tSNE_2 = obj$tsne2)
+    }
     data <- data.frame(axis1 = data$tSNE_1, axis2 = data$tSNE_2, color = obj[[metric.name]], cluster = obj$seurat_clusters)
   }
   return(data)
@@ -28,7 +38,7 @@ GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE 
 DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlot with continious colors by metric
   name <- paste0(name, "_", reduction)
   data <- GetDimPlotPoints(obj, reduction, metric.name) 
-  plot <- ggplot(data, aes(x=axis1, y=axis2, color=eval(parse(text=eval(metric.name))))) + geom_point(size = 0.5) + scale_colour_gradientn(colours=rev(rainbow(4))) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
+  plot <- ggplot(data, aes(x=axis1, y=axis2, color=color)) + geom_point(size = 0.5) + scale_colour_gradientn(colours=rev(rainbow(4))) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
     plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = lbls[as.numeric(cl) + 1], size = 3, fontface=2)
@@ -38,7 +48,7 @@ DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlo
 
 DimPlotCluster <- function(obj, lbls, name, reduction) { #DimPlot colored by cluster
   name <- paste0(name, "_", reduction)
-  data <- GetDimPlotPoints(obj, reduction)
+  data <- GetDimPlotPoints(obj, reduction, "seurat_clusters")
   plot <- ggplot(data, aes(x=axis1, y=axis2, color=cluster)) + geom_point(size = 0.5) + guides(colour = guide_legend(override.aes = list(size=2))) + ggtitle(name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank())
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
@@ -355,26 +365,37 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, min.p
 }
 
 
-saveResults <- function(obj, clusters, obj.markers, mc_specific=FALSE, sm=NA) {
+saveResults <- function(obj, clusters, obj.markers, save.cells=TRUE, save.markers=TRUE, mc_specific=FALSE, sm=NA) {
   message("Writing Results")
 
   write.csv(clusters, file=paste0(results.dir, "/!clusters.csv"))
-  write.csv(obj.markers, file=paste0(results.dir, "/!markers.csv"))
+  if (save.markers) {
+    write.csv(obj.markers, file=paste0(results.dir, "/!markers.csv"))
+  }
   
-  all.cells <- colnames(obj)
-  umap <- as.data.frame(Embeddings(obj$umap)[all.cells, c(1, 2)])
-  tsne <- as.data.frame(Embeddings(obj$tsne)[all.cells, c(1, 2)])
+  if (!exists("data.from.pg")) {
+    umap <- as.data.frame(Embeddings(obj$umap)[all.cells, c(1, 2)])
+    tsne <- as.data.frame(Embeddings(obj$tsne)[all.cells, c(1, 2)])
+    all.cells <- colnames(obj)
+  }
+  else {
+    umap <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
+    tsne <- data.frame(tSNE_1 = obj$tsne1, tSNE_2 = obj$tsne2)
+    all.cells <- obj$X
+  } 
   
-  cells <- data.frame("cell"=all.cells, "cluster"=obj$seurat_clusters, "cell.type"=clusters$cell.type[obj$seurat_clusters], 
-                      "cell.type2"=clusters$cell.type2[obj$seurat_clusters], 
-                      "annotation" = clusters$annotation[obj$seurat_clusters], "annotation2" = clusters$annotation2[obj$seurat_clusters],
-                      "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb, 
-                      "UMAP_1"=umap$UMAP_1, "UMAP_2"=umap$UMAP_2,
-                     "TSNE_1"=tsne$tSNE_1, "TSNE_2"=tsne$tSNE_2)
-  write.csv(cells, file=paste0(results.dir, "/!cells.csv"))
+  if (save.cells) {
+    cells <- data.frame("cell"=all.cells, "cluster"=obj$seurat_clusters, "cell.type"=clusters$cell.type[obj$seurat_clusters], 
+                        "cell.type2"=clusters$cell.type2[obj$seurat_clusters], 
+                        "annotation" = clusters$annotation[obj$seurat_clusters], "annotation2" = clusters$annotation2[obj$seurat_clusters],
+                        "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb, 
+                        "UMAP_1"=umap$UMAP_1, "UMAP_2"=umap$UMAP_2,
+                       "TSNE_1"=tsne$tSNE_1, "TSNE_2"=tsne$tSNE_2)
+    write.csv(cells, file=paste0(results.dir, "/!cells.csv"))
+  }
   
   if (mc_specific) {
-    if (res == 0.5 && method == "none") { 
+    if (res == 1 && method == "none") { 
       message("Recording Additional Stats")
       #record all cells with QC stats into csv for summary plots
       t <- tibble("tissue" = tissue, "cluster" = obj$seurat_clusters, "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb)
@@ -407,12 +428,16 @@ check.save <- function() {
 }
 
 
-#main function
-MCMain <- function() {
+parse.task.id <- function() {
   tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
   res <<- 1 #0.5 * (1 + ((task.id %% tasks.per.tiss) %/% tasks.per.res)) #clustering resolution
   method <<- switch(task.id %% tasks.per.res + 1, "none", "cutoff", "outlier", "mad") #filtering method
   param <<- switch(task.id %% tasks.per.res + 1, 0, 10, 0, 2) #filtering parameter
+}
+
+#main function
+MCMain <- function() {
+  parse.task.id()
   info.msg <- paste0("task.id:", task.id, " - tissue:", tissue, " res:", res, " mehtod:", method, " param:", param, 
                      " project:", project, " do.counts:", do.counts, " do.genes:", do.genes, " do.mito:", do.mito,
                      " do.ribo:", do.ribo)

@@ -9,7 +9,11 @@ library(tools)
 
 #PATHS
 data.dir <<- "/ahg/regevdata/projects/scqc/data/"
-output.dir <<- "/ahg/regevdata/projects/scqc/output/"
+if (! exists("data.from.pg")) {
+  output.dir <<- "/ahg/regevdata/projects/scqc/output/"
+} else {
+  output.dir <<- "/ahg/regevdata/projects/scqc/output_pg/"
+}
 source.dir.prefix <<- output.dir
 
 #FILTERING
