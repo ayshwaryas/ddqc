@@ -21,6 +21,6 @@ if (method == "none") {
   
   message("Recording Additional Stats")
   #record all cells with QC stats into csv for summary plots
-  t <- tibble("tissue" = tissue, "nCount_RNA" = tiss$nCount_RNA, "nFeature_RNA" = tiss$nFeature_RNA, "percent.mt" = tiss$percent.mt, "percent.rb" = tiss$percent.rb)
+  t <- tibble("tissue" = tissue, "cell" = colnames(tiss), "nCount_RNA" = tiss$nCount_RNA, "nFeature_RNA" = tiss$nFeature_RNA, "percent.mt" = tiss$percent.mt, "percent.rb" = tiss$percent.rb)
   write.table(t, paste0(results.dir, "../../stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
 }
