@@ -38,7 +38,7 @@ GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE 
 DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlot with continious colors by metric
   name <- paste0(name, "_", reduction)
   data <- GetDimPlotPoints(obj, reduction, metric.name) 
-  plot <- ggplot(data, aes(x=axis1, y=axis2, color=color)) + geom_point(size = 0.5) + scale_colour_gradientn(colours=rev(rainbow(4))) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
+  plot <- ggplot(data, aes(x=axis1, y=axis2, color=eval(parse(text=eval(metric.name))))) + geom_point(size = 0.5) + scale_colour_gradientn(colours=rev(rainbow(4))) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
     plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = lbls[as.numeric(cl) + 1], size = 3, fontface=2)
@@ -48,7 +48,7 @@ DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlo
 
 DimPlotCluster <- function(obj, lbls, name, reduction) { #DimPlot colored by cluster
   name <- paste0(name, "_", reduction)
-  data <- GetDimPlotPoints(obj, reduction, "seurat_clusters")
+  data <- GetDimPlotPoints(obj, reduction)
   plot <- ggplot(data, aes(x=axis1, y=axis2, color=cluster)) + geom_point(size = 0.5) + guides(colour = guide_legend(override.aes = list(size=2))) + ggtitle(name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank())
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
@@ -125,15 +125,9 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   #tsne and umap continious dimplots
   ggsave1(filename=paste0(name.prefix, "tsne_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "tsne"))
   ggsave1(filename=paste0(name.prefix, "umap_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "umap"))
-  
-  #signature scatter plots
-  if (grepl("cd", metric.name)) {
-    cor1 <- round(cor(obj$percent.mt, data$metric, method = "pearson"), 2)
-    ggsave1(filename=paste0(name.prefix, "/scatter-mito_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=obj$percent.mt, y=metric)) + geom_point() + geom_smooth() + l1 + ggtitle(paste(name, cor1)), n.clusters = n.clusters)
-  }
 }
 
-generatePlots <- function(obj, name, cell.types, annotations, sig.plots) { #main plots function
+generatePlots <- function(obj, name, cell.types, annotations) { #main plots function
   message("Making Plots")
   lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
   for (i in 1:length(cell.types)) {
@@ -145,13 +139,6 @@ generatePlots <- function(obj, name, cell.types, annotations, sig.plots) { #main
   generatePlotsByMetric(obj, name, lbls, "nFeature_RNA", "Number of Genes", "genes") #nGenes plots
   generatePlotsByMetric(obj, name, lbls, "percent.mt", "percent.mt", "mito") #%mito plots
   generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo") #%ribo plots
-  
-  if (sig.plots) {
-    #signatures plots
-    generatePlotsByMetric(obj, name, lbls, "cd11", "cd1", "cd1", "signatures/", save.log2 = FALSE) 
-    generatePlotsByMetric(obj, name, lbls, "cd21", "cd2", "cd2", "signatures/", save.log2 = FALSE)
-    generatePlotsByMetric(obj, name, lbls, "cd31", "cd3", "cd3", "signatures/", save.log2 = FALSE)
-  }
   
   #cluster colored dimplots
   ggsave1(filename=paste0(results.dir, "/tsne_clusters.pdf"), plot=DimPlotCluster(obj, lbls, name, "tsne"))
@@ -198,29 +185,6 @@ clusterize <- function(obj, res, compute.reductions=TRUE, compute.markers=TRUE, 
 }
 
 
-#add cell death module scores
-addCDScores <- function(obj) {
-  message("Calculating CD scores")
-  
-  signatures.path <- paste0(data.dir, "signatures/")
-  if (is.human) {
-    cd1 <- toupper(as.character(read.csv(paste0(signatures.path, "cd1_signatures.csv"), header = FALSE)$V1))
-    cd2 <- toupper(as.character(read.csv(paste0(signatures.path, "cd2_signatures.csv"), header = FALSE)$V1))
-    cd3 <- toupper(as.character(read.csv(paste0(signatures.path, "cd3_signatures.csv"), header = FALSE)$V1))
-  }
-  else {
-    cd1 <- toTitleCase(tolower(as.character(read.csv(paste0(signatures.path, "cd1_signatures.csv"), header = FALSE)$V1)))
-    cd2 <- toTitleCase(tolower(as.character(read.csv(paste0(signatures.path, "cd2_signatures.csv"), header = FALSE)$V1)))
-    cd3 <- toTitleCase(tolower(as.character(read.csv(paste0(signatures.path, "cd3_signatures.csv"), header = FALSE)$V1)))
-  }
-  
-  obj <- AddModuleScore(obj, features=list(cd1), name="cd1")
-  obj <- AddModuleScore(obj, features=list(cd2), name="cd2")
-  obj <- AddModuleScore(obj, features=list(cd3), name="cd3")
-  
-  return(obj)
-}
-
 #annotations & cell types assingment
 formatMarkers <- function(lst) {
   st <- ""
@@ -236,7 +200,7 @@ getAnnotations <- function(obj) { #calculate most common annotations in each clu
   cluster.labels2 <- NULL
   percents1 <- NULL
   percents2 <- NULL
-  for (cl in levels(obj$seurat_clusters)) {
+  for (cl in unique(obj$seurat_clusters)) {
     cluster <- subset(obj, idents = cl)
     #calculate first and second most frequent annotation and percentage of cells that have them
     first.frequent <- sort(table(cluster$annotations),decreasing=TRUE)[1]
@@ -255,7 +219,7 @@ getAnnotations <- function(obj) { #calculate most common annotations in each clu
   return(list("a1" = cluster.labels, "a2" = cluster.labels2, "p1" = percents1, "p2" = percents2))
 }
 
-assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, min.pval=0.05) { #function that assigns cell types based on marker genes using gene to cell.type dictionary
+assignCellTypes <- function(obj, markers, annotations, record.stats=TRUE, min.pval=0.05) { #function that assigns cell types based on marker genes using gene to cell.type dictionary
   message("Assigning Cell Types")
   genes <- read.csv(paste0(data.dir, "markers.tsv"), sep="\t") #read cell type markers
   genes <- data.frame(genes)
@@ -351,12 +315,11 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, min.p
     }
   }
   if (record.stats) {
-    sm <- paste(sum(scores) / length(cluster.ids), sum(scores2) / length(cluster.ids), sum(cells), round(mean(genes.mean), 3), round(mean(mito.mean), 3), sep=",") #add score summary to the file
     clusters <- tibble("cluster" = cluster.ids, "annotation" = annotations[["a1"]], "annotation2" = annotations[["a2"]], "%annotation1" = round(annotations[["p1"]], 3), 
                   "%annotation2" = round(annotations[["p2"]], 3), "cell.type" = cell.types, "cell.type2" = cell.types2, "sum.avg_logFC" = round(scores, 3), 
                   "delta.score" = round(scores2, 3), "cells" = cells, "genes.mean" = round(genes.mean, 3), "genes.median" = round(genes.median, 3), 
                   "mito.mean" = round(mito.mean, 3), "mito.median" = round(mito.median, 3), "markers" = formatted.markers, "score.genes" = score.genes)
-    return(list("clusters" = clusters, "sm" = sm, "markers" = markers))
+    return(list("clusters" = clusters, "markers" = markers))
   }
   else { #return only cell types and annotations
     res <- tibble("cluster" = cluster.ids, "annotation" = annotations[["a1"]], "cell.type" = cell.types)
@@ -365,7 +328,7 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=FALSE, min.p
 }
 
 
-saveResults <- function(obj, clusters, obj.markers, save.cells=TRUE, save.markers=TRUE, mc_specific=FALSE, sm=NA) {
+saveResults <- function(obj, clusters, obj.markers, save.cells=TRUE, save.markers=TRUE, mc_specific=FALSE) {
   message("Writing Results")
 
   write.csv(clusters, file=paste0(results.dir, "/!clusters.csv"))
@@ -373,15 +336,15 @@ saveResults <- function(obj, clusters, obj.markers, save.cells=TRUE, save.marker
     write.csv(obj.markers, file=paste0(results.dir, "/!markers.csv"))
   }
   
+  all.cells <- colnames(obj)
+  
   if (!exists("data.from.pg")) {
     umap <- as.data.frame(Embeddings(obj$umap)[all.cells, c(1, 2)])
     tsne <- as.data.frame(Embeddings(obj$tsne)[all.cells, c(1, 2)])
-    all.cells <- colnames(obj)
   }
   else {
     umap <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
     tsne <- data.frame(tSNE_1 = obj$tsne1, tSNE_2 = obj$tsne2)
-    all.cells <- obj$X
   } 
   
   if (save.cells) {
@@ -400,9 +363,6 @@ saveResults <- function(obj, clusters, obj.markers, save.cells=TRUE, save.marker
       #record all cells with QC stats into csv for summary plots
       t <- tibble("tissue" = tissue, "cluster" = obj$seurat_clusters, "nCount_RNA" = obj$nCount_RNA, "nFeature_RNA" = obj$nFeature_RNA, "percent.mt" = obj$percent.mt, "percent.rb" = obj$percent.rb)
       write.table(t, paste0(results.dir, "../../stats_summary.csv"), sep=",", append=TRUE, col.names=FALSE)
-      
-      sm <- paste(task.name, sm, sep=",")
-      write(sm, paste0(results.dir, "../score_summary.csv"), append=TRUE)
     }
     
     if (check.save()) {
@@ -463,18 +423,15 @@ MCMain <- function() {
   tiss <<- tmp$obj
   obj.markers <<- tmp$markers
   
-  tiss <<- addCDScores(tiss)
-  
-  tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss), record.stats = TRUE) #assign cell types
+  tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss)) #assign cell types
   #unpack returned object
   clusters <<- tmp$clusters
-  sm <- tmp$sm
   obj.markers <<- tmp$markers
   
-  generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation, sig.plots = FALSE) #make plots
+  generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation) #make plots
   # sgenerateMarkerPlots(tiss, obj.markers %>% group_by(cluster) %>% top_n(n = 9, wt = avg_logFC))
   
-  saveResults(tiss, clusters, obj.markers, mc_specific=TRUE, sm=sm)
+  saveResults(tiss, clusters, obj.markers, mc_specific=TRUE)
   
   message(paste0("Finished task.id:", info.msg))
 }

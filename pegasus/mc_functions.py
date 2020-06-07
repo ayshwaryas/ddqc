@@ -44,13 +44,17 @@ def save_to_csv(adata):
         fout.write(df.to_csv())
 
 
-def write_markers(marker_dict):
+def write_markers(marker_dict, min_log_fc=0.25, min_pct=25):
     frames = []
     for cl in marker_dict.keys():
         for d in marker_dict[cl].keys():
             df = marker_dict[cl][d]
             df['cluster'] = cl
             df['up/down'] = d
+
+            df = df[(df["mean_logExpr"] >= min_log_fc) & (
+                        (df["percentage"] >= min_pct) | (df["percentage_other"] >= min_pct))]
+
             frames.append(df)
     result = pd.concat(frames)
     with open(paths.results_dir + "!markers.csv", "w") as fout:
@@ -69,13 +73,22 @@ def main():
 
     adata = filter_cells(adata, res, method, param, do_counts, do_genes, do_mito, do_ribo)
 
+    # pg.qc_metrics(adata, mito_prefix="mt-")
+    # pg.filter_data(adata)
+
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True)
 
     write_markers(marker_dict)
     save_to_csv(adata)
     pg.write_output(adata, results_dir + task_name)
 
-    print(subprocess.check_output("Rscript r_plots.R {} {} {}".format(project, task_id, tissue), shell=True).decode(
+    marker_genes = ['Epcam', 'Krt18', 'Slc12a3', 'Lrp2', 'Cubn', 'Slc34a1', 'Pck1', 'Miox', 'Slc5a2', 'Slc7a13',
+                    'Nphs1', 'Pecam1', 'Ptprc', 'Slc12a1', 'Aqp2', 'Acta2']
+
+    pg.heatmap(adata, keys=marker_genes, by='louvain_labels')
+    pg.embedding(adata, basis='fitsne', keys=marker_genes)
+
+    print(subprocess.check_output("Rscript r_plots.R {} {} {} {}".format(project, task_id, tissue, res), shell=True).decode(
         'UTF-8'))
 
 

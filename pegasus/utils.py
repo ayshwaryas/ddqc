@@ -12,9 +12,8 @@ def safe_mkdir(path):
 
 
 def cluster_data(adata, resolution=1, compute_markers=False, compute_reductions=False):
-    adata = adata[:]
     pg.log_norm(adata)
-    pg.highly_variable_features(adata, consider_batch=False)
+    pg.highly_variable_features(adata, consider_batch=False)  # , flavor="Seurat")
     pg.pca(adata)
     pg.neighbors(adata)
     pg.louvain(adata, resolution=resolution)

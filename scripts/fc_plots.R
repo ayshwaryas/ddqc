@@ -1,19 +1,11 @@
 tasks.per.tiss <<- 1 #How many different res/methods per one tissue
 
-readFilterCsvMethod <- function(method, metric, full.path=FALSE) {
+readFilterCsvMethod <- function(method, metric) {
   filtered.cells <- NULL
   if (metric == "all") {
-    for (metric1 in c("counts", "genes", "mito", "ribo")) {
-      if (full.path) {
-        filtered.cells <- c(filtered.cells, tryCatch({
-          as.character(read.csv(paste0(source.dir, "!filtered_", metric1, ".csv"))[["cell"]])}, 
-          error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
-      } else {
-      filtered.cells <- c(filtered.cells, tryCatch({
-        as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric1, ".csv"))[["cell"]])}, 
-        error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
-      }
-    }
+    filtered.cells <- c(filtered.cells, tryCatch({
+      as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric1, ".csv"))[["cell"]])}, 
+      error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
   }
   else {
     filtered.cells <- c(filtered.cells, tryCatch({
@@ -128,7 +120,7 @@ FCPlotsMain <- function() {
   #unpack returned object
   tiss <<- tmp$obj
   obj.markers <<- tmp$markers
-  tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss), record.stats = TRUE) #assign cell types
+  tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss)) #assign cell types
   #unpack returned object
   clusters <<- tmp$clusters
   obj.markers <<- tmp$markers

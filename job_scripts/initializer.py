@@ -34,6 +34,7 @@ TISSUE_COUNT = {
 SCRIPT_PARAMETERS = {
     "mc": [150, 1, "scripts/mc.R"],
     "mc_plot": [150, 1, "scripts/mc_plot.R"]
+    "custom": [8, 1, "scripts/custom.R"]
 }
 
 TASKS_PER_TISS_MC = 4
@@ -53,7 +54,7 @@ if tissue not in TISSUE_COUNT:
     print("invalid tissue: ", sys.argv[2])
     exit()
 
-if script == "mc":
+if script == "mc" or script == "custom":
     max_task_id = TISSUE_COUNT[tissue] * TASKS_PER_TISS_MC
     project = ("mc_" + tissue)
     submit_command()

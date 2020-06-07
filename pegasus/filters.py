@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import pegasus as pg
 
@@ -30,7 +32,7 @@ def initial_qc(adata, n_genes, n_cells):
     pg.qc_metrics(adata, mito_prefix="mt-", min_umis=-INF, max_umis=INF, min_genes=n_genes, max_genes=INF,
                   percent_mito=80)
     adata = calculate_percent_ribo(adata, "Rpl,Rps")
-    adata = adata[:, adata.var.n_cells >= n_cells]
+    adata = adata[:, adata.var.n_cells > n_cells]
     pg.filter_data(adata)
     return adata
 
@@ -73,11 +75,11 @@ def metric_filter(adata, method, param, metric_name, do_lower_co=False, do_upper
 
 def filter_cells(adata, res, method, threshold, do_counts, do_genes, do_mito, do_ribo):
     adata = initial_qc(adata, 100, 3)
-    adata_copy = adata[:]
+    adata_copy = copy.deepcopy(adata)
     adata_copy = cluster_data(adata_copy, res)
 
     if method == "none":
-        return adata_copy
+        return adata
     if do_counts:
         adata_copy = metric_filter(adata_copy, method, threshold, "n_counts", do_lower_co=True)
     else:

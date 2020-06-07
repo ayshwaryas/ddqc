@@ -1,0 +1,56 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+project <- "mc_tm"
+task.id <- 11
+source("../scripts/readers.R")
+source("../scripts/filters.R")
+source("../scripts/mc_functions.R")
+source("../scripts/settings.R")
+source("../scripts/local_settings.R")
+```
+
+
+
+```{r}
+obj <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
+```
+
+```{r}
+obj <- NormalizeData(obj, normalization.method = "LogNormalize", scale.factor = 10000)
+```
+
+```{r}
+obj <- FindVariableFeatures(obj, selection.method = "vst", nfeatures = 2000)
+
+# Identify the 10 most highly variable genes
+top10 <- head(VariableFeatures(obj), 10)
+
+# plot variable features with and without labels
+plot1 <- VariableFeaturePlot(obj)
+plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plot1
+plot2
+```
+
+```{r}
+all.genes <- rownames(x = obj)
+obj <- ScaleData(obj, features = all.genes)
+```
+
+```{r}
+obj <- RunPCA(obj, npcs=n.pieces)
+print(pbmc[["pca"]], dims = 1:5, nfeatures = 5)
+DimPlot(pbmc, reduction = "pca")
+DimHeatmap(pbmc, dims = 1, cells = 500, balanced = TRUE)
+```
+
+```{r}
+obj <- FindNeighbors(obj, dims = 1:n.pieces)
+obj <- FindClusters(obj, resolution = res)
+```
+
+
