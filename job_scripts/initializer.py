@@ -33,7 +33,7 @@ TISSUE_COUNT = {
 
 SCRIPT_PARAMETERS = {
     "mc": [150, 1, "scripts/mc.R"],
-    "mc_plot": [150, 1, "scripts/mc_plot.R"]
+    "mc_plot": [150, 1, "scripts/mc_plot.R"],
     "custom": [8, 1, "scripts/custom.R"]
 }
 
