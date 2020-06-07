@@ -14,7 +14,7 @@ def read_tm(task_id, tasks_per_tiss):
     read_info.write("Sample,Location,\n")
     for directory in os.listdir(data_path):
         if directory.startswith(tissue):
-            read_info.write("{},{},\n".format(directory, data_path + directory + "/" + "raw_gene_bc_matrices_h5.h5"))
+            read_info.write("{},{},\n".format(directory, data_path + directory + "/"))  # + "raw_gene_bc_matrices_h5.h5"))
     read_info.close()
     adata = pg.aggregate_matrices(filename)
     os.remove(filename)

@@ -6,6 +6,7 @@ import pegasus as pg
 import paths
 from config import do_counts, do_genes, do_mito, do_ribo, OUTPUT_DIR
 from filters import filter_cells
+from local_config import local
 from readers import auto_reader
 from utils import cluster_data, safe_mkdir
 
@@ -53,7 +54,7 @@ def write_markers(marker_dict, min_log_fc=0.25, min_pct=25):
             df['up/down'] = d
 
             df = df[(df["mean_logExpr"] >= min_log_fc) & (
-                        (df["percentage"] >= min_pct) | (df["percentage_other"] >= min_pct))]
+                    (df["percentage"] >= min_pct) | (df["percentage_other"] >= min_pct))]
 
             frames.append(df)
     result = pd.concat(frames)
@@ -87,9 +88,8 @@ def main():
 
     pg.heatmap(adata, keys=marker_genes, by='louvain_labels')
     pg.embedding(adata, basis='fitsne', keys=marker_genes)
-
-    print(subprocess.check_output("Rscript r_plots.R {} {} {} {}".format(project, task_id, tissue, res), shell=True).decode(
-        'UTF-8'))
+    print(subprocess.check_output("Rscript r_plots.R {} {} {} {}".format(project, task_id, tissue, res),
+                                      shell=True).decode('UTF-8'))
 
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ output: html_notebook
 source("../scripts/settings.R")
 source("../scripts/local_settings.R")
 source("plots.R")
+source.dir <<- source.dir.prefix
 generatePlotsInit()
 ```
 

@@ -3,7 +3,7 @@ from local_config import local
 
 if not local:
     DATA_DIR = "/ahg/regevdata/projects/scqc/data/"
-    OUTPUT_DIR = "/ahg/regevdata/projects/scqc/output/"
+    OUTPUT_DIR = "/ahg/regevdata/projects/scqc/output_pg/"
 else:
     DATA_DIR = "/Users/michaelalperovich/Documents/primes_storage/data/"
     OUTPUT_DIR = "/Users/michaelalperovich/Documents/primes_storage/output_pg/"
