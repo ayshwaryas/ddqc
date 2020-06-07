@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 import pandas as pd
 import pegasus as pg
@@ -83,16 +84,15 @@ def main():
     save_to_csv(adata)
     pg.write_output(adata, results_dir + task_name)
 
-    marker_genes = ['Epcam', 'Krt18', 'Slc12a3', 'Lrp2', 'Cubn', 'Slc34a1', 'Pck1', 'Miox', 'Slc5a2', 'Slc7a13',
-                    'Nphs1', 'Pecam1', 'Ptprc', 'Slc12a1', 'Aqp2', 'Acta2']
-
-    pg.heatmap(adata, keys=marker_genes, by='louvain_labels')
-    pg.embedding(adata, basis='fitsne', keys=marker_genes)
     print(subprocess.check_output("Rscript r_plots.R {} {} {} {}".format(project, task_id, tissue, res),
                                       shell=True).decode('UTF-8'))
 
 
 if __name__ == '__main__':
-    project = "mc_tm"
-    task_id = 11
+    if local:
+        project = "mc_tm"
+        task_id = 11
+    else:
+        project = sys.argv[1]
+        task_id = int(sys.argv[2]) - 1
     main()
