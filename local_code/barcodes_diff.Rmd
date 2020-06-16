@@ -1,0 +1,138 @@
+
+```{r}
+split.special <- function(x) {
+  x <- as.character(x)
+  return(paste0(strsplit(x, "-")[[1]][2], "_", strsplit(x, "-")[[1]][3]))
+}
+```
+
+
+```{r}
+create.filtered.df <- function(all.cells, clusters, remaining.cells, counts, genes, mito, ribo) {
+  filtered.cells <- all.cells[remaining.cells,]
+  counts <- intersect(counts, remaining.cells)
+  genes <- intersect(genes, remaining.cells)
+  mito <- intersect(mito, remaining.cells)
+  ribo <- intersect(ribo, remaining.cells)
+  
+  t <- table(filtered.cells$cluster)
+  
+  t.counts <- table(all.cells[counts,]$cluster)
+  t.genes <- table(all.cells[genes,]$cluster)
+  t.mito <- table(all.cells[mito,]$cluster)
+  t.ribo <- table(all.cells[ribo,]$cluster)
+  
+  df <- data.frame("cluster"=as.integer(names(t)), "cell.type"=as.character(clusters[names(t),]$cell.type),
+                   "cells.filtered"=as.integer(t))
+  
+  df["counts.filtered"] <- t.counts[as.character(df$cluster)]
+  df["genes.filtered"] <- t.genes[as.character(df$cluster)]
+  df["mito.filtered"] <- t.ribo[as.character(df$cluster)]
+  df["ribo.filtered"] <- t.mito[as.character(df$cluster)]
+  
+  df[is.na(df)] <- 0
+  return(df)
+}
+```
+
+```{r}
+merge.filtered.dfs <- function(all.cells, clusters, filtered, filtered.other, counts, genes, mito, ribo) {
+  outersect <- setdiff(filtered, filtered.other)
+  intersect <- intersect(filtered, filtered.other)
+  df <- create.filtered.df(all.cells, clusters, filtered, counts, genes, mito, ribo)
+  df.outersect <- create.filtered.df(all.cells, clusters, outersect, counts, genes, mito, ribo)
+  df.intersect <- create.filtered.df(all.cells, clusters, intersect, counts, genes, mito, ribo)
+  
+  row.names(df.outersect) <- df.outersect$cluster
+  row.names(df.intersect) <- df.intersect$cluster
+  
+  df["outersect.filtered"] <- df.outersect[as.character(df$cluster),]$cells.filtered
+  df["outersect.counts.filtered"] <- df.outersect[as.character(df$cluster),]$counts.filtered
+  df["outersect.genes.filtered"] <- df.outersect[as.character(df$cluster),]$genes.filtered
+  df["outersect.mito.filtered"] <- df.outersect[as.character(df$cluster),]$ribo.filtered
+  df["outersect.ribo.filtered"] <- df.outersect[as.character(df$cluster),]$mito.filtered
+  
+  df["intersect.filtered"] <- df.intersect[as.character(df$cluster),]$cells.filtered
+  df["intersect.counts.filtered"] <- df.intersect[as.character(df$cluster),]$counts.filtered
+  df["intersect.genes.filtered"] <- df.intersect[as.character(df$cluster),]$genes.filtered
+  df["intersect.mito.filtered"] <- df.intersect[as.character(df$cluster),]$ribo.filtered
+  df["intersect.ribo.filtered"] <- df.intersect[as.character(df$cluster),]$mito.filtered
+  
+  df[is.na(df)] <- 0
+  
+  myNumCols <- which(unlist(lapply(df, is.numeric)))
+  tmp <- data.frame(df[1,])
+  tmp[1, myNumCols] <- colSums(df[, myNumCols], na.rm=TRUE)
+  
+  df <- rbind(df, tmp)
+  df[(nrow(df)), "cluster"] <- NA
+  df[(nrow(df)), "cell.type"] <- NA
+  return(df)
+}
+```
+
+
+```{r}
+seurat.dir <- "/Users/michaelalperovich/Documents/primes_storage/results/mc_tm/Kidney/1-mad-2/"
+seurat.dir2 <- "/Users/michaelalperovich/Documents/primes_storage/results/mc_tm/Kidney/1-none-0/"
+pegasus.mad.dir <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/Kidney/1.4-mad-2/"
+pegasus.cutoff.dir <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/Kidney/1.4-cutoff-10/"
+pegasus.dir <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/Kidney/1.4-none-0/"
+```
+
+```{r}
+seurat.all.cells <- read.csv(paste0(seurat.dir2, "!cells.csv"))
+seurat.clusters <- read.csv(paste0(seurat.dir2, "!clusters.csv"))
+rownames(seurat.all.cells) <- as.character(seurat.all.cells$cell)
+rownames(seurat.clusters) <- seurat.clusters$cluster
+seurat.counts <- as.character(read.csv(paste0(seurat.dir, "!filtered_counts.csv"))$cell)
+seurat.genes <- as.character(read.csv(paste0(seurat.dir, "!filtered_genes.csv"))$cell)
+seurat.mito <- as.character(read.csv(paste0(seurat.dir, "!filtered_mito.csv"))$cell)
+seurat.ribo <- as.character(read.csv(paste0(seurat.dir, "!filtered_ribo.csv"))$cell)
+seurat.filtered <- as.character(unique(c(seurat.counts, seurat.genes, seurat.mito, seurat.ribo)))
+```
+
+```{r}
+pegasus.all.cells <- read.csv(paste0(pegasus.dir, "!cells.csv"))
+pegasus.all.cells$cluster <- pegasus.all.cells$louvain_labels - 1
+pegasus.clusters <- read.csv(paste0(pegasus.dir, "!clusters.csv"))
+rownames(pegasus.all.cells) <- sapply(pegasus.all.cells$X, split.special)
+rownames(pegasus.clusters) <- pegasus.clusters$cluster
+```
+
+```{r}
+pegasus.cutoff.counts <- as.character(sapply(as.character(read.csv(paste0(pegasus.cutoff.dir, "!filtered_counts.csv"))$X), split.special))
+pegasus.cutoff.genes <- as.character(sapply(as.character(read.csv(paste0(pegasus.cutoff.dir, "!filtered_genes.csv"))$X), split.special))
+pegasus.cutoff.mito <- as.character(sapply(as.character(read.csv(paste0(pegasus.cutoff.dir, "!filtered_mito.csv"))$X), split.special))
+pegasus.cutoff.ribo <- as.character(sapply(as.character(read.csv(paste0(pegasus.cutoff.dir, "!filtered_ribo.csv"))$X), split.special))
+pegasus.cutoff.filtered <- unique(c(pegasus.cutoff.counts, pegasus.cutoff.genes, pegasus.cutoff.mito, pegasus.cutoff.ribo))
+```
+
+```{r}
+pegasus.mad.counts <- as.character(sapply(as.character(read.csv(paste0(pegasus.mad.dir, "!filtered_counts.csv"))$X), split.special))
+pegasus.mad.genes <- as.character(sapply(as.character(read.csv(paste0(pegasus.mad.dir, "!filtered_genes.csv"))$X), split.special))
+pegasus.mad.mito <- as.character(sapply(as.character(read.csv(paste0(pegasus.mad.dir, "!filtered_mito.csv"))$X), split.special))
+pegasus.mad.ribo <- as.character(sapply(as.character(read.csv(paste0(pegasus.mad.dir, "!filtered_ribo.csv"))$X), split.special))
+pegasus.mad.filtered <- unique(c(pegasus.mad.counts, pegasus.mad.genes, pegasus.mad.mito, pegasus.mad.ribo))
+```
+
+```{r}
+write.csv(merge.filtered.dfs(seurat.all.cells, seurat.clusters, seurat.filtered, pegasus.filtered, seurat.counts, seurat.genes, seurat.mito, seurat.ribo), "seurat.csv")
+write.csv(merge.filtered.dfs(pegasus.all.cells, pegasus.clusters, pegasus.filtered, seurat.filtered, pegasus.counts, pegasus.genes, pegasus.mito, pegasus.ribo), "pegasus.csv")
+```
+
+
+```{r}
+write.csv(merge.filtered.dfs(pegasus.all.cells, pegasus.clusters, pegasus.cutoff.filtered, pegasus.mad.filtered, pegasus.cutoff.counts, pegasus.cutoff.genes, pegasus.cutoff.mito, pegasus.cutoff.ribo), "pg_cutoff.csv")
+write.csv(merge.filtered.dfs(pegasus.all.cells, pegasus.clusters, pegasus.mad.filtered, pegasus.cutoff.filtered, pegasus.mad.counts, pegasus.mad.genes, pegasus.mad.mito, pegasus.mad.ribo), "pg_mad.csv")
+```
+
+```{r}
+pegasus.all.cells.mad <- read.csv(paste0(pegasus.mad.dir, "!cells.csv"))
+pegasus.all.cells.mad$cluster <- pegasus.all.cells.mad$louvain_labels - 1
+rownames(pegasus.all.cells.mad) <- sapply(pegasus.all.cells.mad$X, split.special)
+mad.c13 <- subset(pegasus.all.cells.mad, cluster == 13)
+mad.c19 <- subset(pegasus.all.cells.mad, cluster == 19)
+mad.c25 <- subset(pegasus.all.cells.mad, cluster == 25)
+```
+

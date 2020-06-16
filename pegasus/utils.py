@@ -15,8 +15,12 @@ def cluster_data(adata, resolution=1, compute_markers=False, compute_reductions=
     pg.log_norm(adata)
     pg.highly_variable_features(adata, consider_batch=False)  # , flavor="Seurat")
     pg.pca(adata)
-    pg.neighbors(adata)
-    pg.louvain(adata, resolution=resolution)
+    pg.neighbors(adata, K=20)
+
+    if resolution == 0:
+        pg.louvain(adata)
+    else:
+        pg.louvain(adata, resolution=resolution)
 
     if compute_reductions:
         pg.fitsne(adata)

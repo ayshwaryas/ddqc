@@ -8,7 +8,7 @@ ReadTabulaMuris <- function(cells.filter, features.filter, tasks.per.tiss) {
     objs <- NULL
     filenames <- NULL
     for (file in files) {
-      objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir = paste0(data.path, file)), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells.filter, min.features = features.filter))
+      objs <- c(objs, CreateSeuratObject(counts = Read10X(data.dir=paste0(data.path, file)), project = (strsplit(file, "-")[[1]][[2]]), min.cells = cells.filter, min.features = features.filter))
       filenames <- c(filenames, (strsplit(file, "-")[[1]][[2]]))
     }
     tiss <- merge(x = objs[[1]], y = objs[2:length(objs)], add.cell.ids = filenames, project = tissue)

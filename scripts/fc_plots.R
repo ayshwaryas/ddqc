@@ -59,14 +59,24 @@ generateFCPlots <- function(obj, clusters) {
   generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo", "additional_plots/") #%ribo plots
   
   #extract UMAP coordinates for plotting
-  cells <- colnames(obj)
-  data <- as.data.frame(Embeddings(obj$umap)[cells, c(1, 2)])
+  if (!exists("data.from.pg")) {
+    cells <- colnames(obj)
+    data <- as.data.frame(Embeddings(obj$umap)[cells, c(1, 2)])
+    plot.cols <- c("C10 only" = "#D55E00", "MAD2 and C10" = "#E69F00", "Outlier and C10" = "#CC79A7", "MAD2 only" = "#56B4E9",
+                   "Outlier only" = "#0072B2", "MAD2 and Outlier" = "#009E73", "All" = "#000000" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
+    
+  }
+  else {
+    data <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
+    plot.cols <- c("C10 only" = "#E69F00", "MAD2 and C10" = "#0072B2", "Default and C10" = "#CC79A7", "MAD2 only" = "#009E73",
+                   "Default only" = "#D55E00", "MAD2 and Default" = "#56B4E9", "All" = "#000000" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
+    
+  }
+  
   data <- data.frame(UMAP_1 = data$UMAP_1, UMAP_2 = data$UMAP_2, cluster = obj$seurat_clusters, color=obj$color, annotation=obj$annotations)
   
   t1 <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
   t2 <- guides(colour = guide_legend(override.aes = list(size=2)))
-  plot.cols <- c("C10 only" = "#D55E00", "MAD2 and C10" = "#E69F00", "Outlier and C10" = "#CC79A7", "MAD2 only" = "#56B4E9",
-                 "Outlier only" = "#0072B2", "MAD2 and Outlier" = "#009E73", "All" = "#000000" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
   
   plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color)) + geom_point(size = 0.5) + t1 + t2 + scale_fill_manual(values = plot.cols) + scale_color_manual(values = plot.cols) #umap colored by filtering category
   plot2 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=cluster)) + geom_point(size = 0.5) + t1 + t2 #umap colored by cluster

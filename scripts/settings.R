@@ -22,7 +22,7 @@ features.filter <<- 100
 do.counts <<- TRUE
 do.genes <<- TRUE
 do.mito <<- TRUE
-do.ribo <<- TRUE
+do.ribo <<- FALSE
 
 #OTHER
 save.res.1 <<- FALSE #saveRDS of res 1 automatically

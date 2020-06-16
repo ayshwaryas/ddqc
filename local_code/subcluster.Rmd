@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 project <<- "mc_tm"
-task.id <<- 56
+task.id <<- 8
 source("../scripts/readers.R")
 source("../scripts/mc_functions.R")
 source("../scripts/fc_plots.R")
@@ -31,14 +31,14 @@ subcluster <- function(target.cl, n.pieces, tsne.perplexity, min.pval) {
   clusters <- read.csv(paste0(source.dir, "!clusters.csv"))  
   
   all.cells <- colnames(tiss$RNA)
-  filtered <- unique(readFilterCsvMethod("", "all", full.path=TRUE))
+  retained <- cells$X
   pass <- list()
-  pass[all.cells] <- TRUE
-  pass[intersect(all.cells, filtered)] <- FALSE
-  tiss[["pass"]] <<- factor(as.character(pass))
-    
-  tiss <<- tiss[,pass == TRUE] 
+  pass[all.cells] <- FALSE
+  pass[intersect(all.cells, retained)] <- TRUE
+  tiss[["pass"]] <- factor(as.character(pass))
   
+  tiss <<- tiss[,pass == TRUE]
+
   clst <- cells$cluster
   names(clst) <- cells$cell
   tiss$old_clusters <<- cells$cluster

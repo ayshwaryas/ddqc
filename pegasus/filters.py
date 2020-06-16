@@ -55,13 +55,14 @@ def metric_filter(adata, method, param, metric_name, do_lower_co=False, do_upper
             if do_upper_co:
                 upper_co = q75 + 1.5 * (q75 - q25)
         if method == "cutoff":
-            if do_lower_co and do_upper_co:
-                lower_co = param
-                upper_co = param2
-            if do_lower_co:
-                lower_co = param
-            if do_upper_co:
-                upper_co = param
+            if metric_name == "n_counts":
+                lower_co = -INF
+                upper_co = INF
+            if metric_name == "n_genes":
+                lower_co = 200
+                upper_co = INF
+            if metric_name == "percent_mito":
+                upper_co = 10.0
         filters = [
             adata.obs.louvain_labels == str(cl),
             adata.obs[metric_name] >= lower_co,
@@ -80,6 +81,7 @@ def filter_cells(adata, res, method, threshold, do_counts, do_genes, do_mito, do
 
     if method == "none":
         return adata
+
     if do_counts:
         adata_copy = metric_filter(adata_copy, method, threshold, "n_counts", do_lower_co=True)
     else:

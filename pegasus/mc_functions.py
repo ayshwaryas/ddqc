@@ -65,7 +65,7 @@ def write_markers(marker_dict, min_log_fc=0.25, min_pct=25):
 
 def main():
     tissue, is_human, adata = auto_reader(project, task_id, TASKS_PER_TISS)
-    res = 1
+    res = 1.4
     method, param = (("none", 0), ("cutoff", 10), ("outlier", 0), ("mad", 2))[task_id % TASKS_PER_TISS]
     print(
         "task.id:{} - tissue:{}, res:{}, method:{}, param:{}, project:{}, do.counts:{}, do.genes:{}, do.mito:{}, do.ribo:{}".format(
@@ -78,7 +78,7 @@ def main():
     # pg.qc_metrics(adata, mito_prefix="mt-")
     # pg.filter_data(adata)
 
-    adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True)
+    adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=res)
 
     write_markers(marker_dict)
     save_to_csv(adata)
@@ -91,7 +91,7 @@ def main():
 if __name__ == '__main__':
     if local:
         project = "mc_tm"
-        task_id = 11
+        task_id = 8
     else:
         project = sys.argv[1]
         task_id = int(sys.argv[2]) - 1

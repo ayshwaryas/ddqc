@@ -84,6 +84,8 @@ generatePlotsInit <- function() {
       colnames(d2) <- c("#", "tissue", "cell", "nCount_RNA", "nFeature_RNA", "percent.mt", "percent.rb")
       dataset <- full_join(d1, d2)
       dataset <- subset(dataset, !grepl("mouse", tissue))
+      write.csv(dataset, "human.csv")
+      return()
       
     } else {
       dataset <- as.data.frame(read.csv(data.path, header = FALSE))

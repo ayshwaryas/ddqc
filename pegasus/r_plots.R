@@ -37,12 +37,13 @@ pass[intersect(all.cells, sapply(retained, split.special))] <- TRUE
 tiss[["pass"]] <- factor(as.character(pass))
 tiss <<- tiss[,pass == TRUE]
 
-tiss$seurat_clusters <- factor(cells$seurat_clusters - 1)
+rownames(cells) <- sapply(cells$X, split.special)
+tiss$seurat_clusters <- factor(cells[colnames(tiss), ]$seurat_clusters - 1)
 Idents(tiss) <- tiss$seurat_clusters
-tiss[["tsne1"]] <- cells$tsne1
-tiss[["tsne2"]] <- cells$tsne2
-tiss[["umap1"]] <- cells$umap1
-tiss[["umap2"]] <- cells$umap2
+tiss[["tsne1"]] <- cells[colnames(tiss), ]$tsne1
+tiss[["tsne2"]] <- cells[colnames(tiss), ]$tsne2
+tiss[["umap1"]] <- cells[colnames(tiss), ]$umap1
+tiss[["umap2"]] <- cells[colnames(tiss), ]$umap2
 
 obj.markers <- data.frame("gene"=markers$feature, "avg_logFC"=markers$log_fold_change, "p_val_adj"=markers$t_qval, 
                           "cluster"=factor(markers$cluster - 1))
@@ -57,3 +58,4 @@ generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation) #make pl
 # sgenerateMarkerPlots(tiss, obj.markers %>% group_by(cluster) %>% top_n(n = 9, wt = avg_logFC))
 
 saveResults(tiss, clusters, obj.markers, save.cells = FALSE, save.markers = FALSE, mc_specific=FALSE)
+

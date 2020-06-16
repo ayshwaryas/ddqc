@@ -142,7 +142,7 @@ filterCells <- function(obj, method, threshold, do.counts, do.genes, do.mito, do
   obj <- clusterize(obj, res, compute.reductions = FALSE, compute.markers = FALSE) #cluster the data
   if (do.counts) {
     if (method == "cutoff") {
-      obj$counts.qc.pass <- filterCounts(obj, res, method, 500)
+      obj$counts.qc.pass <- filterCounts(obj, res, method, 0)
     }
     else {
       obj$counts.qc.pass <- filterCounts(obj, res, method, threshold)
@@ -154,7 +154,7 @@ filterCells <- function(obj, method, threshold, do.counts, do.genes, do.mito, do
   
   if (do.genes) {
     if (method == "cutoff") {
-      obj$genes.qc.pass <- filterGenes(obj, res, method, 250)
+      obj$genes.qc.pass <- filterGenes(obj, res, method, 200)
     }
     else {
       obj$genes.qc.pass <- filterGenes(obj, res, method, threshold)
