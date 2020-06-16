@@ -23,7 +23,7 @@ def cluster_data(adata, resolution=1, compute_markers=False, compute_reductions=
         pg.louvain(adata, resolution=resolution)
 
     if compute_reductions:
-        pg.fitsne(adata)
+        # pg.fitsne(adata)
         pg.umap(adata)
 
     if compute_markers:

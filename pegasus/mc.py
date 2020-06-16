@@ -37,8 +37,8 @@ def save_to_csv(adata):
     df = adata.obs
     df["pca1"] = [t[0] for t in list(adata.obsm["X_pca"])]
     df["pca2"] = [t[1] for t in list(adata.obsm["X_pca"])]
-    df["tsne1"] = [t[0] for t in list(adata.obsm["X_fitsne"])]
-    df["tsne2"] = [t[1] for t in list(adata.obsm["X_fitsne"])]
+    df["tsne1"] = [0] * len(df["pca1"])  # [t[0] for t in list(adata.obsm["X_fitsne"])]
+    df["tsne2"] = [0] * len(df["pca2"])  # [t[1] for t in list(adata.obsm["X_fitsne"])]
     df["umap1"] = [t[0] for t in list(adata.obsm["X_umap"])]
     df["umap2"] = [t[1] for t in list(adata.obsm["X_umap"])]
 

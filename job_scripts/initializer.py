@@ -32,9 +32,11 @@ TISSUE_COUNT = {
 }
 
 SCRIPT_PARAMETERS = {
-    "mc": [150, 1, "scripts/mc.R"],
-    "mc_plot": [150, 1, "scripts/mc_plot.R"],
-    "custom": [8, 1, "scripts/custom.R"]
+    "mc": [150, 1, "scripts/mc.R", "job_scripts/init.sh"],
+    "mc_plot": [150, 1, "scripts/mc_plot.R", "job_scripts/init.sh"],
+    "pg_mc": [150, 1, "scripts/pegasus/mc.py", "job_scripts/pg_init.sh"],
+    "pg_mc_plot": [150, 1, "scripts/pegasus/mc_plot.py", "job_scripts/pg_init.sh"],
+    "custom": [8, 1, "scripts/custom.R", "job_scripts/init.sh"]
 }
 
 TASKS_PER_TISS_MC = 4
@@ -73,6 +75,7 @@ elif script == "mc+mc_plot":
     script = "mc_plot"
     project = ("mc_" + tissue)
     submit_command()
+
 else:
     print("invalid task type: ", sys.argv[1])
     exit()
