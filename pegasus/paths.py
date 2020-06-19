@@ -1,3 +1,6 @@
+# file to make results_dir available in all functions as a global variable
+
+
 results_dir = ""
 
 
