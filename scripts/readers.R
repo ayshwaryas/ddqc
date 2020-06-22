@@ -276,7 +276,7 @@ AutoReader <- function(dataset, cells.filter, features.filter, tasks.per.tiss) {
   }
   
   obj[["percent.mt"]] <- PercentageFeatureSet(obj, features=grep("^MT-", rownames(obj$RNA), ignore.case=TRUE))
-  obj[["percent.rb"]] <- PercentageFeatureSet(obj, features=grep("^(RPL)|(RPS)", rownames(obj$RNA), ignore.case=TRUE))
+  obj[["percent.rb"]] <- PercentageFeatureSet(obj, features=grep("^RP[SL][[:digit:]]", rownames(obj$RNA), ignore.case=TRUE))
   
   obj <- subset(obj, percent.mt <= 80)
   
