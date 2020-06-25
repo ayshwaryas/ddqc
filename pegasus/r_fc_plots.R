@@ -19,14 +19,14 @@ message("Starting R script to generate results")
 tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
 
 tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
-res <<- 1 #0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
+res <<- commandArgs(trailingOnly = TRUE)[4]
 metric <<- "all" #switch(task.id %% tasks.per.res + 1, "counts", "genes", "mito", "ribo", "all")
 results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/", metric, "/") #directory for saving all other output
 
 dir.create(paste0(results.dir, "additional_plots/"), showWarnings=FALSE)
 
 cells <- read.csv(paste0(results.dir, "!cells.csv"))
-colnames(cells) <- c("X", "Channel", "color", "passed_qc", "nFeature_RNA", "nCount_RNA", "percent.mt", "seurat_clusters", "pca1", "pca2", "tsne1", "tsne2", "umap1",  "umap2") 
+colnames(cells) <- c("X", "Channel", "color", "passed_qc", "nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb", "seurat_clusters", "pca1", "pca2", "tsne1", "tsne2", "umap1",  "umap2") 
 markers <- read.csv(paste0(results.dir, "!markers.csv"))
 
 all.cells <- colnames(tiss$RNA)

@@ -22,7 +22,7 @@ parse.task.id()
 res <<- res1
 task.directory <- paste0(res, "-", method, "-", param)
 task.name <<- paste0(tissue, "-", task.directory)
-results.dir <<- paste0("~/Documents/primes_storage/output_pg/", project, "/", tissue, "/", task.directory, "/") #directory for saving all other output
+results.dir <<- paste0(output.dir, project, "/", tissue, "/", task.directory, "/") #directory for saving all other output
 
 cells <- read.csv(paste0(results.dir, "!cells.csv"))
 colnames(cells) <- c("X", "Channel", "passed_qc", "nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb", 

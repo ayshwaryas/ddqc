@@ -73,11 +73,13 @@ merge.filtered.dfs <- function(all.cells, clusters, filtered, filtered.other, co
 
 
 ```{r}
+tissue <- "Tongue"
+dir.prefix <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/"
 seurat.dir <- "/Users/michaelalperovich/Documents/primes_storage/results/mc_tm/Kidney/1-mad-2/"
 seurat.dir2 <- "/Users/michaelalperovich/Documents/primes_storage/results/mc_tm/Kidney/1-none-0/"
-pegasus.mad.dir <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/Kidney/1.4-mad-2/"
-pegasus.cutoff.dir <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/Kidney/1.4-cutoff-10/"
-pegasus.dir <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/Kidney/1.4-none-0/"
+pegasus.mad.dir <- paste0(dir.prefix, tissue, "/1.4-mad-2/")
+pegasus.cutoff.dir <- paste0(dir.prefix, tissue, "/1.4-cutoff-10/")
+pegasus.dir <- paste0(dir.prefix, tissue, "/1.4-none-0/")
 ```
 
 ```{r}
@@ -123,14 +125,25 @@ write.csv(merge.filtered.dfs(pegasus.all.cells, pegasus.clusters, pegasus.filter
 
 
 ```{r}
-write.csv(merge.filtered.dfs(pegasus.all.cells, pegasus.clusters, pegasus.cutoff.filtered, pegasus.mad.filtered, pegasus.cutoff.counts, pegasus.cutoff.genes, pegasus.cutoff.mito, pegasus.cutoff.ribo), "pg_cutoff.csv")
-write.csv(merge.filtered.dfs(pegasus.all.cells, pegasus.clusters, pegasus.mad.filtered, pegasus.cutoff.filtered, pegasus.mad.counts, pegasus.mad.genes, pegasus.mad.mito, pegasus.mad.ribo), "pg_mad.csv")
+write.csv(merge.filtered.dfs(pegasus.all.cells, pegasus.clusters, pegasus.cutoff.filtered, pegasus.mad.filtered, pegasus.cutoff.counts, pegasus.cutoff.genes, pegasus.cutoff.mito, pegasus.cutoff.ribo), paste0(tissue, "_pg_cutoff.csv"))
+write.csv(merge.filtered.dfs(pegasus.all.cells, pegasus.clusters, pegasus.mad.filtered, pegasus.cutoff.filtered, pegasus.mad.counts, pegasus.mad.genes, pegasus.mad.mito, pegasus.mad.ribo), paste0(tissue, "_pg_mad.csv"))
 ```
 
 ```{r}
 pegasus.all.cells.mad <- read.csv(paste0(pegasus.mad.dir, "!cells.csv"))
 pegasus.all.cells.mad$cluster <- pegasus.all.cells.mad$louvain_labels - 1
 rownames(pegasus.all.cells.mad) <- sapply(pegasus.all.cells.mad$X, split.special)
+
+pegasus.all.cells.cutoff <- read.csv(paste0(pegasus.cutoff.dir, "!cells.csv"))
+pegasus.all.cells.cutoff$cluster <- pegasus.all.cells.cutoff$louvain_labels - 1
+rownames(pegasus.all.cells.cutoff) <- sapply(pegasus.all.cells.cutoff$X, split.special)
+
+cutoff.15and17 <- subset(pegasus.all.cells.cutoff, cluster == 15 | cluster == 17)
+mad.0and16and18 <- subset(pegasus.all.cells.mad, cluster == 0 | cluster == 16 | cluster == 18)
+
+cutoff.unique <- pegasus.all.cells.cutoff[sapply(setdiff(cutoff.15and17$X, mad.0and16and18$X), split.special),]
+
+
 mad.c13 <- subset(pegasus.all.cells.mad, cluster == 13)
 mad.c19 <- subset(pegasus.all.cells.mad, cluster == 19)
 mad.c25 <- subset(pegasus.all.cells.mad, cluster == 25)

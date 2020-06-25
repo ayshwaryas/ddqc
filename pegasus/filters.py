@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 import pegasus as pg
 
@@ -18,7 +20,7 @@ def calculate_percent_ribo(adata, ribo_prefix):
 
     def startswith(name):
         for prefix in ribo_prefixes:
-            if name.startswith(prefix):
+            if re.match(prefix, name, flags=re.IGNORECASE):
                 return True
         return False
 
@@ -33,7 +35,7 @@ def calculate_percent_ribo(adata, ribo_prefix):
 def initial_qc(adata, n_genes, n_cells):
     pg.qc_metrics(adata, mito_prefix="mt-", min_umis=-INF, max_umis=INF, min_genes=n_genes, max_genes=INF,
                   percent_mito=80)  # default PG filtering with custom cutoffs
-    adata = calculate_percent_ribo(adata, "Rpl,Rps")  # calculate percent ribo
+    adata = calculate_percent_ribo(adata, "^Rp[sl]\d")  # calculate percent ribo
     adata = adata[:, adata.var.n_cells > n_cells]  # filtering based on nCells
     pg.filter_data(adata)  # filtering based on the parameters from qc_metrics
     return adata
