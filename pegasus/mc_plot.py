@@ -83,4 +83,5 @@ if __name__ == '__main__':
     else:  # project and task id are provided as commandline args
         project = sys.argv[1]
         task_id = int(sys.argv[2]) - 1
+        main()
 
