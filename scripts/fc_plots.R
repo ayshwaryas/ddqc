@@ -3,9 +3,11 @@ tasks.per.tiss <<- 1 #How many different res/methods per one tissue
 readFilterCsvMethod <- function(method, metric) {
   filtered.cells <- NULL
   if (metric == "all") {
-    filtered.cells <- c(filtered.cells, tryCatch({
-      as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric1, ".csv"))[["cell"]])}, 
-      error = function(e) {warning(paste(method, metric, "filtered cells not found"))}))
+    for (metric1 in c("counts", "genes", "mito", "ribo")) {
+      filtered.cells <- c(filtered.cells, tryCatch({
+        as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric1, ".csv"))[["cell"]])}, 
+        error = function(e) {warning(paste(method, metric1, "filtered cells not found"))}))
+    }
   }
   else {
     filtered.cells <- c(filtered.cells, tryCatch({
@@ -22,19 +24,19 @@ readFilterCsv <- function(obj, metric) {
   all.cells = colnames(obj$RNA)
   
   cutoff10 <- setdiff(all.cells, readFilterCsvMethod("cutoff-10", metric))
-  zscore2 <- setdiff(all.cells, readFilterCsvMethod("z_score-2", metric))
-  mad <- setdiff(all.cells, readFilterCsvMethod("outlier-0", metric))
+  outlier <- setdiff(all.cells, readFilterCsvMethod("outlier-0", metric))
+  mad <- setdiff(all.cells, readFilterCsvMethod("mad-2", metric))
   
   #categorize cells
   color <- list()
   color[all.cells] <- "Did not pass"
   color[mad] <- "MAD2 only"
   color[cutoff10] <- "C10 only"
-  color[zscore2] <- "Outlier only"
+  color[outlier] <- "Outlier only"
   color[intersect(mad, cutoff10)] <- "MAD2 and C10"
-  color[intersect(mad, zscore2)] <- "MAD2 and Outlier"
-  color[intersect(zscore2, cutoff10)] <- "Outlier and C10"
-  color[intersect(mad, intersect(cutoff10, zscore2))] <- "All"
+  color[intersect(mad, outlier)] <- "MAD2 and Outlier"
+  color[intersect(outlier, cutoff10)] <- "Outlier and C10"
+  color[intersect(mad, intersect(cutoff10, outlier))] <- "All"
   obj[["color"]] <- factor(as.character(color))
   
   obj <- obj[,color != "Did not pass"] #filter out cells that did not pass any qc method
