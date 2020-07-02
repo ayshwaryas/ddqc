@@ -93,14 +93,14 @@ def main():
     #  pg.write_output(adata, results_dir + task_name)
 
     # launch seurat plot script
-    print(subprocess.check_output("Rscript r_plots.R {} {} {} {}".format(project, task_id, tissue, res),
+    print(subprocess.check_output("Rscript r_plots.R {} {} {} {} {}".format(project, task_id, tissue, res, param),
                                       shell=True).decode('UTF-8'))
 
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        project = "mc_tm"
-        for task_id in (8, 9, 10, 11, 40, 41, 42, 43, 44, 45, 46, 47):
+        project = "mc_other"
+        for task_id in []:
             main()
 
     else:  # project and task id are provided as commandline args

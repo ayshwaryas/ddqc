@@ -2,7 +2,12 @@ data.from.pg <- TRUE
 
 split.special <- function(x) {
   x <- as.character(x)
-  return(paste0(strsplit(x, "-")[[1]][2], "_", strsplit(x, "-")[[1]][3]))
+  if (project == "mc_tm") {
+    return(paste0(strsplit(x, "-")[[1]][2], "_", strsplit(x, "-")[[1]][3]))
+  } 
+  if (project == "mc_other_10X") {
+    return(paste0(strsplit(x, "-")[[1]][2], "_1"))
+  }
 }
 
 source("../scripts/mc_functions.R")
@@ -13,6 +18,7 @@ project <<- commandArgs(trailingOnly = TRUE)[1]
 task.id <<- as.integer(commandArgs(trailingOnly = TRUE)[2])
 tissue <<- commandArgs(trailingOnly = TRUE)[3]
 res1 <<- commandArgs(trailingOnly = TRUE)[4]
+param1 <<- commandArgs(trailingOnly = TRUE)[5]
 
 message("Starting R script to generate results")
 
@@ -20,6 +26,7 @@ tiss <- AutoReader(project, cells.filter, features.filter, tasks.per.tiss)
 
 parse.task.id()
 res <<- res1
+param <<- param1
 task.directory <- paste0(res, "-", method, "-", param)
 task.name <<- paste0(tissue, "-", task.directory)
 results.dir <<- paste0(output.dir, project, "/", tissue, "/", task.directory, "/") #directory for saving all other output
