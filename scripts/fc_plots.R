@@ -69,18 +69,12 @@ generateFCPlots <- function(obj, clusters) {
   if (!exists("data.from.pg")) {
     cells <- colnames(obj)
     data <- as.data.frame(Embeddings(obj$umap)[cells, c(1, 2)])
-    plot.cols <- c("C10 only" = "#D55E00", "MAD2 and C10" = "#E69F00", "Outlier and C10" = "#CC79A7", "MAD2 only" = "#56B4E9",
-                   "Outlier only" = "#0072B2", "MAD2 and Outlier" = "#009E73", "All" = "#000000" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
-    
   } else {
     data <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
-    plot.cols <- c("C10 only" = "#E69F00", "MAD2 and C10" = "#0072B2", "Outlier and C10" = "#CC79A7", "MAD2 only" = "#009E73",
-                   "Outlier only" = "#D55E00", "MAD2 and Outlier" = "#56B4E9", "All" = "#000000" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
-    
   }
   
-  plot.cols <- c("C10 only" = "#D55E00", "MAD2 and C10" = "#E69F00", "Outlier and C10" = "#CC79A7", "MAD2 only" = "#56B4E9",
-                 "Outlier only" = "#0072B2", "MAD2 and Outlier" = "#009E73", "All" = "#000000" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
+  plot.cols <- c("C10 only" = "#E41A1C", "MAD2 and C10" = "#984EA3", "Outlier and C10" = "#FF7F00", "MAD2 only" = "#377EB8",
+                 "Outlier only" = "#FFFF33", "MAD2 and Outlier" = "#4DAF4A", "All" = "#808080" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
   
   
   data <- data.frame(UMAP_1 = data$UMAP_1, UMAP_2 = data$UMAP_2, cluster = obj$seurat_clusters, color=obj$color, annotation=obj$annotations)
@@ -88,8 +82,8 @@ generateFCPlots <- function(obj, clusters) {
   t1 <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
   t2 <- guides(colour = guide_legend(override.aes = list(size=2)))
   
-  plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color)) + geom_point(size = 0.75) + t1 + t2 + scale_fill_manual(values = plot.cols) + scale_color_manual(values = plot.cols) #umap colored by filtering category
-  plot2 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=cluster)) + geom_point(size = 0.75) + t1 + t2 #umap colored by cluster
+  plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color)) + geom_point(size = 1.5) + t1 + t2 + scale_fill_manual(values = plot.cols) + scale_color_manual(values = plot.cols) #umap colored by filtering category
+  plot2 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=cluster)) + geom_point(size = 1.5) + t1 + t2 #umap colored by cluster
   for (cl in levels(obj$seurat_clusters)) { #add labels to plots
     cluster.umap <- subset(data, cluster == cl)
     plot1 <- plot1 + annotate("text", x = mean(cluster.umap$UMAP_1), y = mean(cluster.umap$UMAP_2), label = lbls[(as.numeric(cl) + 1)], size = 3, fontface=2)
@@ -113,11 +107,20 @@ generateFCPlots <- function(obj, clusters) {
   plot3 <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + 
     scale_fill_manual(values = plot.cols) + scale_x_discrete(labels=lbls) + theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"),  axis.title.x=element_blank())
   
+  plot4 <- DimPlotContinuous(obj, "percent.mt", lbls, name, "umap")
+  plot5 <- DimPlotContinuous(obj, "cd1", lbls, name, "umap")
+  plot6 <- DimPlotContinuous(obj, "cd2", lbls, name, "umap")
+  plot7 <- DimPlotContinuous(obj, "cd3", lbls, name, "umap")
+  
   #write plots
   n.clusters <- length(unique(obj$seurat_clusters))
   ggsave1(filename = paste0(results.dir, res, "-filterplot.pdf"), plot=plot1)
   ggsave1(filename = paste0(results.dir, res, "-clusterplot.pdf"), plot=plot2)
   ggsave1(filename = paste0(results.dir, res, "-barplot.pdf"), plot=plot3, n.clusters=n.clusters)
+  ggsave1(filename = paste0(results.dir, res, "-mito.pdf"), plot=plot4)
+  ggsave1(filename = paste0(results.dir, res, "-cd1.pdf"), plot=plot5)
+  ggsave1(filename = paste0(results.dir, res, "-cd2.pdf"), plot=plot6)
+  ggsave1(filename = paste0(results.dir, res, "-cd3.pdf"), plot=plot7)
 }
 
 

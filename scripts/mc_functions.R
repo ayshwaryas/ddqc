@@ -38,7 +38,7 @@ GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE 
 DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlot with continious colors by metric
   name <- paste0(name, "_", reduction)
   data <- GetDimPlotPoints(obj, reduction, metric.name) 
-  plot <- ggplot(data, aes(x=axis1, y=axis2, color=color)) + geom_point(size = 0.5) + scale_colour_gradientn(colours=rev(rainbow(4))) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
+  plot <- ggplot(data, aes(x=axis1, y=axis2, color=color)) + geom_point(size = 1.5) + scale_colour_gradientn(colours=rev(c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")), n.breaks=8) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
     plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = lbls[as.numeric(cl) + 1], size = 3, fontface=2)
@@ -49,7 +49,7 @@ DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlo
 DimPlotCluster <- function(obj, lbls, name, reduction) { #DimPlot colored by cluster
   name <- paste0(name, "_", reduction)
   data <- GetDimPlotPoints(obj, reduction, "seurat_clusters")
-  plot <- ggplot(data, aes(x=axis1, y=axis2, color=cluster)) + geom_point(size = 0.5) + guides(colour = guide_legend(override.aes = list(size=2))) + ggtitle(name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank())
+  plot <- ggplot(data, aes(x=axis1, y=axis2, color=cluster)) + geom_point(size = 1.5) + guides(colour = guide_legend(override.aes = list(size=2))) + ggtitle(name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank())
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
     plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = lbls[as.numeric(cl) + 1], size = 3, fontface=2)
@@ -65,7 +65,7 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   t3 <- ggtitle(name)
   t4 <- theme(legend.position="none")
   t5 <- facet_wrap(. ~ clusters, ncol=5, labeller = as_labeller(lbls))
-  t6 <- stat_summary(fun.y=mean, geom="point", shape=23, fill="blue", size=3)
+  t6 <- stat_summary(fun=mean, geom="point", shape=23, fill="blue", size=3)
   t7 <- theme(axis.text.x = element_text(size=10), axis.text.y = element_text(size=10, face="bold"), legend.position="none", axis.title.y=element_blank())
   l1 <- labs(y=metric.name)
   l2 <- labs(y=paste0("log2(", metric.name, ")"))
