@@ -32,8 +32,9 @@ def calculate_percent_ribo(adata, ribo_prefix):
 
 
 # basic qc that is performed for each method
-def initial_qc(adata, n_genes, n_cells):
-    pg.qc_metrics(adata, mito_prefix="mt-", min_umis=-INF, max_umis=INF, min_genes=n_genes, max_genes=INF,
+def initial_qc(adata, n_genes, n_cells, is_human):
+    mt_prefix = "MT-" if is_human else "mt-"
+    pg.qc_metrics(adata, mito_prefix=mt_prefix, min_umis=-INF, max_umis=INF, min_genes=n_genes, max_genes=INF,
                   percent_mito=80)  # default PG filtering with custom cutoffs
     adata = calculate_percent_ribo(adata, "^Rp[sl]\d")  # calculate percent ribo
     adata = adata[:, adata.var.n_cells > n_cells]  # filtering based on nCells
@@ -89,8 +90,8 @@ def metric_filter(adata, method, param, metric_name, do_lower_co=False, do_upper
 # method - method name for filtering (mad, outlier, cutoff)
 # threshold - parameter for the selected method
 # do_metric - set to true, if you want to filter the data based on metric
-def filter_cells(adata, res, method, threshold, do_counts, do_genes, do_mito, do_ribo):
-    adata = initial_qc(adata, 100, 3)  # perform initial qc with min 100 genes and min 3 cells
+def filter_cells(adata, res, method, threshold, is_human, do_counts, do_genes, do_mito, do_ribo):
+    adata = initial_qc(adata, 100, 3, is_human)  # perform initial qc with min 100 genes and min 3 cells
     adata_copy = adata.copy()  # make a copy of adata, so the clustering results won't affect future downstream analysis
     adata_copy = cluster_data(adata_copy, res)  # do initial clustering of adata
 

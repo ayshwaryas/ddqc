@@ -14,7 +14,7 @@ from utils import cluster_data, safe_mkdir
 TASKS_PER_TISS = 4  # how many different methods per one tissue. Used to determine method and param from task id
 
 
-# function that creates all the relevant directories
+# function that creates allthe relevant directories
 def create_dirs(tissue, res, method, param):
     res = str(res)
     param = str(param)
@@ -84,7 +84,7 @@ def main():
             task_id, tissue, res, method, param, project, do_counts, do_genes, do_mito, do_ribo))
 
     task_directory, task_name, results_dir = create_dirs(tissue, res, method, param)
-    adata = filter_cells(adata, res, method, param, do_counts, do_genes, do_mito, do_ribo)  # perform filtering
+    adata = filter_cells(adata, res, method, param, is_human, do_counts, do_genes, do_mito, do_ribo)  # perform filtering
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=res)
 
     # write the results
@@ -99,8 +99,8 @@ def main():
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        project = "mc_other"
-        for task_id in []:
+        project = "mc_hca"
+        for task_id in range(4, 24):
             main()
 
     else:  # project and task id are provided as commandline args
