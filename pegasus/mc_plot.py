@@ -9,7 +9,7 @@ from filters import initial_qc
 from local_config import local
 from mc import write_markers, save_to_csv
 from readers import auto_reader
-from utils import cluster_data, safe_mkdir
+from utils import cluster_data, safe_mkdir, add_cd_scores
 
 TASKS_PER_TISS = 2  # how many different methods per one tissue. Used to determine method and param from task id
 
@@ -69,6 +69,7 @@ def main():
     adata = filter_cells_by_csv(adata, tissue, res, method)
     adata = initial_qc(adata, 100, 3, is_human)
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=res)
+    adata = add_cd_scores(adata, is_human)
 
     # write the results
     write_markers(marker_dict)
@@ -82,7 +83,7 @@ def main():
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
         project = "mc_tm"
-        for task_id in range(11, TASKS_PER_TISS * 12):
+        for task_id in [4]:
             main()
     else:  # project and task id are provided as commandline args
         project = sys.argv[1]

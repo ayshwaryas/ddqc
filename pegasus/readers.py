@@ -66,12 +66,22 @@ def read_hca(task_id, tasks_per_tiss):
     for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
         if tissue in directory:  # if directory matches the tissue
             p = data_path + directory  # path to the txt
-            read_info.write("{},{},{},\n".format(directory, p, "GRCh38"))  # add the file info to csv
+            name = directory.split("_")[1]
+            name = "Adult" + name[len("Adult-"):]
+            if name[-2] == "-":
+                name = name.rsplit("-", 1)[0]
+            name = name.replace("-", "")
+            read_info.write("{},{},{},\n".format(name, p, "GRCh38"))  # add the file info to csv
     read_info.close()
     adata = pg.aggregate_matrices(filename)  # read data
     os.remove(filename)  # remove the info csv
 
-    adata.obs["annotations"] = "Unknown"
+    annotations = pd.read_csv(data_path + "annotations.csv")
+    annotations_cell_type = annotations["celltype"]
+    annotations_cell_type.index = ["-".join(t.split(".", 1)).replace("_", "") for t in annotations["cellnames"]]
+    annotations_cell_type = annotations_cell_type.reindex(adata.obs.index)
+    annotations_cell_type = annotations_cell_type.fillna("Unknown")
+    adata.obs["annotations"] = annotations_cell_type
 
     return tissue, is_human, adata
 

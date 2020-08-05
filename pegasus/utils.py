@@ -37,6 +37,26 @@ def cluster_data(adata, resolution=1, compute_markers=False, compute_reductions=
         return adata
 
 
+def title(s):
+    if len(s) == 1:
+        return s[0].upper()
+    return s[0].upper() + s[1:].lower()
+
+
+def add_cd_scores(adata, is_human):
+    if is_human:
+        cd1 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd1_signatures.csv").readlines()]
+        cd2 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd2_signatures.csv").readlines()]
+        cd3 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd3_signatures.csv").readlines()]
+    else:
+        cd1 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd1_signatures.csv").readlines()]
+        cd2 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd2_signatures.csv").readlines()]
+        cd3 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd3_signatures.csv").readlines()]
+    signatures = {"cd1": cd1, "cd2": cd2, "cd3": cd3}
+    pg.calc_signature_score(adata, signatures)
+    return adata
+
+
 # currently not used
 def load_markers_dict():
     markers_dict = dict()

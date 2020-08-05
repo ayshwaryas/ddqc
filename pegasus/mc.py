@@ -9,7 +9,7 @@ from config import do_counts, do_genes, do_mito, do_ribo, OUTPUT_DIR
 from filters import filter_cells
 from local_config import local
 from readers import auto_reader
-from utils import cluster_data, safe_mkdir
+from utils import cluster_data, safe_mkdir, add_cd_scores
 
 TASKS_PER_TISS = 4  # how many different methods per one tissue. Used to determine method and param from task id
 
@@ -86,6 +86,7 @@ def main():
     task_directory, task_name, results_dir = create_dirs(tissue, res, method, param)
     adata = filter_cells(adata, res, method, param, is_human, do_counts, do_genes, do_mito, do_ribo)  # perform filtering
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=res)
+    adata = add_cd_scores(adata, is_human)
 
     # write the results
     write_markers(marker_dict)
