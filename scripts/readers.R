@@ -18,6 +18,7 @@ ReadTabulaMuris <- function(cells.filter, features.filter, tasks.per.tiss) {
     tiss <- RenameCells(tiss, add.cell.id = (strsplit(file, "-")[[1]][[2]]))
   }
   
+  tiss <- RenameCells(tiss, new.names = sapply(strsplit(colnames(tiss), "-"), first))
   annotations <- read.csv(file= paste0(data.path, "annotations_droplet.csv"), header=TRUE, sep=",")
   annotations.cell.type <- as.character(annotations[["cell_ontology_class"]])
   names(annotations.cell.type) <- as.character(annotations[["cell"]])

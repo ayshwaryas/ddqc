@@ -38,7 +38,7 @@ GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE 
 DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlot with continious colors by metric
   name <- paste0(name, "_", reduction)
   data <- GetDimPlotPoints(obj, reduction, metric.name) 
-  plot <- ggplot(data, aes(x=axis1, y=axis2, color=eval(parse(text=eval(metric.name))))) + geom_point(size = 0.5) + scale_colour_gradientn(colours=rev(rainbow(4))) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
+  plot <- ggplot(data, aes(x=axis1, y=axis2, color=color)) + geom_point(size = 0.5) + scale_colour_gradientn(colours=rev(rainbow(4))) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
     plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = lbls[as.numeric(cl) + 1], size = 3, fontface=2)
@@ -48,7 +48,7 @@ DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlo
 
 DimPlotCluster <- function(obj, lbls, name, reduction) { #DimPlot colored by cluster
   name <- paste0(name, "_", reduction)
-  data <- GetDimPlotPoints(obj, reduction)
+  data <- GetDimPlotPoints(obj, reduction, "seurat_clusters")
   plot <- ggplot(data, aes(x=axis1, y=axis2, color=cluster)) + geom_point(size = 0.5) + guides(colour = guide_legend(override.aes = list(size=2))) + ggtitle(name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank())
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
@@ -186,9 +186,9 @@ clusterize <- function(obj, res, compute.reductions=TRUE, compute.markers=TRUE, 
 
 
 #annotations & cell types assingment
-formatMarkers <- function(lst) {
+formatMarkers <- function(lst, mx=50) {
   st <- ""
-  for (marker in unlist(lst)) {
+  for (marker in unlist(lst)[1:min(length(unlist(lst)), mx)]) {
     st <- paste0(st, "; ", marker)
   }
   return(substring(st, 3))
@@ -201,7 +201,7 @@ getAnnotations <- function(obj) { #calculate most common annotations in each clu
   percents1 <- NULL
   percents2 <- NULL
   for (cl in unique(obj$seurat_clusters)) {
-    cluster <- subset(obj, idents = cl)
+    cluster <- subset(obj, seurat_clusters == cl)
     #calculate first and second most frequent annotation and percentage of cells that have them
     first.frequent <- sort(table(cluster$annotations),decreasing=TRUE)[1]
     cluster.labels <- c(cluster.labels, names(first.frequent)[1])
@@ -212,9 +212,9 @@ getAnnotations <- function(obj) { #calculate most common annotations in each clu
     }
     else {
       cluster.labels2 <- c(cluster.labels2, names(second.frequent)[1])
-      percents2 <- c(percents2, second.frequent / length(colnames(cluster$RNA)))
+      percents2 <- c(percents2, second.frequent / length(cluster$seurat_clusters))
     }
-    percents1 <- c(percents1, first.frequent / length(colnames(cluster$RNA)))
+    percents1 <- c(percents1, first.frequent / length(cluster$seurat_clusters))
   }
   return(list("a1" = cluster.labels, "a2" = cluster.labels2, "p1" = percents1, "p2" = percents2))
 }
@@ -247,7 +247,7 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=TRUE, min.pv
   
   for (cl in levels(markers$cluster)) {
     cluster.markers <- subset(markers, cluster == cl) #subset cells and markers for this cluster
-    obj.cluster <- subset(obj, idents = cl)
+    obj.cluster <- subset(obj, seurat_clusters == cl)
     cell.type <- list()
     sg <- list() #list of significant gebes
     for (i in 1:nrow(cluster.markers)) { #cycle though all cluster markers
@@ -305,7 +305,7 @@ assignCellTypes <- function(obj, markers, annotations, record.stats=TRUE, min.pv
     }
     
     if (record.stats) { #recorbd additional statistics about cluster
-      cells <- c(cells, length(colnames(obj.cluster$RNA)))
+      cells <- c(cells, length(obj.cluster$seurat_clusters))
       genes.mean <- c(genes.mean, mean(obj.cluster$nFeature_RNA))
       genes.median <- c(genes.median, median(obj.cluster$nFeature_RNA))
       mito.mean <- c(mito.mean, mean(obj.cluster$percent.mt))
