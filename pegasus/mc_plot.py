@@ -81,10 +81,13 @@ def main():
 
 
 if __name__ == '__main__':
-    if local:  # for debug outside of cluster
-        project = "mc_tm"
-        for task_id in [4]:
+    if not local:  # for debug outside of cluster
+        project = "mc_hca"
+        for task_id in range(140):
+            # try:
             main()
+            # except:
+            #    print("FAIL task.id: " + str(task_id))
     else:  # project and task id are provided as commandline args
         project = sys.argv[1]
         task_id = int(sys.argv[2]) - 1
