@@ -73,8 +73,8 @@ generateFCPlots <- function(obj, clusters) {
     data <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
   }
   
-  plot.cols <- c("C10 only" = "#E41A1C", "MAD2 and C10" = "#984EA3", "Outlier and C10" = "#FF7F00", "MAD2 only" = "#377EB8",
-                 "Outlier only" = "#FFFF33", "MAD2 and Outlier" = "#4DAF4A", "All" = "#808080" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
+  plot.cols <- c("C10 only" = "#E3191C", "MAD2 and C10" = "#E1C7A7", "Outlier and C10" = "#974FA2", "MAD2 only" = "#974FA2",
+                 "Outlier only" = "#FA9A99", "MAD2 and Outlier" = "#A7CEE2", "All" = "#A65527" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
   
   
   data <- data.frame(UMAP_1 = data$UMAP_1, UMAP_2 = data$UMAP_2, cluster = obj$seurat_clusters, color=obj$color, annotation=obj$annotations)

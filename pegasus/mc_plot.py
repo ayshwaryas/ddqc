@@ -76,7 +76,7 @@ def main():
     save_to_csv(adata)
 
     # launch seurat plot script
-    print(subprocess.check_output("Rscript r_fc_plots.R {} {} {} {} {}".format(project, task_id, tissue, res, method),
+    print(subprocess.check_output("1 {} {} {} {} {}".format(project, task_id, tissue, res, method),
                                   shell=True).decode('UTF-8'))
 
 

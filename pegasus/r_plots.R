@@ -21,7 +21,7 @@ task.name <<- paste0(tissue, "-", task.directory)
 results.dir <<- paste0(output.dir, project, "/", tissue, "/", task.directory, "/") #directory for saving all other output
 
 tiss <- read.csv(paste0(results.dir, "!cells.csv"))
-colnames(tiss) <- c("X", "Channel", "annotations", "color","passed_qc", "nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb", 
+colnames(tiss) <- c("X", "Channel", "annotations","passed_qc", "nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb", 
                     "seurat_clusters", "cd1", "cd2", "cd3",  "pca1", "pca2", "tsne1", "tsne2", "umap1",  "umap2")  
 markers <- read.csv(paste0(results.dir, "!markers.csv"))
 
