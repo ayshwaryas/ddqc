@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-import pegasus as pg
+import pegasusio as io
 
 from config import DATA_DIR
 
@@ -19,7 +19,7 @@ def read_tm(task_id, tasks_per_tiss):
             p = data_path + directory + "/"  # path to the mtx
             read_info.write("{},{},{},\n".format(directory, p + "matrix.mtx", "GRCm38"))  # add the file info to csv
     read_info.close()
-    adata = pg.aggregate_matrices(filename)  # read data
+    adata = io.aggregate_matrices(filename)  # read data
     os.remove(filename)  # remove the info csv
 
     annotations = pd.read_csv(data_path + "annotations_droplet.csv")
@@ -32,7 +32,7 @@ def read_tm(task_id, tasks_per_tiss):
     return tissue, is_human, adata
 
 
-def read_other_10X(task_id, tasks_per_tiss):
+def read_other_10x(task_id, tasks_per_tiss):
     tissue = ("adipose", "ASD_snRNAseq", "liver", "skin")[task_id // tasks_per_tiss]  # select tissue based on task id
     is_human = True  # this is mouse data
     data_path = DATA_DIR + "other/" + tissue + "/"  # path to the mtx files of this dataset
@@ -44,7 +44,7 @@ def read_other_10X(task_id, tasks_per_tiss):
         if os.path.isdir(p):
             read_info.write("{},{},{},\n".format(directory, p + "matrix.mtx", "GRCh37"))  # add the file info to csv
     read_info.close()
-    adata = pg.aggregate_matrices(filename)  # read data
+    adata = io.aggregate_matrices(filename)  # read data
     os.remove(filename)  # remove the info csv
     return tissue, is_human, adata
 
@@ -66,22 +66,30 @@ def read_hca(task_id, tasks_per_tiss):
     for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
         if tissue in directory:  # if directory matches the tissue
             p = data_path + directory  # path to the txt
-            name = directory.split("_")[1]
-            name = "Adult" + name[len("Adult-"):]
-            if name[-2] == "-":
-                name = name.rsplit("-", 1)[0]
-            name = name.replace("-", "")
-            read_info.write("{},{},{},\n".format(name, p, "GRCh38"))  # add the file info to csv
+            read_info.write("{},{},{},\n".format(directory.split("_")[1], p, "GRCh38"))  # add the file info to csv
     read_info.close()
-    adata = pg.aggregate_matrices(filename)  # read data
+    adata = io.aggregate_matrices(filename)  # read data
     os.remove(filename)  # remove the info csv
 
+    def reformat_ann_names(name):
+        name = "-".join(name.split(".", 1)).replace("_", "")
+        if name[-1].isdigit():
+            name = name[:-1]
+        return name
+
+    def reformat_cell_names(name):
+        name = name.rsplit("-", 1)
+        if name[0][-2] == "-":
+            name[0] = name[0][:-2]
+        return name[0].replace("-", "") + "-" + name[1]
+
     annotations = pd.read_csv(data_path + "annotations.csv")
-    annotations_cell_type = annotations["celltype"]
-    annotations_cell_type.index = ["-".join(t.split(".", 1)).replace("_", "") for t in annotations["cellnames"]]
-    annotations_cell_type = annotations_cell_type.reindex(adata.obs.index)
+    annotations["cellnames"] = [reformat_ann_names(t) for t in annotations["cellnames"]]
+    annotations = annotations.drop_duplicates("cellnames", keep='first')
+    annotations.index = annotations["cellnames"]
+    annotations_cell_type = annotations.reindex([reformat_cell_names(t) for t in adata.obs.index])["celltype"]
     annotations_cell_type = annotations_cell_type.fillna("Unknown")
-    adata.obs["annotations"] = annotations_cell_type
+    adata.obs["annotations"] = list(annotations_cell_type)
 
     return tissue, is_human, adata
 
@@ -90,6 +98,6 @@ def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function 
     if dataset == "mc_tm" or dataset == "tm":
         return read_tm(task_id, tasks_per_tiss)
     if dataset == "mc_other_10X" or dataset == "other_10X":
-        return read_other_10X(task_id, tasks_per_tiss)
+        return read_other_10x(task_id, tasks_per_tiss)
     if dataset == "mc_hca" or dataset == "hca":
         return read_hca(task_id, tasks_per_tiss)

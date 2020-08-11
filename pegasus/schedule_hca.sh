@@ -13,4 +13,4 @@ reuse R-3.5
 reuse .python-3.8.3
 source /home/unix/malperov/myenv3.8/bin/activate
 
-python3 mc.tm "mc_hca" $SGE_TASK_ID
+python3 mc.py "mc_hca" $SGE_TASK_ID

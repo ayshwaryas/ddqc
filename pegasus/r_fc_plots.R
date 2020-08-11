@@ -7,26 +7,19 @@ source("../scripts/readers.R")
 source("../scripts/settings.R")
 source("../scripts/local_settings.R")
 project <<- commandArgs(trailingOnly = TRUE)[1]
-task.id <<- as.integer(commandArgs(trailingOnly = TRUE)[2])
-tissue <<- commandArgs(trailingOnly = TRUE)[3]
-
+tissue <<- commandArgs(trailingOnly = TRUE)[2]
+res <<- commandArgs(trailingOnly = TRUE)[3]
+metric <<- commandArgs(trailingOnly = TRUE)[4]
 message("Starting R script to generate results")
 
-tasks.per.res <- tasks.per.tiss #how many different methods per one resolution
-res <<- commandArgs(trailingOnly = TRUE)[4]
-metric <<- commandArgs(trailingOnly = TRUE)[5]
 results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/", metric, "/") #directory for saving all other output
-
 dir.create(paste0(results.dir, "additional_plots/"), showWarnings=FALSE)
 
 tiss <- read.csv(paste0(results.dir, "!cells.csv"))
-colnames(tiss) <- c("X", "Channel", "annotations", "color","passed_qc", "nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb", 
-                    "seurat_clusters", "cd1", "cd2", "cd3",  "pca1", "pca2", "tsne1", "tsne2", "umap1",  "umap2") 
-markers <- read.csv(paste0(results.dir, "!markers.csv"))
-
-rownames(tiss) <- tiss$X
+tiss <- tiss %>% rename(nFeature_RNA = n_genes, nCount_RNA = n_counts, percent.mt = percent_mito, percent.rb = percent_ribo, seurat_clusters = louvain_labels)
 tiss$seurat_clusters <- factor(tiss$seurat_clusters - 1)
 
+markers <- read.csv(paste0(results.dir, "!markers.csv"))
 obj.markers <- data.frame("gene"=markers$feature, "avg_logFC"=markers$log_fold_change, "p_val_adj"=markers$t_qval, 
                           "cluster"=factor(markers$cluster - 1))
 obj.markers <- obj.markers %>% filter(avg_logFC > 0.25)

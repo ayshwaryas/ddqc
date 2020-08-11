@@ -107,20 +107,21 @@ generateFCPlots <- function(obj, clusters) {
   plot3 <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + 
     scale_fill_manual(values = plot.cols) + scale_x_discrete(labels=lbls) + theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"),  axis.title.x=element_blank())
   
-  plot4 <- DimPlotContinuous(obj, "percent.mt", lbls, name, "umap")
-  plot5 <- DimPlotContinuous(obj, "cd1", lbls, name, "umap")
-  plot6 <- DimPlotContinuous(obj, "cd2", lbls, name, "umap")
-  plot7 <- DimPlotContinuous(obj, "cd3", lbls, name, "umap")
   
   #write plots
   n.clusters <- length(unique(obj$seurat_clusters))
   ggsave1(filename = paste0(results.dir, res, "-filterplot.pdf"), plot=plot1)
   ggsave1(filename = paste0(results.dir, res, "-clusterplot.pdf"), plot=plot2)
   ggsave1(filename = paste0(results.dir, res, "-barplot.pdf"), plot=plot3, n.clusters=n.clusters)
-  ggsave1(filename = paste0(results.dir, res, "-mito.pdf"), plot=plot4)
-  ggsave1(filename = paste0(results.dir, res, "-cd1.pdf"), plot=plot5)
-  ggsave1(filename = paste0(results.dir, res, "-cd2.pdf"), plot=plot6)
-  ggsave1(filename = paste0(results.dir, res, "-cd3.pdf"), plot=plot7)
+  ggsave1(filename = paste0(results.dir, res, "-mito.pdf"), plot=DimPlotContinuous(obj, "percent.mt", lbls, name, "umap"))
+  ggsave1(filename = paste0(results.dir, res, "-cd1.pdf"), plot=DimPlotContinuous(obj, "cd1", lbls, name, "umap"))
+  ggsave1(filename = paste0(results.dir, res, "-cd2.pdf"), plot= DimPlotContinuous(obj, "cd2", lbls, name, "umap"))
+  ggsave1(filename = paste0(results.dir, res, "-cd3.pdf"), plot=DimPlotContinuous(obj, "cd3", lbls, name, "umap"))
+  ggsave1(filename = paste0(results.dir, res, "-mito_genes.pdf"), plot=DimPlotContinuous(obj, "mito_genes", lbls, name, "umap"))
+  ggsave1(filename = paste0(results.dir, res, "-ribo_genes.pdf"), plot=DimPlotContinuous(obj, "ribo_genes", lbls, name, "umap"))
+  ggsave1(filename = paste0(results.dir, res, "-mito_ribo.pdf"), plot=DimPlotContinuous(obj, "mito_ribo", lbls, name, "umap"))
+  
+  
 }
 
 

@@ -37,8 +37,10 @@ def initial_qc(adata, n_genes, n_cells, is_human):
     pg.qc_metrics(adata, mito_prefix=mt_prefix, min_umis=-INF, max_umis=INF, min_genes=n_genes, max_genes=INF,
                   percent_mito=80)  # default PG filtering with custom cutoffs
     adata = calculate_percent_ribo(adata, "^Rp[sl]\d")  # calculate percent ribo
-    adata = adata[:, adata.var.n_cells > n_cells]  # filtering based on nCells
+    adata.var["n_cells"] = adata.X.getnnz(axis=0)
+    # adata = adata[:, adata.var.n_cells > n_cells]  # filtering based on nCells
     pg.filter_data(adata)  # filtering based on the parameters from qc_metrics
+    pg.identify_robust_genes(adata)
     return adata
 
 

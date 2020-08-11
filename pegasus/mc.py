@@ -2,7 +2,6 @@ import subprocess
 import sys
 
 import pandas as pd
-import pegasus as pg
 
 import paths
 from config import do_counts, do_genes, do_mito, do_ribo, OUTPUT_DIR
@@ -14,8 +13,8 @@ from utils import cluster_data, safe_mkdir, add_cd_scores
 TASKS_PER_TISS = 4  # how many different methods per one tissue. Used to determine method and param from task id
 
 
-# function that creates allthe relevant directories
-def create_dirs(tissue, res, method, param):
+# function that creates all the relevant directories
+def create_dirs(project, tissue, res, method, param):
     res = str(res)
     param = str(param)
     task_directory = res + "-" + method + "-" + param  # name of the directory for this task
@@ -68,12 +67,12 @@ def write_markers(marker_dict, min_log_fc=0.25, min_pct=25):
                     (df["percentage"] >= min_pct) | (df["percentage_other"] >= min_pct))]
 
             frames.append(df)
-    result = pd.concat(frames) # merge all marker data frames together
+    result = pd.concat(frames)  # merge all marker data frames together
     with open(paths.results_dir + "!markers.csv", "w") as fout:
         fout.write(result.to_csv())
 
 
-def main():
+def main(project, task_id):
     tissue, is_human, adata = auto_reader(project, task_id, TASKS_PER_TISS)  # read the data for current task id
     res = 1.4  # this resolution gives results closest to seurat
     # determine the method and param based on task id
@@ -83,8 +82,9 @@ def main():
         "task.id:{} - tissue:{}, res:{}, method:{}, param:{}, project:{}, do.counts:{}, do.genes:{}, do.mito:{}, do.ribo:{}".format(
             task_id, tissue, res, method, param, project, do_counts, do_genes, do_mito, do_ribo))
 
-    task_directory, task_name, results_dir = create_dirs(tissue, res, method, param)
-    adata = filter_cells(adata, res, method, param, is_human, do_counts, do_genes, do_mito, do_ribo)  # perform filtering
+    create_dirs(project, tissue, res, method, param)
+    adata = filter_cells(adata, res, method, param, is_human, do_counts, do_genes, do_mito,
+                         do_ribo)  # perform filtering
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=res)
     adata = add_cd_scores(adata, is_human)
 
@@ -94,17 +94,16 @@ def main():
     #  pg.write_output(adata, results_dir + task_name)
 
     # launch seurat plot script
-    print(subprocess.check_output("Rscript r_plots.R {} {} {} {} {}".format(project, task_id, tissue, res, param),
-                                      shell=True).decode('UTF-8'))
+    print(subprocess.check_output("Rscript r_plots.R {} {} {} {} {}".format(project, tissue, res, method, param),
+                                  shell=True).decode('UTF-8'))
 
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        project = "mc_hca"
-        for task_id in range(4, 24):
-            main()
-
+        proj = "mc_hca"
+        for t_id in range(4, 5):
+            main(proj, t_id)
     else:  # project and task id are provided as commandline args
-        project = sys.argv[1]
-        task_id = int(sys.argv[2]) - 1
-        main()
+        proj = sys.argv[1]
+        t_id = int(sys.argv[2]) - 1
+        main(proj, t_id)

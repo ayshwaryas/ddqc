@@ -48,12 +48,19 @@ def add_cd_scores(adata, is_human):
         cd1 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd1_signatures.csv").readlines()]
         cd2 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd2_signatures.csv").readlines()]
         cd3 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd3_signatures.csv").readlines()]
+        mito = "mitochondrial_genes_human"
+        ribo = "ribosomal_genes_human"
     else:
         cd1 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd1_signatures.csv").readlines()]
         cd2 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd2_signatures.csv").readlines()]
         cd3 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd3_signatures.csv").readlines()]
+        mito = "mitochondrial_genes_mouse"
+        ribo = "ribosomal_genes_mouse"
     signatures = {"cd1": cd1, "cd2": cd2, "cd3": cd3}
+
     pg.calc_signature_score(adata, signatures)
+    pg.calc_signature_score(adata, mito)
+    pg.calc_signature_score(adata, ribo)
     return adata
 
 

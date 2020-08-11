@@ -2,6 +2,7 @@ import subprocess
 import sys
 
 import pandas as pd
+import pegasus as pg
 
 import paths
 from config import OUTPUT_DIR, SOURCE_DIR_PREFIX
@@ -15,7 +16,7 @@ TASKS_PER_TISS = 2  # how many different methods per one tissue. Used to determi
 
 
 # function that creates all the relevant directories
-def create_fc_dirs(tissue, method):
+def create_fc_dirs(project, tissue, method):
     results_dir = OUTPUT_DIR + project + "/" + tissue + "/" + "filtered_cells_plots/" + method + "/"  # directory for saving output
 
     # set results dir globally, so other functions can access it
@@ -29,7 +30,7 @@ def create_fc_dirs(tissue, method):
     return results_dir
 
 
-def filter_cells_by_csv(adata, tissue, res, method):
+def filter_cells_by_csv(adata, project, tissue, res, method):
     mad_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-mad-2/!cells.csv")
     cutoff_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-cutoff-10/!cells.csv")
     outlier_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-outlier-0/!cells.csv")
@@ -52,12 +53,13 @@ def filter_cells_by_csv(adata, tissue, res, method):
         adata.obs["color"][list(set(cutoff_cells["Unnamed: 0"]).intersection(set(mad_cells["Unnamed: 0"])).intersection(
             set(outlier_cells["Unnamed: 0"])))] = "All"
 
-    adata = adata[adata.obs.color != "Did Not Pass"]
+    adata.obs["qc_pass"] = (adata.obs.color != "Did Not Pass")
+    pg.filter_data(adata)
 
     return adata
 
 
-def main():
+def main(project, task_id):
     tissue, is_human, adata = auto_reader(project, task_id, TASKS_PER_TISS)  # read the data for current task id
     res = 1.4  # this resolution gives results closest to seurat
     # determine the method and param based on task id
@@ -65,8 +67,8 @@ def main():
 
     print("task.id:{} - tissue:{}, res:{}, project:{}, method:{}".format(task_id, tissue, res, project, method))
 
-    create_fc_dirs(tissue, method)
-    adata = filter_cells_by_csv(adata, tissue, res, method)
+    create_fc_dirs(project, tissue, method)
+    adata = filter_cells_by_csv(adata, project,  tissue, res, method)
     adata = initial_qc(adata, 100, 3, is_human)
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=res)
     adata = add_cd_scores(adata, is_human)
@@ -76,20 +78,16 @@ def main():
     save_to_csv(adata)
 
     # launch seurat plot script
-    print(subprocess.check_output("1 {} {} {} {} {}".format(project, task_id, tissue, res, method),
+    print(subprocess.check_output("Rscript r_fc_plots.R {} {} {} {}".format(project, tissue, res, method),
                                   shell=True).decode('UTF-8'))
 
 
 if __name__ == '__main__':
-    if not local:  # for debug outside of cluster
-        project = "mc_hca"
-        for task_id in range(140):
-            # try:
-            main()
-            # except:
-            #    print("FAIL task.id: " + str(task_id))
+    if local:  # for debug outside of cluster
+        proj = "mc_hca"
+        for t_id in range(4, 5):
+            main(proj, t_id)
     else:  # project and task id are provided as commandline args
-        project = sys.argv[1]
-        task_id = int(sys.argv[2]) - 1
-        main()
-
+        proj = sys.argv[1]
+        t_id = int(sys.argv[2]) - 1
+        main(proj, t_id)

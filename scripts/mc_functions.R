@@ -3,7 +3,7 @@ tasks.per.tiss <<- 4 #How many different res/methods per one tissue
 
 #plots
 ggsave1 <- function(filename, plot, n.clusters=30) {
-  n.clusters <- max(10, n.clusters)
+  n.clusters <- max(20, n.clusters)
   no_bkg <- theme(axis.line = element_line(colour = "black"),
                   panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank(),
