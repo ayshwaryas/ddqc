@@ -53,7 +53,7 @@ def filter_cells_by_csv(adata, project, tissue, res, method):
         adata.obs["color"][list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])).intersection(
             set(outlier_cells["barcodekey"])))] = "All"
 
-    adata.obs["qc_pass"] = (adata.obs.color != "Did Not Pass")
+    adata.obs["passed_qc"] = (adata.obs.color != "Did Not Pass")
     pg.filter_data(adata)
 
     return adata
@@ -84,8 +84,8 @@ def main(project, task_id):
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        proj = "mc_tm"
-        for t_id in range(4, 5):
+        proj = "mc_hca"
+        for t_id in range(1):
             main(proj, t_id)
     else:  # project and task id are provided as commandline args
         proj = sys.argv[1]
