@@ -36,22 +36,22 @@ def filter_cells_by_csv(adata, project, tissue, res, method):
     outlier_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-outlier-0/!cells.csv")
 
     adata.obs["color"] = "Did Not Pass"
-    adata.obs["color"][mad_cells["Unnamed: 0"]] = "MAD2 only"
-    adata.obs["color"][cutoff_cells["Unnamed: 0"]] = "C10 only"
+    adata.obs["color"][mad_cells["barcodekey"]] = "MAD2 only"
+    adata.obs["color"][cutoff_cells["barcodekey"]] = "C10 only"
 
     if method == "no_outlier":
-        adata.obs["color"][list(set(cutoff_cells["Unnamed: 0"]).intersection(set(mad_cells["Unnamed: 0"])))] = "All"
+        adata.obs["color"][list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "All"
     elif method == "all":
-        adata.obs["color"][outlier_cells["Unnamed: 0"]] = "Outlier only"
+        adata.obs["color"][outlier_cells["barcodekey"]] = "Outlier only"
         adata.obs["color"][
-            list(set(cutoff_cells["Unnamed: 0"]).intersection(set(mad_cells["Unnamed: 0"])))] = "MAD2 and C10"
+            list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "MAD2 and C10"
         adata.obs["color"][
-            list(set(cutoff_cells["Unnamed: 0"]).intersection(set(outlier_cells["Unnamed: 0"])))] = "Outlier and C10"
+            list(set(cutoff_cells["barcodekey"]).intersection(set(outlier_cells["barcodekey"])))] = "Outlier and C10"
         adata.obs["color"][
-            list(set(outlier_cells["Unnamed: 0"]).intersection(set(mad_cells["Unnamed: 0"])))] = "MAD2 and Outlier"
+            list(set(outlier_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "MAD2 and Outlier"
 
-        adata.obs["color"][list(set(cutoff_cells["Unnamed: 0"]).intersection(set(mad_cells["Unnamed: 0"])).intersection(
-            set(outlier_cells["Unnamed: 0"])))] = "All"
+        adata.obs["color"][list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])).intersection(
+            set(outlier_cells["barcodekey"])))] = "All"
 
     adata.obs["qc_pass"] = (adata.obs.color != "Did Not Pass")
     pg.filter_data(adata)
@@ -84,7 +84,7 @@ def main(project, task_id):
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        proj = "mc_hca"
+        proj = "mc_tm"
         for t_id in range(4, 5):
             main(proj, t_id)
     else:  # project and task id are provided as commandline args
