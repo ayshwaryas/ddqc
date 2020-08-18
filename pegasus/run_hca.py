@@ -1,8 +1,8 @@
-from mc import main
+from mc_plot import main
 import traceback
 
-project = "mc_hca"
-for task_id in range(140):
+project = "mc_tm"
+for task_id in range(12 * 4 ):
     try:
         main(project, task_id)
     except Exception as e:

@@ -1,15 +1,14 @@
 data.from.pg <- TRUE
-remake.plots <- !is.na(commandArgs(trailingOnly = TRUE)[5])
 
-source("../scripts/mc_functions.R")
-source("../scripts/fc_plots.R")
-source("../scripts/readers.R")
-source("../scripts/settings.R")
-source("../scripts/local_settings.R")
-project <<- commandArgs(trailingOnly = TRUE)[1]
-tissue <<- commandArgs(trailingOnly = TRUE)[2]
-res <<- commandArgs(trailingOnly = TRUE)[3]
-metric <<- commandArgs(trailingOnly = TRUE)[4]
+source("../../scripts/mc_functions.R")
+source("../../scripts/fc_plots.R")
+source("../../scripts/readers.R")
+source("../../scripts/settings.R")
+source("../../scripts/local_settings.R")
+project <<- "mc_hca"
+tissue <<- "Trachea"
+res <<- 1.4
+metric <<- "no_outlier"
 message("Starting R script to generate results")
 
 results.dir <<- paste0(output.dir, project, "/", tissue, "/filtered_cells_plots/", metric, "/") #directory for saving all other output
@@ -24,17 +23,6 @@ obj.markers <- data.frame("gene"=markers$feature, "avg_logFC"=markers$log_fold_c
                           "cluster"=factor(markers$cluster - 1))
 obj.markers <- obj.markers %>% filter(avg_logFC > 0.25)
 
-if (!remake.plots) {
-  tmp <- assignCellTypes(tiss, obj.markers, getAnnotations(tiss), record.stats = TRUE) #assign cell types
-  #unpack returned object
-  clusters <<- tmp$clusters
-  obj.markers <<- tmp$markers
-} else {
-  clusters <<- read.csv(paste0(results.dir, "!clusters.csv"))
-}
+clusters <<- read.csv(paste0(results.dir, "!clusters.csv"))
 
 generateFCPlots(tiss, clusters)
-
-if (!remake.plots) {
-  saveResults(tiss, clusters, obj.markers, save.cells = FALSE, save.markers = FALSE, mc_specific=FALSE)
-}
