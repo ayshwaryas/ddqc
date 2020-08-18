@@ -73,7 +73,7 @@ generateFCPlots <- function(obj, clusters) {
     data <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
   }
   
-  plot.cols <- c("C10 only" = "#E3191C", "MAD2 and C10" = "#E1C7A7", "Outlier and C10" = "#974FA2", "MAD2 only" = "#974FA2",
+  plot.cols <- c("C10 only" = "#E3191C", "MAD2 and C10" = "#E1C7A7", "Outlier and C10" = "#974FA2", "MAD2 only" = "#367EB8",
                  "Outlier only" = "#FA9A99", "MAD2 and Outlier" = "#A7CEE2", "All" = "#A65527" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
   
   
@@ -110,10 +110,12 @@ generateFCPlots <- function(obj, clusters) {
   
   #write plots
   n.clusters <- length(unique(obj$seurat_clusters))
-  ggsave1(filename = paste0(results.dir, res, "-filterplot.pdf"), plot=plot1)
-  ggsave1(filename = paste0(results.dir, res, "-clusterplot.pdf"), plot=plot2)
-  ggsave1(filename = paste0(results.dir, res, "-barplot.pdf"), plot=plot3, n.clusters=n.clusters)
-  ggsave1(filename = paste0(results.dir, res, "-mito.pdf"), plot=DimPlotContinuous(obj, "percent.mt", lbls, name, "umap"))
+  ggsave1(filename = paste0(results.dir, res, "-!filterplot.pdf"), plot=plot1)
+  ggsave1(filename = paste0(results.dir, res, "-!clusterplot.pdf"), plot=plot2)
+  ggsave1(filename = paste0(results.dir, res, "-!barplot.pdf"), plot=plot3, n.clusters=n.clusters)
+  ggsave1(filename = paste0(results.dir, res, "-umap_counts.pdf"), plot=DimPlotContinuous(obj, "nCount_RNA", lbls, name, "umap", log2=TRUE))
+  ggsave1(filename = paste0(results.dir, res, "-umap_genes.pdf"), plot=DimPlotContinuous(obj, "nFeature_RNA", lbls, name, "umap", log2=TRUE))
+  ggsave1(filename = paste0(results.dir, res, "-umap_mito.pdf"), plot=DimPlotContinuous(obj, "percent.mt", lbls, name, "umap"))
   ggsave1(filename = paste0(results.dir, res, "-cd1.pdf"), plot=DimPlotContinuous(obj, "cd1", lbls, name, "umap"))
   ggsave1(filename = paste0(results.dir, res, "-cd2.pdf"), plot= DimPlotContinuous(obj, "cd2", lbls, name, "umap"))
   ggsave1(filename = paste0(results.dir, res, "-cd3.pdf"), plot=DimPlotContinuous(obj, "cd3", lbls, name, "umap"))

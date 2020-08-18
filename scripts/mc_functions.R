@@ -35,10 +35,16 @@ GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE 
   return(data)
 }
 
-DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction) { #DimPlot with continious colors by metric
+DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction, log2=FALSE) { #DimPlot with continious colors by metric
   name <- paste0(name, "_", reduction)
-  data <- GetDimPlotPoints(obj, reduction, metric.name) 
-  plot <- ggplot(data, aes(x=axis1, y=axis2, color=color)) + geom_point(size = 1.5) + scale_colour_gradientn(colours=c("#DEEBF7", "#C6DBEF", "#9ECAE1", "#6BAED6", "#4292C6", "#2171B5", "#08519C", "#08306B")) + labs(color=metric.name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank()) + ggtitle(name)
+  data <- GetDimPlotPoints(obj, reduction, metric.name)
+  t <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
+  cols <- scale_colour_gradientn(colours=rev(c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")), n.breaks=8)
+  if (log2) {
+    plot <- ggplot(data, aes(x=axis1, y=axis2, color=log2(color))) + geom_point(size = 1.5) + labs(color=paste0("log2(", metric.name, ")")) + t + cols + ggtitle(name)
+  } else {
+    plot <- ggplot(data, aes(x=axis1, y=axis2, color=color)) + geom_point(size = 1.5) + labs(color=metric.name) + t + cols + ggtitle(name)
+  }
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
     plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = lbls[as.numeric(cl) + 1], size = 3, fontface=2)
