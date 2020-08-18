@@ -70,6 +70,32 @@ generatePlots <- function(results.dir, dataset, project) {
   }
 }
 
+generatePlotsPG <- function() {
+  data.from.pg <<- TRUE
+  source("../scripts/settings.R")
+  source("../scripts/local_settings.R")
+  project <- "mc_hca"
+  data.path <- paste0(source.dir.prefix, project, "/")
+  dataset <- NULL
+  for (directory in list.files(data.path)) {
+    d <- read.csv(paste0(data.path, directory, "/1.4-none-0/!cells.csv"))
+    d$tissue <- directory
+    if (is.null(dataset)) {
+      dataset <- d
+    }
+    else {
+      dataset <- full_join(dataset, d)
+    }
+  }
+  dataset <- dataset %>% rename(nFeature_RNA = n_genes, nCount_RNA = n_counts, percent.mt = percent_mito, percent.rb = percent_ribo, seurat_clusters = louvain_labels)
+  
+  results.dir <- paste0(source.dir.prefix, "summary_plots/", project, "/")
+  dir.create(paste0(source.dir.prefix, "summary_plots/"), showWarnings = FALSE)
+  dir.create(paste0(results.dir), showWarnings = FALSE)
+  
+  generatePlots(results.dir, dataset, project)
+}
+
 generatePlotsInit <- function() {
   for (project in c("human", "mc_ebi", "mc_ebi_tm", "mc_mca", "mc_tm", "mc_ts30", "mc_PanglaoDB")) {
     data.path <- paste0(source.dir, project, "/stats_summary.csv")
