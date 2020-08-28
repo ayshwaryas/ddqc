@@ -4,8 +4,8 @@ source("../scripts/mc_functions.R")
 source("../scripts/readers.R")
 source("../scripts/settings.R")
 source("../scripts/local_settings.R")
-project <<- "mc_hca"
-tissue <<- "Trachea"
+project <<- "mc_tm"
+tissue <<- "Bladder"
 res <<- 1.4
 method <<- "mad"
 param <<- 2
@@ -24,7 +24,7 @@ obj.markers <- data.frame("gene"=markers$feature, "avg_logFC"=markers$log_fold_c
                           "cluster"=factor(markers$cluster - 1))
 obj.markers <- obj.markers %>% filter(avg_logFC > 0.25)
 
-clusters <<- read.csv(results.dir + "!clusters.csv")
+clusters <<- read.csv(paste0(results.dir, "!clusters.csv"))
 
 generatePlots(tiss, task.name, clusters$cell.type, clusters$annotation) #make plots
 

@@ -4,8 +4,8 @@ from readers import get_tissue_by_task_id
 
 N_TISSUES_PROJ = {"mc_tm": 12, "mc_other_10X": 4, "mc_hca": 35}
 
-task = "mc"  # mc or mc_plot
-project = "mc_hca"
+task = "mc_plot"  # mc or mc_plot
+project = "mc_tm"
 
 if task == "mc":
     from mc import TASKS_PER_TISS

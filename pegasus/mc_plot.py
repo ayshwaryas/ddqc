@@ -12,7 +12,7 @@ from mc import write_markers, save_to_csv
 from readers import auto_reader
 from utils import cluster_data, safe_mkdir, add_cd_scores
 
-TASKS_PER_TISS = 2  # how many different methods per one tissue. Used to determine method and param from task id
+TASKS_PER_TISS = 1  # how many different methods per one tissue. Used to determine method and param from task id
 
 
 # function that creates all the relevant directories
@@ -63,7 +63,7 @@ def main(project, task_id):
     tissue, is_human, adata = auto_reader(project, task_id, TASKS_PER_TISS)  # read the data for current task id
     res = 1.4  # this resolution gives results closest to seurat
     # determine the method and param based on task id
-    method = ("all", "no_outlier")[task_id % TASKS_PER_TISS]
+    method = "no_outlier"
 
     print("task.id:{} - tissue:{}, res:{}, project:{}, method:{}".format(task_id, tissue, res, project, method))
 

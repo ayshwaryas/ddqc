@@ -116,13 +116,12 @@ generateFCPlots <- function(obj, clusters) {
   ggsave1(filename = paste0(results.dir, res, "-umap_counts.pdf"), plot=DimPlotContinuous(obj, "nCount_RNA", lbls, name, "umap", log2=TRUE))
   ggsave1(filename = paste0(results.dir, res, "-umap_genes.pdf"), plot=DimPlotContinuous(obj, "nFeature_RNA", lbls, name, "umap", log2=TRUE))
   ggsave1(filename = paste0(results.dir, res, "-umap_mito.pdf"), plot=DimPlotContinuous(obj, "percent.mt", lbls, name, "umap"))
+  ggsave1(filename = paste0(results.dir, res, "-umap_ribo.pdf"), plot=DimPlotContinuous(obj, "percent.rb", lbls, name, "umap"))
   ggsave1(filename = paste0(results.dir, res, "-cd1.pdf"), plot=DimPlotContinuous(obj, "cd1", lbls, name, "umap"))
   ggsave1(filename = paste0(results.dir, res, "-cd2.pdf"), plot= DimPlotContinuous(obj, "cd2", lbls, name, "umap"))
   ggsave1(filename = paste0(results.dir, res, "-cd3.pdf"), plot=DimPlotContinuous(obj, "cd3", lbls, name, "umap"))
   ggsave1(filename = paste0(results.dir, res, "-mito_genes.pdf"), plot=DimPlotContinuous(obj, "mito_genes", lbls, name, "umap"))
   ggsave1(filename = paste0(results.dir, res, "-ribo_genes.pdf"), plot=DimPlotContinuous(obj, "ribo_genes", lbls, name, "umap"))
-  ggsave1(filename = paste0(results.dir, res, "-mito_ribo.pdf"), plot=DimPlotContinuous(obj, "mito_ribo", lbls, name, "umap"))
-  
   
 }
 

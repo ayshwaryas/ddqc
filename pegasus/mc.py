@@ -10,7 +10,7 @@ from local_config import local
 from readers import auto_reader
 from utils import cluster_data, safe_mkdir, add_cd_scores
 
-TASKS_PER_TISS = 4  # how many different methods per one tissue. Used to determine method and param from task id
+TASKS_PER_TISS = 3  # how many different methods per one tissue. Used to determine method and param from task id
 
 
 # function that creates all the relevant directories
@@ -77,7 +77,7 @@ def main(project, task_id):
     res = 1.4  # this resolution gives results closest to seurat
     # determine the method and param based on task id
     # none - no additional filtering; cutoff - min 200 genes, max 10% mito; outlier and mad - data driven methods
-    method, param = (("none", 0), ("cutoff", 10), ("outlier", 0), ("mad", 2))[task_id % TASKS_PER_TISS]
+    method, param = (("none", 0), ("cutoff", 10), ("mad", 2))[task_id % TASKS_PER_TISS]
     print(
         "task.id:{} - tissue:{}, res:{}, method:{}, param:{}, project:{}, do.counts:{}, do.genes:{}, do.mito:{}, do.ribo:{}".format(
             task_id, tissue, res, method, param, project, do_counts, do_genes, do_mito, do_ribo))

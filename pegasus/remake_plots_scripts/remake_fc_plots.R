@@ -1,12 +1,12 @@
 data.from.pg <- TRUE
 
-source("../../scripts/mc_functions.R")
-source("../../scripts/fc_plots.R")
-source("../../scripts/readers.R")
-source("../../scripts/settings.R")
-source("../../scripts/local_settings.R")
-project <<- "mc_hca"
-tissue <<- "Trachea"
+source("../scripts/mc_functions.R")
+source("../scripts/fc_plots.R")
+source("../scripts/readers.R")
+source("../scripts/settings.R")
+source("../scripts/local_settings.R")
+project <<- "mc_tm"
+tissue <<- "Bladder"
 res <<- 1.4
 metric <<- "no_outlier"
 message("Starting R script to generate results")
