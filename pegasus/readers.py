@@ -34,7 +34,7 @@ def read_tm(task_id, tasks_per_tiss):
 def read_ebi_tm(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_ebi_tm", task_id, tasks_per_tiss)
     is_human = False  # this is mouse data
-    data_path = DATA_DIR + "tabula_muris/droplet/"  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "ebi_tm/" + tissue + "/" # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("ebi_tm", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -149,21 +149,21 @@ def read_hca(task_id, tasks_per_tiss):
 
 
 def read_manton(task_id, tasks_per_tiss):
-    tissue = "manton"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
-    is_human = True  # this is human data
-    data_path = "/broad/hptmp/subraman/"  # path to the mtx files of this dataset
-    filename = "read_info_{}_{}.csv".format("manton", task_id)  # filename of csv used by aggregate_matrices
-    read_info = open(filename, "w")  # csv for aggregate_matrices
-    read_info.write("Sample,Location,Reference,\n")
-    for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
-        if directory.startswith(tissue):  # if directory matches the tissue
-            p = data_path + directory + "/"  # path to the mtx
-            read_info.write("{},{},{},\n".format(directory, p + "raw_gene_bc_matrices_h5.h5", "GRCh38"))  # add the file info to csv
-    read_info.close()
-    adata = io.aggregate_matrices(filename)  # read data
-    os.remove(filename)  # remove the info csv
+tissue = "Manton"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
+is_human = True  # this is human data
+data_path = "/broad/hptmp/subraman/"  # path to the mtx files of this dataset
+filename = "read_info_{}_{}.csv".format("manton", task_id)  # filename of csv used by aggregate_matrices
+read_info = open(filename, "w")  # csv for aggregate_matrices
+read_info.write("Sample,Location,Reference,\n")
+for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
+    if directory.startswith(tissue):  # if directory matches the tissue
+        p = data_path + directory + "/"  # path to the mtx
+        read_info.write("{},{},{},\n".format(directory, p + "raw_gene_bc_matrices_h5.h5", "GRCh38"))  # add the file info to csv
+read_info.close()
+adata = io.aggregate_matrices(filename)  # read data
+os.remove(filename)  # remove the info csv
 
-    adata.obs["annotations"] = "Unknown"
+adata.obs["annotations"] = "Unknown"
     return tissue, is_human, adata
 
 
@@ -171,6 +171,10 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
     if dataset == "mc_tm" or dataset == "tm":
         tissues = ("Bladder", "Heart_and_Aorta", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland", "Marrow",
               "Spleen", "Thymus", "Tongue", "Trachea")
+    elif dataset == "mc_ebi_tm" or dataset == "ebi_tm":
+        tissues = ("Adipose", "Bladder", "Bone_Marrow", "Cerebellum", "Cerebral_Cortex", "Colon", "Diaphragm", "Fat",
+                   "Heart_and_Aorta", "Hippocampus", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland",
+                   "Pancreas", "Skin", "Spleen", "Striatum", "Thymus", "Tongue", "Trachea")
     elif dataset == "mc_mca" or dataset == "mca":
         tissues = ("Bladder", "BoneMarrow", "Brain", "Kidney", "Liver", "Lung", "MammaryGland.Involution",
                    "MammaryGland.Lactation", "MammaryGland.Pregnancy", "MammaryGland.Virgin", "MesenchymalStemCells",
