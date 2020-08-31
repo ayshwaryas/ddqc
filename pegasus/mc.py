@@ -101,7 +101,7 @@ def main(project, task_id):
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
         proj = "mc_hca"
-        for t_id in range(4, 5):
+        for t_id in range(3, 4):
             main(proj, t_id)
     else:  # project and task id are provided as commandline args
         proj = sys.argv[1]
