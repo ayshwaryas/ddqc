@@ -149,21 +149,21 @@ def read_hca(task_id, tasks_per_tiss):
 
 
 def read_manton(task_id, tasks_per_tiss):
-tissue = "Manton"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
-is_human = True  # this is human data
-data_path = "/broad/hptmp/subraman/"  # path to the mtx files of this dataset
-filename = "read_info_{}_{}.csv".format("manton", task_id)  # filename of csv used by aggregate_matrices
-read_info = open(filename, "w")  # csv for aggregate_matrices
-read_info.write("Sample,Location,Reference,\n")
-for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
-    if directory.startswith(tissue):  # if directory matches the tissue
-        p = data_path + directory + "/"  # path to the mtx
-        read_info.write("{},{},{},\n".format(directory, p + "raw_gene_bc_matrices_h5.h5", "GRCh38"))  # add the file info to csv
-read_info.close()
-adata = io.aggregate_matrices(filename)  # read data
-os.remove(filename)  # remove the info csv
+    tissue = "Manton"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
+    is_human = True  # this is human data
+    data_path = "/broad/hptmp/subraman/"  # path to the mtx files of this dataset
+    filename = "read_info_{}_{}.csv".format("manton", task_id)  # filename of csv used by aggregate_matrices
+    read_info = open(filename, "w")  # csv for aggregate_matrices
+    read_info.write("Sample,Location,Reference,\n")
+    for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
+        if directory.startswith(tissue):  # if directory matches the tissue
+            p = data_path + directory + "/"  # path to the mtx
+            read_info.write("{},{},{},\n".format(directory, p + "raw_gene_bc_matrices_h5.h5", "GRCh38"))  # add the file info to csv
+    read_info.close()
+    adata = io.aggregate_matrices(filename)  # read data
+    os.remove(filename)  # remove the info csv
 
-adata.obs["annotations"] = "Unknown"
+    adata.obs["annotations"] = "Unknown"
     return tissue, is_human, adata
 
 
@@ -198,9 +198,13 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
 def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function based on project name
     if dataset == "mc_tm" or dataset == "tm":
         return read_tm(task_id, tasks_per_tiss)
+    if dataset == "mc_ebi_tm" or dataset == "ebi_tm":
+        return read_tm(task_id, tasks_per_tiss)
     if dataset == "mc_other" or dataset == "other":
         return read_other(task_id, tasks_per_tiss)
     if dataset == "mc_other_10X" or dataset == "other_10X":
         return read_other_10x(task_id, tasks_per_tiss)
     if dataset == "mc_hca" or dataset == "hca":
+        return read_hca(task_id, tasks_per_tiss)
+    if dataset == "mc_manton" or dataset == "manton":
         return read_hca(task_id, tasks_per_tiss)
