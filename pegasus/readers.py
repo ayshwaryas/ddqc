@@ -199,7 +199,7 @@ def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function 
     if dataset == "mc_tm" or dataset == "tm":
         return read_tm(task_id, tasks_per_tiss)
     if dataset == "mc_ebi_tm" or dataset == "ebi_tm":
-        return read_tm(task_id, tasks_per_tiss)
+        return read_ebi_tm(task_id, tasks_per_tiss)
     if dataset == "mc_other" or dataset == "other":
         return read_other(task_id, tasks_per_tiss)
     if dataset == "mc_other_10X" or dataset == "other_10X":
@@ -207,4 +207,4 @@ def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function 
     if dataset == "mc_hca" or dataset == "hca":
         return read_hca(task_id, tasks_per_tiss)
     if dataset == "mc_manton" or dataset == "manton":
-        return read_hca(task_id, tasks_per_tiss)
+        return read_manton(task_id, tasks_per_tiss)
