@@ -33,7 +33,6 @@ def create_fc_dirs(project, tissue, method):
 def filter_cells_by_csv(adata, project, tissue, res, method):
     mad_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-mad-2/!cells.csv")
     cutoff_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-cutoff-10/!cells.csv")
-    outlier_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-outlier-0/!cells.csv")
 
     adata.obs["color"] = "Did Not Pass"
     adata.obs["color"][mad_cells["barcodekey"]] = "MAD2 only"
@@ -42,6 +41,8 @@ def filter_cells_by_csv(adata, project, tissue, res, method):
     if method == "no_outlier":
         adata.obs["color"][list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "All"
     elif method == "all":
+        outlier_cells = pd.read_csv(
+            SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-outlier-0/!cells.csv")
         adata.obs["color"][outlier_cells["barcodekey"]] = "Outlier only"
         adata.obs["color"][
             list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "MAD2 and C10"
