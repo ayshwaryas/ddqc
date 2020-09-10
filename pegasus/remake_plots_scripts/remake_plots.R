@@ -4,11 +4,11 @@ source("../scripts/mc_functions.R")
 source("../scripts/readers.R")
 source("../scripts/settings.R")
 source("../scripts/local_settings.R")
-project <<- "mc_tm"
-tissue <<- "Bladder"
+project <<- "mc_other"
+tissue <<- "colon-epi_human"
 res <<- 1.4
-method <<- "mad"
-param <<- 2
+method <<- "cutoff"
+param <<- 10
 message("Starting R script to generate results")
 
 task.directory <- paste0(res, "-", method, "-", param)

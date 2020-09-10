@@ -39,7 +39,7 @@ DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction, log2=FALS
   name <- paste0(name, "_", reduction)
   data <- GetDimPlotPoints(obj, reduction, metric.name)
   t <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
-  cols <- scale_colour_gradientn(colours=rev(c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")), n.breaks=8)
+  cols <- scale_colour_gradientn(colours=rev(c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")))
   if (log2) {
     plot <- ggplot(data, aes(x=axis1, y=axis2, color=log2(color))) + geom_point(size = 1.5) + labs(color=paste0("log2(", metric.name, ")")) + t + cols + ggtitle(name)
   } else {
