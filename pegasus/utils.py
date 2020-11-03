@@ -31,7 +31,7 @@ def cluster_data(adata, resolution=1, compute_markers=False, compute_reductions=
     if compute_markers:
         pg.de_analysis(adata, cluster='louvain_labels', auc=False, t=True, fisher=False, mwu=False,
                        temp_folder="/tmp")
-        marker_dict = pg.markers(adata)
+        marker_dict = pg.markers(adata, alpha=1)
         return adata, marker_dict
     else:
         return adata

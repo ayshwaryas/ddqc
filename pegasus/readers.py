@@ -72,9 +72,9 @@ def read_mca(task_id, tasks_per_tiss):
     for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
         if directory.startswith(tissue):  # if directory matches the tissue
             p = data_path + directory  # path to the mtx
-            read_info.write("{},{},{},\n".format(tissue, p, "GRCm38"))  # add the file info to csv
+            read_info.write("{},{},{},\n".format(directory, p, "GRCm38"))  # add the file info to csv
     read_info.close()
-    adata = io.aggregate_matrices(filename)  # read data
+    adata = io.aggregate_matrices(filename, append_sample_name=False)  # read data
     os.remove(filename)  # remove the info csv
 
     annotations = pd.read_csv(data_path + "annotations.csv")
@@ -199,6 +199,64 @@ def read_human_blood(task_id, tasks_per_tiss):
     return tissue, is_human, adata
 
 
+def read_human_brain(task_id, tasks_per_tiss):
+    tissue = "Brain"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
+    is_human = True  # this is human data
+    data_path = DATA_DIR + "other/brain.h5"
+    filename = "read_info_{}_{}.csv".format("brain", task_id)  # filename of csv used by aggregate_matrices
+    read_info = open(filename, "w")  # csv for aggregate_matrices
+    read_info.write("Sample,Location,Reference,\n")
+    read_info.write("{},{},{},\n".format(tissue, data_path, "GRCh38"))  # add the file info to csv
+    read_info.close()
+    adata = io.aggregate_matrices(filename)  # read data
+    os.remove(filename)  # remove the info csv
+
+    adata.obs["annotations"] = "Unknown"
+    return tissue, is_human, adata
+
+
+def read_human_brain_olfactory(task_id, tasks_per_tiss):
+    tissue = "Brain_olfactory"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
+    is_human = True  # this is human data
+    data_path = DATA_DIR + "other/brain-olfactory_human/"
+    filename = "read_info_{}_{}.csv".format("brain_olfactory", task_id)  # filename of csv used by aggregate_matrices
+    read_info = open(filename, "w")  # csv for aggregate_matrices
+    read_info.write("Sample,Location,Reference,\n")
+    for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
+        if directory.startswith("patient"):  # if directory matches the tissue
+            p = data_path + directory + "/"  # path to the mtx
+            read_info.write("{},{},{},\n".format(directory, p + "matrix.mtx", "GRCh38"))  # add the file info to csv
+    read_info.close()
+    adata = io.aggregate_matrices(filename)  # read data
+    os.remove(filename)  # remove the info csv
+
+    adata.obs["annotations"] = "Unknown"
+    return tissue, is_human, adata
+
+
+def read_heart_circulation(task_id, tasks_per_tiss):
+    tissue = "Heart_Circulation"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
+    is_human = True  # this is human data
+    data_path = DATA_DIR + "other/heart_circulation.h5ad"
+    filename = "read_info_{}_{}.csv".format("heart_circulation", task_id)  # filename of csv used by aggregate_matrices
+    read_info = open(filename, "w")  # csv for aggregate_matrices
+    read_info.write("Sample,Location,Reference,\n")
+    read_info.write("{},{},{},\n".format(tissue, data_path, "GRCh38"))  # add the file info to csv
+    read_info.close()
+    adata = io.aggregate_matrices(filename)  # read data
+    os.remove(filename)  # remove the info csv
+
+    annotations = pd.read_csv(DATA_DIR + "other/heart_circulation_annotations.csv")
+    annotations["annotation"] = [t[4:] for t in annotations["Cluster"]]
+    annotations.index = annotations["index"]
+    new_cell_names = [t[18:].replace("::", "_").replace("_Reseq", "").replace("_Rerun", "").replace("LV_01723_1", "LV_1723_1").replace("LV_P01681_1", "LV_1681_1") for t in adata.obs.index]
+    annotations_cell_type = annotations.reindex(new_cell_names)["annotation"]
+    annotations_cell_type = annotations_cell_type.fillna("Unknown")
+    adata.obs["annotations"] = list(annotations_cell_type)
+
+    return tissue, is_human, adata
+
+
 def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
     if dataset == "mc_tm" or dataset == "tm":
         tissues = ("Bladder", "Heart_and_Aorta", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland", "Marrow",
@@ -231,6 +289,12 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
         tissues = ("Lung_Epithelial", "Mammary_Gland", "Pancreatic_Islets", "Prostate", "Testis")
     elif dataset == "mc_blood" or dataset == "blood":
         tissues = ("Blood",)
+    elif dataset == "mc_brain" or dataset == "brain":
+        tissues = ("Brain",)
+    elif dataset == "mc_brain_olfactory" or dataset == "brain_olfactory":
+        tissues = ("Brain_olfactory",)
+    elif dataset == "mc_heart_circulation" or dataset == "heart_circulation":
+        tissues = ("Brain_olfactory",)
     else:
         return None
     return tissues[task_id // tasks_per_tiss]
@@ -255,3 +319,9 @@ def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function 
         return read_panglaodb(task_id, tasks_per_tiss)
     if dataset == "mc_blood" or dataset == "blood":
         return read_human_blood(task_id, tasks_per_tiss)
+    if dataset == "mc_brain" or dataset == "brain":
+        return read_human_brain(task_id, tasks_per_tiss)
+    if dataset == "mc_brain_olfactory" or dataset == "brain_olfactory":
+        return read_human_brain_olfactory(task_id, tasks_per_tiss)
+    elif dataset == "mc_heart_circulation" or dataset == "heart_circulation":
+        return read_heart_circulation(task_id, tasks_per_tiss)

@@ -82,8 +82,17 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   if (metric.name.seurat == "percent.mt") {
     a1 <- scale_y_continuous(breaks=seq(0, 80, 5))
     a2 <- scale_x_continuous(breaks=seq(0, 80, 5))
+    hl <- geom_hline(yintercept=10, color="red", size=1)
+    vl <- geom_vline(xintercept=10, color="red", size=1)
   }
   else {
+    if (metric.name.seurat == "nFeature_RNA") {
+      hl <- geom_hline(yintercept=log2(200), color="red", size=1)
+      vl <- geom_vline(xintercept=log2(200), color="red", size=1)
+    } else { 
+      hl <- NULL
+      vl <- NULL
+    }
     a1 <- NULL
     a2 <- NULL
   }
@@ -102,31 +111,22 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   
   name.prefix <- paste0(results.dir, add.dir)
   
-  if (save.log2) {
-    #barplot of cluster means
-    #ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0) %>% group_by(clusters) %>% summarize(metric = mean(log2(metric))), aes(x=clusters, y=log2(metric))) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + c1 + c2 + l6, n.clusters = n.clusters)
+  if (metric.name.seurat == "nCount_RNA" || metric.name.seurat == "nFeature_RNA") {
+    
     #boxplot by cluster
-    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters) 
-    #combined density plots for each cluster
-    #ggsave1(filename=paste0(name.prefix, "density_", name.suffix, ".pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill=clusters)) + t3 + t4 + t5 + c1 + c2 + l4, n.clusters = n.clusters)
+    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2 + hl, n.clusters = n.clusters) 
     #joyplot by cluster
-    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l4, n.clusters = n.clusters) 
-    #overall destiny plot
-    #ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric))) + geom_density(aes(fill="red")) + t3 + l4, n.clusters = n.clusters) 
+    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l4 + vl, n.clusters = n.clusters) 
     #violin plot by cluster
-    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2, n.clusters = n.clusters)
+    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2 + hl, n.clusters = n.clusters)
+  } else {
+    #boxplot by cluster
+    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1 + hl, n.clusters = n.clusters) 
+    #joyplot by cluster
+    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l3 + a2 + vl, n.clusters = n.clusters) 
+    #violin plot by cluster
+    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1 + hl, n.clusters = n.clusters)
   }
-  
-  #barplot of cluster means
-  #ggsave1(filename=paste0(name.prefix, "bar_mean_", name.suffix, ".pdf"), plot=ggplot(data %>% group_by(clusters) %>% summarize(metric = mean(metric)), aes(x=clusters, y=metric)) + geom_bar(aes(fill=clusters), stat="identity") + t + t2 + t3 + l5 + c1 + c2 + a1, n.clusters = n.clusters)
-  #boxplot by cluster
-  ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters) 
-  #joyplot by cluster
-  ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l3 + a2, n.clusters = n.clusters) 
-  #overall destiny plot
-  #ggsave1(filename=paste0(name.prefix, "density3_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric)) + geom_density(aes(fill="red")) + t3 + l3 + a2, n.clusters = n.clusters) 
-  #violin plot by cluster
-  ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.clusters = n.clusters)
   
   #tsne and umap continious dimplots
   ggsave1(filename=paste0(name.prefix, "tsne_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "tsne"))
@@ -137,7 +137,7 @@ generatePlots <- function(obj, name, cell.types, annotations) { #main plots func
   message("Making Plots")
   lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
   for (i in 1:length(cell.types)) {
-    lbls <- c(lbls, paste0((i - 1), " ", cell.types[i], "\n", annotations[i]))
+    lbls <- c(lbls, paste0((i - 1), " ", cell.types[i]))#, "\n", annotations[i]))
   }
   names(lbls) <- 0:(length(lbls) - 1) #rename labels with cluster #
   

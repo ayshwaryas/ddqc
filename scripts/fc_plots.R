@@ -54,7 +54,7 @@ generateFCPlots <- function(obj, clusters) {
   message("Making FC Plots")
   lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
   for (i in 1:length(clusters$cell.type)) {
-    lbls <- c(lbls, paste0((i - 1), " ", clusters$cell.type[i], "\n", clusters$annotation[i]))
+    lbls <- c(lbls, paste0((i - 1), " ", clusters$cell.type[i]))#, "\n", clusters$annotation[i]))
   }
   names(lbls) <- 0:(length(lbls) - 1)  #rename labels with cluster #
   
