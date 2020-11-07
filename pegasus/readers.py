@@ -257,6 +257,26 @@ def read_heart_circulation(task_id, tasks_per_tiss):
     return tissue, is_human, adata
 
 
+def read_skin_cellbender(task_id, tasks_per_tiss):
+    tissue = "Skin_Cellbender"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
+    is_human = True  # this is human data
+    data_path = "/ahg/regevdata/projects/scqc/data/manton_skin_cellbender"  # path to the mtx files of this dataset
+    files = ["skin003_l/skin003_l_out_FPR_0.1.h5", "skin003_m/skin003_m_out_FPR_0.1.h5",
+             "skin02_l/skin_02_l_out_FPR_0.1.h5", "skin02_m/skin_02_m_out_FPR_0.1.h5"]
+    filename = "read_info_{}_{}.csv".format("blood", task_id)  # filename of csv used by aggregate_matrices
+    read_info = open(filename, "w")  # csv for aggregate_matrices
+    read_info.write("Sample,Location,Reference,\n")
+    for file in files:
+        p = data_path + file + "/"  # path to the mtx
+        read_info.write("{},{},{},\n".format(file, p, "GRCh38"))  # add the file info to csv
+    read_info.close()
+    adata = io.aggregate_matrices(filename)  # read data
+    os.remove(filename)  # remove the info csv
+
+    adata.obs["annotations"] = "Unknown"
+    return tissue, is_human, adata
+
+
 def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
     if dataset == "mc_tm" or dataset == "tm":
         tissues = ("Bladder", "Heart_and_Aorta", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland", "Marrow",
@@ -294,7 +314,9 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
     elif dataset == "mc_brain_olfactory" or dataset == "brain_olfactory":
         tissues = ("Brain_olfactory",)
     elif dataset == "mc_heart_circulation" or dataset == "heart_circulation":
-        tissues = ("Brain_olfactory",)
+        tissues = ("Heart_Circulation",)
+    elif dataset == "mc_skin_cellbender" or dataset == "skin_cellbender":
+        tissues = ("Skin_Cellbender",)
     else:
         return None
     return tissues[task_id // tasks_per_tiss]
@@ -323,5 +345,7 @@ def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function 
         return read_human_brain(task_id, tasks_per_tiss)
     if dataset == "mc_brain_olfactory" or dataset == "brain_olfactory":
         return read_human_brain_olfactory(task_id, tasks_per_tiss)
-    elif dataset == "mc_heart_circulation" or dataset == "heart_circulation":
+    if dataset == "mc_heart_circulation" or dataset == "heart_circulation":
         return read_heart_circulation(task_id, tasks_per_tiss)
+    if dataset == "mc_skin_cellbender" or dataset == "skin_cellbender":
+        return read_skin_cellbender(task_id, tasks_per_tiss)
