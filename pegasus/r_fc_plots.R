@@ -20,7 +20,7 @@ tiss <- tiss %>% rename(nFeature_RNA = n_genes, nCount_RNA = n_counts, percent.m
 tiss$seurat_clusters <- factor(tiss$seurat_clusters - 1)
 
 markers <- read.csv(paste0(results.dir, "!markers.csv"))
-obj.markers <- data.frame("gene"=markers$feature, "avg_logFC"=markers$log_fold_change, "p_val_adj"=markers$t_qval, 
+obj.markers <- data.frame("gene"=markers$feature, "avg_logFC"=markers$log2FC, "p_val_adj"=markers$t_qval, 
                           "cluster"=factor(markers$cluster - 1))
 obj.markers <- obj.markers %>% filter(avg_logFC > 0.25)
 

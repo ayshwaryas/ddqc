@@ -53,7 +53,7 @@ def save_to_csv(adata):
 
 
 # write markers to csv
-def write_markers(marker_dict, min_log_fc=0.25, min_pct=25):
+def write_markers(marker_dict, min_log_fc=0.25, min_pct=25, max_pval=0.05):
     frames = []
     # iterate through all keys in the markers dict
     for cl in marker_dict.keys():
@@ -63,7 +63,7 @@ def write_markers(marker_dict, min_log_fc=0.25, min_pct=25):
             df['up/down'] = d
 
             # filter markers based on log_fc and pct
-            df = df[(df["mean_logExpr"] >= min_log_fc) & (
+            df = df[(df["t_pval"] <= max_pval) & (df["log2FC"] >= min_log_fc) & (
                     (df["percentage"] >= min_pct) | (df["percentage_other"] >= min_pct))]
 
             frames.append(df)
@@ -100,8 +100,8 @@ def main(project, task_id):
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        proj = "mc_PanglaoDB"
-        for t_id in range(0, 1):
+        proj = "mc_brain_olfactory"
+        for t_id in range(0, 3):
             main(proj, t_id)
     else:  # project and task id are provided as commandline args
         proj = sys.argv[1]
