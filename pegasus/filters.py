@@ -51,6 +51,8 @@ def initial_qc(adata, n_genes, n_cells, is_human):
 # do_upper_co and do_lower_co - whether to do upper and lower cutoff
 def metric_filter(adata, method, param, metric_name, do_lower_co=False, do_upper_co=False):
     adata.obs[metric_name + "_qc_pass"] = False  # T/F array to tell whether the cell is filtered
+    adata.obs[metric_name + "_lower_co"] = None
+    adata.obs[metric_name + "_upper_co"] = None
     for cl in range(1, max(list(map(int, adata.obs.louvain_labels.cat.categories))) + 1):  # iterate though all clusters
         lower_co = -INF
         upper_co = INF
@@ -80,6 +82,10 @@ def metric_filter(adata, method, param, metric_name, do_lower_co=False, do_upper
             adata.obs[metric_name] >= lower_co,
             adata.obs[metric_name] <= upper_co
         ]  # filtering condition
+        if do_upper_co:
+            adata.obs.loc[adata.obs.louvain_labels == str(cl), metric_name + "_upper_co"] = upper_co
+        if do_lower_co:
+            adata.obs.loc[adata.obs.louvain_labels == str(cl), metric_name + "_lower_co"] = lower_co
         # for cells that satisfy the condition set the value to true
         adata.obs.loc[np.logical_and.reduce(filters), metric_name + "_qc_pass"] = True
     with open(paths.results_dir + "!filtered_" + metric_name[metric_name.find("_") + 1:] + ".csv", "w") as file:
