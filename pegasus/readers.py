@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 import pegasusio as io
+from projects_info import *
 
 from config import DATA_DIR
 
@@ -9,7 +10,7 @@ from config import DATA_DIR
 def read_tm(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_tm", task_id, tasks_per_tiss)
     is_human = False  # this is mouse data
-    data_path = DATA_DIR + "tabula_muris/droplet/"  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "mouse/tabula_muris/" + tissue + "/"
     filename = "read_info_{}_{}.csv".format("tm", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -21,7 +22,7 @@ def read_tm(task_id, tasks_per_tiss):
     adata = io.aggregate_matrices(filename)  # read data
     os.remove(filename)  # remove the info csv
 
-    annotations = pd.read_csv(data_path + "annotations_droplet.csv")
+    annotations = pd.read_csv(data_path + "../annotations_droplet.csv")
     annotations_cell_type = annotations["cell_ontology_class"]
     annotations_cell_type.index = [tissue + "-" + "-".join(t.rsplit("_", 1)) for t in annotations["cell"]]
     annotations_cell_type = annotations_cell_type.reindex(adata.obs.index)
@@ -34,7 +35,7 @@ def read_tm(task_id, tasks_per_tiss):
 def read_ebi_tm(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_ebi_tm", task_id, tasks_per_tiss)
     is_human = False  # this is mouse data
-    data_path = DATA_DIR + "ebi_tm/ebi_tm_pg/" + tissue  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "mouse/ebi_tm/" + tissue + "/" + tissue  # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("ebi_tm", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -49,7 +50,7 @@ def read_ebi_tm(task_id, tasks_per_tiss):
 def read_ebi(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_ebi", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = DATA_DIR + "ebi/" + tissue + "/"  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "human/ebi/" + tissue + "/"  # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("ebi", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -65,7 +66,7 @@ def read_ebi(task_id, tasks_per_tiss):
 def read_mca(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_mca", task_id, tasks_per_tiss)
     is_human = False  # this is mouse data
-    data_path = DATA_DIR + "mca/mca_pg/"  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "mouse/mca/" + tissue + "/"  # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("mca", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -77,7 +78,7 @@ def read_mca(task_id, tasks_per_tiss):
     adata = io.aggregate_matrices(filename, append_sample_name=False)  # read data
     os.remove(filename)  # remove the info csv
 
-    annotations = pd.read_csv(data_path + "annotations.csv")
+    annotations = pd.read_csv(data_path + "../annotations.csv")
     annotations_cell_type = annotations["Annotation"]
     annotations_cell_type.index = [tissue + "-" + t for t in annotations["Cell.name"]]
     annotations_cell_type = annotations_cell_type.reindex(adata.obs.index)
@@ -90,7 +91,7 @@ def read_mca(task_id, tasks_per_tiss):
 def read_other_10x(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_other_10X", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = DATA_DIR + "other/" + tissue + "/"  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "human/other/" + tissue + "/"  # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("other_10X", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -107,7 +108,7 @@ def read_other_10x(task_id, tasks_per_tiss):
 def read_other(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_other", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = DATA_DIR + "other/" + tissue + "/"  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "human/other/" + tissue + "/"  # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("other", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -129,7 +130,7 @@ def read_other(task_id, tasks_per_tiss):
 def read_hca(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_hca", task_id, tasks_per_tiss)
     is_human = True  # this is mouse data
-    data_path = DATA_DIR + "HCA/"  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "human/HCA/" + tissue + "/" # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("hca", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -153,7 +154,7 @@ def read_hca(task_id, tasks_per_tiss):
             name[0] = name[0][:-2]
         return name[0].replace("-", "") + "-" + name[1]
 
-    annotations = pd.read_csv(data_path + "annotations.csv")
+    annotations = pd.read_csv(data_path + "../annotations.csv")
     annotations["cellnames"] = [reformat_ann_names(t) for t in annotations["cellnames"]]
     annotations = annotations.drop_duplicates("cellnames", keep='first')
     annotations.index = annotations["cellnames"]
@@ -167,7 +168,7 @@ def read_hca(task_id, tasks_per_tiss):
 def read_panglaodb(task_id, tasks_per_tiss):
     tissue = get_tissue_by_task_id("mc_PanglaoDB", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = DATA_DIR + "PanglaoDB/" + tissue + "/"  # path to the mtx files of this dataset
+    data_path = DATA_DIR + "human/PanglaoDB/" + tissue + "/"  # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("PanglaoDB", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -202,7 +203,7 @@ def read_human_blood(task_id, tasks_per_tiss):
 def read_human_brain(task_id, tasks_per_tiss):
     tissue = "Brain"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = DATA_DIR + "other/brain.h5"
+    data_path = DATA_DIR + "human/other/brain/brain.h5"
     filename = "read_info_{}_{}.csv".format("brain", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -218,7 +219,7 @@ def read_human_brain(task_id, tasks_per_tiss):
 def read_human_brain_olfactory(task_id, tasks_per_tiss):
     tissue = "Brain_olfactory"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = DATA_DIR + "other/brain-olfactory_human/"
+    data_path = DATA_DIR + "human/other/brain-olfactory/"
     filename = "read_info_{}_{}.csv".format("brain_olfactory", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -237,7 +238,7 @@ def read_human_brain_olfactory(task_id, tasks_per_tiss):
 def read_heart_circulation(task_id, tasks_per_tiss):
     tissue = "Heart_Circulation"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = DATA_DIR + "other/heart_circulation.h5ad"
+    data_path = DATA_DIR + "human/other/heart/heart_circulation.h5ad"
     filename = "read_info_{}_{}.csv".format("heart_circulation", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
@@ -255,71 +256,6 @@ def read_heart_circulation(task_id, tasks_per_tiss):
     adata.obs["annotations"] = list(annotations_cell_type)
 
     return tissue, is_human, adata
-
-
-def read_skin_cellbender(task_id, tasks_per_tiss):
-    tissue = "Skin_Cellbender"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
-    is_human = True  # this is human data
-    data_path = "/ahg/regevdata/projects/scqc/data/manton_skin_cellbender"  # path to the mtx files of this dataset
-    files = ["skin003_l/skin003_l_out_FPR_0.1.h5", "skin003_m/skin003_m_out_FPR_0.1.h5",
-             "skin02_l/skin_02_l_out_FPR_0.1.h5", "skin02_m/skin_02_m_out_FPR_0.1.h5"]
-    filename = "read_info_{}_{}.csv".format("blood", task_id)  # filename of csv used by aggregate_matrices
-    read_info = open(filename, "w")  # csv for aggregate_matrices
-    read_info.write("Sample,Location,Reference,\n")
-    for file in files:
-        p = data_path + file + "/"  # path to the mtx
-        read_info.write("{},{},{},\n".format(file, p, "GRCh38"))  # add the file info to csv
-    read_info.close()
-    adata = io.aggregate_matrices(filename)  # read data
-    os.remove(filename)  # remove the info csv
-
-    adata.obs["annotations"] = "Unknown"
-    return tissue, is_human, adata
-
-
-def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
-    if dataset == "mc_tm" or dataset == "tm":
-        tissues = ("Bladder", "Heart_and_Aorta", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland", "Marrow",
-              "Spleen", "Thymus", "Tongue", "Trachea")
-    elif dataset == "mc_ebi_tm" or dataset == "ebi_tm":
-        tissues = ("Adipose", "Bladder", "Bone_Marrow", "Cerebellum", "Cerebral_Cortex", "Colon", "Diaphragm", "Fat",
-                   "Heart_and_Aorta", "Hippocampus", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland",
-                   "Pancreas", "Skin", "Spleen", "Striatum", "Thymus", "Tongue", "Trachea")
-    elif dataset == "mc_ebi" or dataset == "ebi":
-        tissues = ("E-ENAD-21-breast_epithelial1", "E-ENAD-27-islet", "E-GEOD-81547-pancreas", "E-GEOD-81608-islet2",
-                   "E-GEOD-83139-pancreatic_endocrine", "E-GEOD-86618-lung_epithelial", "E-GEOD-89232-dendritic_cells",
-                   "E-GEOD-130148-lung", "E-MTAB-6386-B_cells", "E-MTAB-6653-lung_carcinomas",
-                   "E-MTAB-6701-fetal-maternal_interface", "E-CURD-6-bone_marrow", "E-MTAB-7316-retina")
-    elif dataset == "mc_mca" or dataset == "mca":
-        tissues = ("Bladder", "BoneMarrow", "Brain", "Kidney", "Liver", "Lung", "MammaryGland.Involution",
-                   "MammaryGland.Lactation", "MammaryGland.Pregnancy", "MammaryGland.Virgin", "MesenchymalStemCells",
-                   "Muscle", "Ovary", "Pancreas", "PeripheralBlood", "Placenta", "Prostate", "SmallIntestine", "Spleen",
-                   "Stomach", "Testis", "Thymus", "TrophoblastStemCells", "Uterus")
-    elif dataset == "mc_other_10X" or dataset == "other_10X":
-        tissues = ("adipose", "ASD_snRNAseq", "liver", "skin")
-    elif dataset == "mc_other" or dataset == "other":
-        tissues = ("colon-epi_human", "colon-fib_human", "colon-imm_human", "kidney_human", "retina_human")
-    elif dataset == "mc_hca" or dataset == "hca":
-        tissues = ("Adipose", "Adrenal-Gland", "Artery", "Ascending-Colon", "Bladder", "Bone-Marrow", "Cerebellum",
-                    "Cervix", "Duodenum", "Epityphlon", "Esophagus", "Fallopian-Tube", "Gall-Bladder", "Heart", "Ileum",
-                    "Jejunum", "Kidney", "Liver", "Lung", "Muscle", "Omentum", "Pancreas", "Peripheral-Blood", "Pleura",
-                    "Prostate", "Rectum", "Sigmoid-Colon", "Spleen", "Stomach", "Temporal-Lobe", "Thyroid", "Trachea",
-                    "TransverseColon", "Ureter", "Uterus")
-    elif dataset == "mc_PanglaoDB" or dataset == "PanglaoDB":
-        tissues = ("Lung_Epithelial", "Mammary_Gland", "Pancreatic_Islets", "Prostate", "Testis")
-    elif dataset == "mc_blood" or dataset == "blood":
-        tissues = ("Blood",)
-    elif dataset == "mc_brain" or dataset == "brain":
-        tissues = ("Brain",)
-    elif dataset == "mc_brain_olfactory" or dataset == "brain_olfactory":
-        tissues = ("Brain_olfactory",)
-    elif dataset == "mc_heart_circulation" or dataset == "heart_circulation":
-        tissues = ("Heart_Circulation",)
-    elif dataset == "mc_skin_cellbender" or dataset == "skin_cellbender":
-        tissues = ("Skin_Cellbender",)
-    else:
-        return None
-    return tissues[task_id // tasks_per_tiss]
 
 
 def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function based on project name
@@ -347,5 +283,4 @@ def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function 
         return read_human_brain_olfactory(task_id, tasks_per_tiss)
     if dataset == "mc_heart_circulation" or dataset == "heart_circulation":
         return read_heart_circulation(task_id, tasks_per_tiss)
-    if dataset == "mc_skin_cellbender" or dataset == "skin_cellbender":
-        return read_skin_cellbender(task_id, tasks_per_tiss)
+

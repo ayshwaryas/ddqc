@@ -75,7 +75,7 @@ def main(project, task_id):
     adata = add_cd_scores(adata, is_human)
 
     # write the results
-    write_markers(marker_dict)
+    write_markers(marker_dict, min_pct=0, max_pval=1, min_log_fc=0)
     save_to_csv(adata)
 
     # launch seurat plot script
@@ -85,7 +85,7 @@ def main(project, task_id):
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        proj = "mc_hca"
+        proj = "mc_brain_olfactory"
         for t_id in range(1):
             main(proj, t_id)
     else:  # project and task id are provided as commandline args
