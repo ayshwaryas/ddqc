@@ -84,9 +84,10 @@ generatePlots <- function(results.dir, dataset, project) {
 
 generatePlotsPG <- function(project) {
   data.from.pg <<- TRUE
+  PATH <- "/ahg/regevdata/projects/scqc/"
   source("../scripts/settings.R")
   source("../scripts/local_settings.R")
-  data.path <- paste0("figure1_data/", project, "/")
+  data.path <- paste0(PATH, "figure1_data/", project, "/")
   dataset <- NULL
   for (directory in list.files(data.path)) {
     d <- read.csv(paste0(data.path, directory, "/!cells.csv"))
@@ -100,7 +101,6 @@ generatePlotsPG <- function(project) {
   }
   dataset <- dataset %>% rename(nFeature_RNA = n_genes, nCount_RNA = n_counts, percent.mt = percent_mito, percent.rb = percent_ribo)
   
-  PATH <- "/ahg/regevdata/projects/scqc/"
   results.dir <- paste0(PATH, "figure1_plots/", project, "/")
   dir.create(paste0(PATH, "figure1_plots/"), showWarnings = FALSE)
   dir.create(paste0(results.dir), showWarnings = FALSE)
