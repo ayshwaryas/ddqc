@@ -21,7 +21,7 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
                    "Muscle", "Ovary", "Pancreas", "PeripheralBlood", "Placenta", "Prostate", "SmallIntestine", "Spleen",
                    "Stomach", "Testis", "Thymus", "TrophoblastStemCells", "Uterus")
     elif dataset == "mc_other_10X" or dataset == "other_10X":
-        tissues = ("adipose", "ASD_snRNAseq", "liver", "kidney2" "skin")
+        tissues = ("adipose", "ASD_snRNAseq", "liver", "kidney2", "skin")
     elif dataset == "mc_other" or dataset == "other":
         tissues = ("colon-epi", "colon-fib", "colon-imm", "kidney", "retina")
     elif dataset == "mc_hca" or dataset == "hca":

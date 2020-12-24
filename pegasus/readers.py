@@ -98,10 +98,12 @@ def read_other_10x(task_id, tasks_per_tiss):
     for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
         p = data_path + directory + "/"  # path to the mtx
         if os.path.isdir(p):
-            read_info.write("{},{},{},\n".format(directory, p + "matrix.mtx", "GRCh37"))  # add the file info to csv
+            read_info.write("{},{},{},\n".format(directory, p + "matrix.mtx", "GRCh38"))  # add the file info to csv
     read_info.close()
     adata = io.aggregate_matrices(filename)  # read data
     os.remove(filename)  # remove the info csv
+
+    adata.obs["annotations"] = "Unknown"
     return tissue, is_human, adata
 
 
