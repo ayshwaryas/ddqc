@@ -1,4 +1,4 @@
-N_TISSUES_PROJ = {"mc_tm": 12, "mc_other_10X": 4, "mc_hca": 35, "mc_other": 5, "mc_manton": 1, "mc_PanglaoDB": 5,
+N_TISSUES_PROJ = {"mc_tm": 12, "mc_other_10X": 5, "mc_hca": 35, "mc_other": 5, "mc_manton": 1, "mc_PanglaoDB": 5,
                   "mc_blood": 1, "mc_brain_olfactory": 1, }
 
 
@@ -21,7 +21,7 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
                    "Muscle", "Ovary", "Pancreas", "PeripheralBlood", "Placenta", "Prostate", "SmallIntestine", "Spleen",
                    "Stomach", "Testis", "Thymus", "TrophoblastStemCells", "Uterus")
     elif dataset == "mc_other_10X" or dataset == "other_10X":
-        tissues = ("adipose", "ASD_snRNAseq", "liver", "skin")
+        tissues = ("adipose", "ASD_snRNAseq", "liver", "kidney2" "skin")
     elif dataset == "mc_other" or dataset == "other":
         tissues = ("colon-epi", "colon-fib", "colon-imm", "kidney", "retina")
     elif dataset == "mc_hca" or dataset == "hca":
