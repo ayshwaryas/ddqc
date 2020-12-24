@@ -32,8 +32,33 @@ def read_tm(task_id, tasks_per_tiss):
     return tissue, is_human, adata
 
 
+def read_ts24(task_id, tasks_per_tiss):
+    tissue = get_tissue_by_task_id("mc_ts24", task_id, tasks_per_tiss)
+    is_human = False  # this is mouse data
+    data_path = DATA_DIR + "mouse/tabula_senis/24_month/" + tissue + "/"
+    filename = "read_info_{}_{}.csv".format("ts24", task_id)  # filename of csv used by aggregate_matrices
+    read_info = open(filename, "w")  # csv for aggregate_matrices
+    read_info.write("Sample,Location,Reference,\n")
+    for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
+        if tissue.upper() in directory:  # if directory matches the tissue
+            p = data_path + directory + "/"  # path to the mtx
+            read_info.write("{},{},{},\n".format(directory[:-3], p, "GRCm38"))  # add the file info to csv
+    read_info.close()
+    adata = io.aggregate_matrices(filename)  # read data
+    os.remove(filename)  # remove the info csv
+
+    annotations = pd.read_csv(data_path + "../annotations.csv")
+    annotations_cell_type = pd.Series([t if t != "nan" else "Unknown" for t in annotations["cell_ontology_class_reannotated"]])
+    annotations_cell_type.index = ["-".join(t.rsplit("_", 1)) for t in annotations["cell"]]
+    annotations_cell_type = annotations_cell_type.reindex(adata.obs.index)
+    annotations_cell_type = annotations_cell_type.fillna("Unknown")
+    adata.obs["annotations"] = annotations_cell_type
+
+    return tissue, is_human, adata
+
+
 def read_ts30(task_id, tasks_per_tiss):
-    tissue = get_tissue_by_task_id("mc_tm", task_id, tasks_per_tiss)
+    tissue = get_tissue_by_task_id("mc_ts30", task_id, tasks_per_tiss)
     is_human = False  # this is mouse data
     data_path = DATA_DIR + "mouse/tabula_senis/30_month/" + tissue + "/"
     filename = "read_info_{}_{}.csv".format("ts30", task_id)  # filename of csv used by aggregate_matrices
@@ -288,6 +313,8 @@ def read_heart_circulation(task_id, tasks_per_tiss):
 def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function based on project name
     if dataset == "mc_tm" or dataset == "tm":
         return read_tm(task_id, tasks_per_tiss)
+    if dataset == "mc_ts24" or dataset == "ts24":
+        return read_ts24(task_id, tasks_per_tiss)
     if dataset == "mc_ts30" or dataset == "ts30":
         return read_ts30(task_id, tasks_per_tiss)
     if dataset == "mc_ebi_tm" or dataset == "ebi_tm":

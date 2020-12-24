@@ -1,4 +1,4 @@
-N_TISSUES_PROJ = {"mc_tm": 12, "mc_ts30": 10, "mc_other_10X": 5, "mc_hca": 35, "mc_other": 5, "mc_manton": 1, "mc_PanglaoDB": 5,
+N_TISSUES_PROJ = {"mc_tm": 12, "mc_ts24": 15, "mc_ts30": 10, "mc_other_10X": 5, "mc_hca": 35, "mc_other": 5, "mc_manton": 1, "mc_PanglaoDB": 5,
                   "mc_blood": 1, "mc_brain_olfactory": 1, }
 
 
@@ -6,6 +6,9 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
     if dataset == "mc_tm" or dataset == "tm":
         tissues = ("Bladder", "Heart_and_Aorta", "Kidney", "Limb_Muscle", "Liver", "Lung", "Mammary_Gland", "Marrow",
               "Spleen", "Thymus", "Tongue", "Trachea")
+    elif dataset == "mc_ts24" or dataset == "ts24":
+        tissues = ("BAT", "Bladder", "BM", "GAT", "Heart", "Hepatocytes", "Kidney", "Lung", "MAT", "Muscle",
+                   "Pancrease_exo", "SCAT", "Spleen", "Thymus", "Tongue")
     elif dataset == "mc_ts30" or dataset == "ts30":
         tissues = ("Fat", "Heart_and_Aorta", "Kidney", "Large_Intestine", "Limb_Muscle", "Liver", "Lung", "Marrow",
                    "Pancreas", "Spleen")
