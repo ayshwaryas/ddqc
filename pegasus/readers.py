@@ -310,6 +310,44 @@ def read_heart_circulation(task_id, tasks_per_tiss):
     return tissue, is_human, adata
 
 
+def read_krasnow_lung(task_id, tasks_per_tiss):
+    tissue = "krasnow_lung"
+    is_human = True  # this is human data
+    data_path = DATA_DIR + "human/other/krasnow_lung/"
+    filename = "read_info_{}_{}.csv".format("krasnow_lung", task_id)  # filename of csv used by aggregate_matrices
+    read_info = open(filename, "w")  # csv for aggregate_matrices
+    read_info.write("Sample,Location,Reference,\n")
+    for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
+        if directory.startswith("P"):  # if directory matches the tissue
+            p = data_path + directory + "/"  # path to the mtx
+            read_info.write("{},{},{},\n".format(directory, p + "matrix.mtx", "GRCh38"))  # add the file info to csv
+    read_info.close()
+    adata = io.aggregate_matrices(filename)  # read data
+    os.remove(filename)  # remove the info csv
+
+    adata.obs["annotations"] = "Unknown"
+    return tissue, is_human, adata
+
+
+def read_kidney2(task_id, tasks_per_tiss):
+    tissue = "kidney2"
+    is_human = True  # this is human data
+    data_path = DATA_DIR + "human/other/kidney2/"
+    filename = "read_info_{}_{}.csv".format("kidney2", task_id)  # filename of csv used by aggregate_matrices
+    read_info = open(filename, "w")  # csv for aggregate_matrices
+    read_info.write("Sample,Location,Reference,\n")
+    for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
+        if directory.startswith("kidney"):  # if directory matches the tissue
+            p = data_path + directory + "/"  # path to the mtx
+            read_info.write("{},{},{},\n".format(directory, p + "matrix.mtx", "GRCh38"))  # add the file info to csv
+    read_info.close()
+    adata = io.aggregate_matrices(filename)  # read data
+    os.remove(filename)  # remove the info csv
+
+    adata.obs["annotations"] = "Unknown"
+    return tissue, is_human, adata
+
+
 def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function based on project name
     if dataset == "mc_tm" or dataset == "tm":
         return read_tm(task_id, tasks_per_tiss)
