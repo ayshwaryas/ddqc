@@ -377,4 +377,8 @@ def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function 
         return read_human_brain_olfactory(task_id, tasks_per_tiss)
     if dataset == "mc_heart_circulation" or dataset == "heart_circulation":
         return read_heart_circulation(task_id, tasks_per_tiss)
+    if dataset == "mc_krasnow_lung" or dataset == "krasnow_lung":
+        return read_krasnow_lung(task_id, tasks_per_tiss)
+    if dataset == "mc_kidney2" or dataset == "kidney2":
+        return read_kidney2(task_id, tasks_per_tiss)
 
