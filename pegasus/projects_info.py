@@ -37,7 +37,8 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
                     "Prostate", "Rectum", "Sigmoid-Colon", "Spleen", "Stomach", "Temporal-Lobe", "Thyroid", "Trachea",
                     "Transverse-Colon", "Ureter", "Uterus")
     elif dataset == "mc_PanglaoDB" or dataset == "PanglaoDB":
-        tissues = ("Lung_Epithelial", "Mammary_Gland", "Pancreatic_Islets", "Prostate", "Testis")
+        tissues = ("Lung_Epithelial", "Mammary_Gland", "Pancreatic_Islets", "Prostate", "Testis", "Bone_Marrow", "Liver",
+                   "Substantia_Nigra")
     elif dataset == "mc_blood" or dataset == "blood":
         tissues = ("Blood",)
     elif dataset == "mc_brain" or dataset == "brain":
