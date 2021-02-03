@@ -268,11 +268,11 @@ def read_human_brain(task_id, tasks_per_tiss):
     return tissue, is_human, adata
 
 
-def read_human_brain_olfactory(task_id, tasks_per_tiss):
-    tissue = "Brain_olfactory"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
+def read_human_olfactory_epithelium(task_id, tasks_per_tiss):
+    tissue = "Olfactory_Epithelium"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = DATA_DIR + "human/other/brain-olfactory/"
-    filename = "read_info_{}_{}.csv".format("brain_olfactory", task_id)  # filename of csv used by aggregate_matrices
+    data_path = DATA_DIR + "human/other/Olfactory_Epithelium/"
+    filename = "read_info_{}_{}.csv".format("Olfactory_Epithelium", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
     for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
@@ -354,8 +354,8 @@ def auto_reader(dataset, task_id, tasks_per_tiss):  # find the reading function 
         return read_human_blood(task_id, tasks_per_tiss)
     if dataset == "mc_brain" or dataset == "brain":
         return read_human_brain(task_id, tasks_per_tiss)
-    if dataset == "mc_brain_olfactory" or dataset == "brain_olfactory":
-        return read_human_brain_olfactory(task_id, tasks_per_tiss)
+    if dataset == "mc_olfactory_epithelium" or dataset == "olfactory_epithelium":
+        return read_human_olfactory_epithelium(task_id, tasks_per_tiss)
     if dataset == "mc_heart_circulation" or dataset == "heart_circulation":
         return read_heart_circulation(task_id, tasks_per_tiss)
     if dataset == "mc_krasnow_lung" or dataset == "krasnow_lung":

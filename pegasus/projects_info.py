@@ -1,5 +1,5 @@
-N_TISSUES_PROJ = {"mc_tm": 12, "mc_ts24": 15, "mc_ts30": 10, "mc_ebi_tm": 22, "mc_ebi": 13, "mc_mca": 24, "mc_other_10X": 5, "mc_hca": 35, "mc_other": 5, "mc_PanglaoDB": 8,
-                  "mc_other_10X": 5}
+N_TISSUES_PROJ = {"mc_tm": 12, "mc_ts24": 15, "mc_ts30": 10, "mc_ebi_tm": 22, "mc_ebi": 13, "mc_mca": 24,
+                  "mc_other_10X": 5, "mc_hca": 35, "mc_other": 5, "mc_PanglaoDB": 8}
 
 
 def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
@@ -43,8 +43,8 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
         tissues = ("Blood",)
     elif dataset == "mc_brain" or dataset == "brain":
         tissues = ("Brain",)
-    elif dataset == "mc_brain_olfactory" or dataset == "brain_olfactory":
-        tissues = ("Brain_olfactory",)
+    elif dataset == "mc_olfactory_epithelium" or dataset == "ofactory_epithelium":
+        tissues = ("olfactory_epithelium",)
     elif dataset == "mc_heart_circulation" or dataset == "heart_circulation":
         tissues = ("Heart_Circulation",)
     else:
