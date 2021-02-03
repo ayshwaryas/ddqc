@@ -94,8 +94,6 @@ generatePlots <- function(results.dir, dataset, project) {
 
 generatePlotsPG <- function(project) {
   data.from.pg <<- TRUE
-  #PATH <- "/ahg/regevdata/projects/scqc/"
-  PATH <- "~/Downloads/"
   source("../scripts/settings.R")
   source("../scripts/local_settings.R")
   data.path <- paste0(PATH, "figure1_data/", project, "/")
@@ -120,7 +118,10 @@ generatePlotsPG <- function(project) {
   generatePlots(results.dir, dataset, project)
 }
 
-generatePlotsPG("mc_tm")
+PATH <- "/ahg/regevdata/projects/scqc/"
+for (prj in list.files(paste0(PATH, "figure1_data/"))) {
+  generatePlotsPG(prj)
+}
 
 
 
