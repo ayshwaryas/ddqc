@@ -299,7 +299,7 @@ def read_heart_circulation(task_id, tasks_per_tiss):
     adata = io.aggregate_matrices(filename)  # read data
     os.remove(filename)  # remove the info csv
 
-    annotations = pd.read_csv(DATA_DIR + "other/heart_circulation_annotations.csv")
+    annotations = pd.read_csv(DATA_DIR + "human/other/heart/heart_circulation_annotations.csv")
     annotations["annotation"] = [t[4:] for t in annotations["Cluster"]]
     annotations.index = annotations["index"]
     new_cell_names = [t[18:].replace("::", "_").replace("_Reseq", "").replace("_Rerun", "").replace("LV_01723_1", "LV_1723_1").replace("LV_P01681_1", "LV_1681_1") for t in adata.obs.index]
