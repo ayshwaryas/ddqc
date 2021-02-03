@@ -236,12 +236,12 @@ def read_panglaodb(task_id, tasks_per_tiss):
 def read_human_blood(task_id, tasks_per_tiss):
     tissue = "Blood"  # get_tissue_by_task_id("mc_manton", task_id, tasks_per_tiss)
     is_human = True  # this is human data
-    data_path = "/broad/hptmp/subraman/"  # path to the mtx files of this dataset
+    data_path = "/broad/hptmp/bltmp/"  # path to the mtx files of this dataset
     filename = "read_info_{}_{}.csv".format("blood", task_id)  # filename of csv used by aggregate_matrices
     read_info = open(filename, "w")  # csv for aggregate_matrices
     read_info.write("Sample,Location,Reference,\n")
     for directory in os.listdir(data_path):  # each directory is one mtx file + genes and barcodes
-        if directory.startswith(tissue):  # if directory matches the tissue
+        if directory.startswith("Manton"):  # if directory matches the tissue
             p = data_path + directory + "/"  # path to the mtx
             read_info.write("{},{},{},\n".format(directory, p + "raw_gene_bc_matrices_h5.h5", "GRCh38"))  # add the file info to csv
     read_info.close()
