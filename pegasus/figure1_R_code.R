@@ -109,7 +109,7 @@ generatePlotsPG <- function(project) {
   generatePlots(results.dir, dataset, project)
 }
 
-generatePlotsPG("mc_tm")
+generatePlotsPG("mc_other_human")
 
 
 

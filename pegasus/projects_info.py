@@ -1,5 +1,5 @@
-N_TISSUES_PROJ = {"mc_tm": 12, "mc_ts24": 15, "mc_ts30": 10, "mc_other_10X": 5, "mc_hca": 35, "mc_other": 4,
-                  "mc_PanglaoDB": 5}
+N_TISSUES_PROJ = {"mc_tm": 12, "mc_ts24": 15, "mc_ts30": 10, "mc_ebi_tm": 22, "mc_ebi": 13, "mc_mca": 24, "mc_other_10X": 5, "mc_hca": 35, "mc_other": 5, "mc_PanglaoDB": 8,
+                  "mc_other_10X": 5}
 
 
 def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
