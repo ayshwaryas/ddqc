@@ -34,35 +34,17 @@ def filter_cells_by_csv(adata, project, tissue, res, method):
     mad_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-mad-2/!cells.csv")
     cutoff_cells = pd.read_csv(SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-cutoff-10/!cells.csv")
 
-    adata.obs["color"] = "Did Not Pass"
+    adata.obs["color"] = "Neither"
     adata.obs["color"][mad_cells["barcodekey"]] = "MAD2 only"
-    adata.obs["color"][cutoff_cells["barcodekey"]] = "C10 only"
-
-    if method == "no_outlier":
-        adata.obs["color"][list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "All"
-    elif method == "all":
-        outlier_cells = pd.read_csv(
-            SOURCE_DIR_PREFIX + project + "/" + tissue + "/" + str(res) + "-outlier-0/!cells.csv")
-        adata.obs["color"][outlier_cells["barcodekey"]] = "Outlier only"
-        adata.obs["color"][
-            list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "MAD2 and C10"
-        adata.obs["color"][
-            list(set(cutoff_cells["barcodekey"]).intersection(set(outlier_cells["barcodekey"])))] = "Outlier and C10"
-        adata.obs["color"][
-            list(set(outlier_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "MAD2 and Outlier"
-
-        adata.obs["color"][list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])).intersection(
-            set(outlier_cells["barcodekey"])))] = "All"
-
-    adata.obs["passed_qc"] = (adata.obs.color != "Did Not Pass")
-    pg.filter_data(adata)
+    adata.obs["color"][cutoff_cells["barcodekey"]] = "Cutoff only"
+    adata.obs["color"][list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "All"
 
     return adata
 
 
 def main(project, task_id):
     tissue, is_human, adata = auto_reader(project, task_id, TASKS_PER_TISS)  # read the data for current task id
-    res = 1.4  # this resolution gives results closest to seurat
+    res = 1.4
     # determine the method and param based on task id
     method = "no_outlier"
 
@@ -75,7 +57,7 @@ def main(project, task_id):
     adata = add_cd_scores(adata, is_human)
 
     # write the results
-    write_markers(marker_dict, min_pct=0, max_pval=1, min_log_fc=0)
+    write_markers(marker_dict)
     save_to_csv(adata)
 
     # launch seurat plot script
@@ -85,8 +67,8 @@ def main(project, task_id):
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        proj = "mc_brain_olfactory"
-        for t_id in range(1):
+        proj = "mc_tm"
+        for t_id in [1, 5]:
             main(proj, t_id)
     else:  # project and task id are provided as commandline args
         proj = sys.argv[1]

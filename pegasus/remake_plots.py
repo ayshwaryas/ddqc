@@ -2,10 +2,11 @@ import subprocess
 
 from readers import get_tissue_by_task_id
 
-N_TISSUES_PROJ = {"mc_tm": 12, "mc_other_10X": 4, "mc_hca": 35, "mc_other": 5, "mc_manton": 1}
+N_TISSUES_PROJ = {"mc_tm": 12, "mc_other_10X": 4, "mc_hca": 35, "mc_other": 5, "mc_manton": 1, "mc_PanglaoDB": 5,
+                  "mc_blood": 1, "mc_brain_olfactory": 1, "mc_brain": 1, "mc_heart_circulation": 1}
 
 task = "mc"  # mc or mc_plot
-project = "mc_manton"
+project = "mc_other"
 
 if task == "mc":
     from mc import TASKS_PER_TISS

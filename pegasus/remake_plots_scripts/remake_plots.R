@@ -4,13 +4,14 @@ source("../scripts/mc_functions.R")
 source("../scripts/readers.R")
 source("../scripts/settings.R")
 source("../scripts/local_settings.R")
-project <<- "mc_other"
-tissue <<- "colon-epi_human"
+project <<- "mc_tm"
+tissue <<- "Spleen"
 res <<- 1.4
-method <<- "cutoff"
-param <<- 10
+method <<- "mad"
+param <<- 2
 message("Starting R script to generate results")
 
+output.dir <- "~/Documents/primes_storage/output_pg/"
 task.directory <- paste0(res, "-", method, "-", param)
 task.name <<- paste0(tissue, "-", task.directory)
 results.dir <<- paste0(output.dir, project, "/", tissue, "/", task.directory, "/") #directory for saving all other output
