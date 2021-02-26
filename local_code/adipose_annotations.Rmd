@@ -1,0 +1,70 @@
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+ggsave1 <- function(filename, plot, n.clusters=30) {
+  n.clusters <- max(20, n.clusters)
+  no_bkg <- theme(axis.line = element_line(colour = "black"),
+                  panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(),
+                  panel.border = element_blank(),
+                  panel.background = element_blank()) 
+  ggsave(filename = filename, plot = plot + no_bkg, width = 14 / 30 * n.clusters, height = 10) #saves plot with custom dimensions 
+}
+```
+
+
+
+```{r}
+obj <- readRDS("/Volumes/scqc/data/as_adipose/2020-10-05.adipose_manton.RDS")
+```
+
+```{r}
+ann <- read.csv("adipose_annotations.csv")
+ann$barcodekey <- as.character(sapply("adipose-", paste0, ann$X))
+ann$barcodekey <- gsub("adipose-adipose003_l_", "adipose003_l-", ann$barcodekey)
+ann$barcodekey <- gsub("adipose-adipose_02_c_", "adipose_tmp", ann$barcodekey)
+ann$barcodekey <- gsub("adipose-", "adipose_003_collagenase-", ann$barcodekey)
+ann$barcodekey <- gsub("adipose_tmp", "adipose-", ann$barcodekey)
+
+#ann.cell.type <- data.frame(barcodekey=ann$barcodekey, annotations=ann$x)
+ann.cell.type <- ann$x
+names(ann.cell.type) <- ann$barcodekey
+
+adipose.cells <-read.csv("/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_human/adipose/filtered_cells_plots/no_outlier/!cells.csv")
+adipose.cells$annotations <- NULL
+
+#adipose.cells.test <- merge(adipose.cells, ann.cell.type, by="barcodekey", all=TRUE)
+#adipose.cells.test <- adipose.cells.test %>% filter(!is.na(Channel))
+#adipose.cells.test$annotations[is.na(adipose.cells.test$annotations)] <- "Unknown"
+#adipose.cells.test <- adipose.cells.test %>% distinct(barcodekey, .keep_all = TRUE)
+#adipose.cells$annotations <- adipose.cells.test$annotations
+
+adipose.cells$annotations <- ann.cell.type[adipose.cells$barcodekey]
+adipose.cells$annotations[is.na(adipose.cells$annotations)] <- "Unknown"
+```
+
+```{r}
+adipose.clusters <- read.csv("/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_human/adipose/filtered_cells_plots/no_outlier/!clusters.csv")
+rownames(adipose.clusters) <- adipose.clusters$cluster
+
+adipose.cells$clusters <- adipose.cells$louvain_labels - 1
+adipose.cells$cell.types <- adipose.clusters$cell.type[adipose.cells$louvain_labels]
+```
+
+
+
+```{r}
+ggsave1("plot1.png", ggplot(data = adipose.cells, aes(x=umap1, y=umap2, color=annotations)) + geom_point(size = 1.5))
+ggsave1("plot2.png", ggplot(data = adipose.cells, aes(x=umap1, y=umap2, color=cell.types)) + geom_point(size = 1.5))
+```
+
+```{r}
+tmp_csv <- data.frame(barcodekey=adipose.cells$barcodekey, clusters=adipose.cells$clusters, cell_types=adipose.cells$cell.types, umap1=adipose.cells$umap1, umap2=adipose.cells$umap2)
+tmp_csv2 <- data.frame(cellnames=ann$X, barcodekey=ann$barcodekey, annotations=ann$x, orig.ident=obj$orig.ident)
+write.csv(tmp_csv, "~/Desktop/Pegasus_object.csv")
+write.csv(tmp_csv2, "~/Desktop/R_object.csv")
+```
+

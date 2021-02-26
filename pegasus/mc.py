@@ -74,7 +74,7 @@ def write_markers(marker_dict, min_log_fc=0.25, min_pct=25, max_pval=0.05):
 
 def main(project, task_id):
     tissue, is_human, adata = auto_reader(project, task_id, TASKS_PER_TISS)  # read the data for current task id
-    res = 1.3  # this resolution gives results closest to seurat
+    res = 1.4  # this resolution gives results closest to seurat
     # determine the method and param based on task id
     # none - no additional filtering; cutoff - min 200 genes, max 10% mito; outlier and mad - data driven methods
     method, param = (("none", 0), ("cutoff", 10), ("mad", 2))[task_id % TASKS_PER_TISS]
@@ -100,8 +100,8 @@ def main(project, task_id):
 
 if __name__ == '__main__':
     if local:  # for debug outside of cluster
-        proj = "mc_mca"
-        for t_id in range(0, 1):
+        proj = "mc_tm"
+        for t_id in range(2, 3):
             main(proj, t_id)
     else:  # project and task id are provided as commandline args
         proj = sys.argv[1]

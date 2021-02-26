@@ -30,14 +30,14 @@ medianr <- function(x) {
 
 ```{r}
 tiss <- NULL
-tissue <- "liver"
-path <- paste0("~/Downloads/", tissue, ".csv")
+tissue <- "HCA_immune"
+path <- paste0("~/Downloads/", tissue)
 
 line <- tissue
 cells <- 0
 features <- 0
-#tiss <- CreateSeuratObject(counts = Read10X(data.dir =  path), min.cells = cells, min.features = features)
-tiss <- CreateSeuratObject(counts = read.table(file = path, header = TRUE,), min.cells = cells, min.features = features)
+tiss <- CreateSeuratObject(counts = Read10X(data.dir =  path), min.cells = cells, min.features = features)
+#tiss <- CreateSeuratObject(counts = read.table(file = paste0(path, ".csv", header = TRUE,), min.cells = cells, min.features = features))
 
 tiss[["percent.mt"]] <- PercentageFeatureSet(object = tiss, features=grep("^MT-", rownames(tiss$RNA), ignore.case=TRUE))
 tiss[["percent.rb"]] <- PercentageFeatureSet(object = tiss, features=grep("^(RPL)|(RPS)", rownames(tiss$RNA), ignore.case=TRUE))

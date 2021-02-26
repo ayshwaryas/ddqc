@@ -1,0 +1,58 @@
+```{r}
+library(ggplot2)
+```
+
+```{r}
+split.special <- function(x) {
+  x <- strsplit(x, "-")[[1]]
+  return(paste0(x[1], x[2]))
+}
+```
+
+
+```{r}
+tissue <- "Lung"
+dir.prefix <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/"
+pegasus.mad.dir <- paste0(dir.prefix, tissue, "/1.4-mad-2/")
+pegasus.joint.dir <- paste0(dir.prefix, tissue, "/filtered_cells_plots/no_outlier/")
+pegasus.dir <- paste0(dir.prefix, tissue, "/1.4-none-0/")
+```
+
+```{r}
+pegasus.all.cells <- read.csv(paste0(pegasus.dir, "!cells.csv"))
+rownames(pegasus.all.cells) <- pegasus.all.cells$barcodekey
+pegasus.all.cells$n_genes.log <- log2(pegasus.all.cells$n_genes)
+```
+
+```{r}
+summary(subset(pegasus.all.cells, Channel == "Lung-10X_P7_8")$n_genes.log)
+summary(subset(pegasus.all.cells, Channel == "Lung-10X_P7_9")$n_genes.log)
+summary(subset(pegasus.all.cells, Channel == "Lung-10X_P8_12")$n_genes.log)
+summary(subset(pegasus.all.cells, Channel == "Lung-10X_P8_13")$n_genes.log)
+
+median(subset(pegasus.all.cells, Channel == "Lung-10X_P7_8")$n_genes.log) - 2 * mad(subset(pegasus.all.cells, Channel == "Lung-10X_P7_8")$n_genes.log)
+
+median(subset(pegasus.all.cells, Channel == "Lung-10X_P7_9")$n_genes.log) - 2 * mad(subset(pegasus.all.cells, Channel == "Lung-10X_P7_9")$n_genes.log)
+
+median(subset(pegasus.all.cells, Channel == "Lung-10X_P8_12")$n_genes.log) - 2 * mad(subset(pegasus.all.cells, Channel == "Lung-10X_P8_12")$n_genes.log)
+
+median(subset(pegasus.all.cells, Channel == "Lung-10X_P8_13")$n_genes.log) - 2 * mad(subset(pegasus.all.cells, Channel == "Lung-10X_P8_13")$n_genes.log)
+```
+```{r}
+mean(subset(pegasus.all.cells, Channel == "Lung-10X_P7_8")$n_genes.log) - 2 * sd(subset(pegasus.all.cells, Channel == "Lung-10X_P7_8")$n_genes.log)
+
+mean(subset(pegasus.all.cells, Channel == "Lung-10X_P7_9")$n_genes.log) - 2 * sd(subset(pegasus.all.cells, Channel == "Lung-10X_P7_9")$n_genes.log)
+
+mean(subset(pegasus.all.cells, Channel == "Lung-10X_P8_12")$n_genes.log) - 2 * sd(subset(pegasus.all.cells, Channel == "Lung-10X_P8_12")$n_genes.log)
+
+mean(subset(pegasus.all.cells, Channel == "Lung-10X_P8_13")$n_genes.log) - 2 * sd(subset(pegasus.all.cells, Channel == "Lung-10X_P8_13")$n_genes.log)
+```
+
+
+```{r}
+summary(subset(pegasus.all.cells, Channel == "Lung-10X_P7_8")$percent_mito)
+summary(subset(pegasus.all.cells, Channel == "Lung-10X_P7_9")$percent_mito)
+summary(subset(pegasus.all.cells, Channel == "Lung-10X_P8_12")$percent_mito)
+summary(subset(pegasus.all.cells, Channel == "Lung-10X_P8_13")$percent_mito)
+```
+

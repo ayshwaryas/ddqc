@@ -15,16 +15,17 @@ readFilteredCells <- function(path) {
 
 
 ```{r}
-results.dir <- "~/Documents/primes_storage/output_pg/"
-write("project,tissue,cluster,cell.type,n.cells,percent.unique,genes.mean,mito.mean,markers", "result.csv")
+results.dir <- "~/Documents/primes_storage/results/"
+write("project,tissue,cluster,annotation,cell.type,n.cells,percent.unique,genes.median,mito.median,ribo.median,markers", "result.csv")
 for (project in dir(results.dir,  pattern="mc_", recursive=FALSE)) {
   for (tissue in dir(paste0(results.dir, project, "/"), recursive=FALSE)) {
     if (tissue == "stats_summary.csv") {
       next
     }
     tissue.dir <- paste0(results.dir, project, "/", tissue, "/")
-    mad.dir <- paste0(tissue.dir, "1.4-mad-2/")
-    cutoff.dir <- paste0(tissue.dir, "1.4-cutoff-10/")
+    
+    mad.dir <- paste0(tissue.dir, "1-mad-2/")
+    cutoff.dir <- paste0(tissue.dir, "1-cutoff-10/")
     
     if (!file.exists(paste0(mad.dir, "!cells.csv")) || !file.exists(paste0(cutoff.dir, "!cells.csv"))) {
       next
@@ -40,12 +41,12 @@ for (project in dir(results.dir,  pattern="mc_", recursive=FALSE)) {
 
     
     for (cl in rownames(mad.clusters)) {
-      cluster.cells <- as.character(subset(mad.cells, louvain_labels == cl)$X)
-      ribo.mean <- mean(subset(mad.cells, louvain_labels == cl)$percent_ribo)
+      cluster.cells <- as.character(subset(mad.cells, cluster == cl)$X)
+      ribo.median <- round(median(subset(mad.cells, cluster == cl)$percent.rb), 3)
       mad.only.cells <- setdiff(cluster.cells, cutoff.cells)
       if (length(cluster.cells) >= 30 && length(mad.only.cells) / length(cluster.cells) >= 0.85) {
         mrk <- strsplit(as.character(mad.clusters[cl,]$markers), split=";")[[1]]
-        write(paste(project, tissue, cl, as.character(mad.clusters[cl,]$cell.type), length(cluster.cells), round(length(mad.only.cells) / length(cluster.cells), 4), as.character(mad.clusters[cl,]$genes.mean), as.character(mad.clusters[cl,]$mito.mean), paste(mrk[1:min(25, length(mrk))], collapse=";", sep=""),  sep=","), file = "result.csv", append = TRUE)
+        write(paste(project, tissue, cl, as.character(mad.clusters[cl,]$annotation), as.character(mad.clusters[cl,]$cell.type), length(cluster.cells), round(length(mad.only.cells) / length(cluster.cells), 4), as.character(mad.clusters[cl,]$genes.median), as.character(mad.clusters[cl,]$mito.median), ribo.median, paste(mrk[1:min(25, length(mrk))], collapse=";", sep=""),  sep=","), file = "result.csv", append = TRUE)
       }
     }
   }

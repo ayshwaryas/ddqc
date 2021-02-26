@@ -26,12 +26,12 @@ generatePlots <- function(results.dir, dataset, project) {
     add.dir <- ""
     
     #themes and axis labels for plots
-    t2 <- theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"), axis.text.y = element_text(size=10), legend.position="none", axis.title.x=element_blank())
+    t2 <- theme(axis.text.x = element_text(angle = 45, size=15, hjust=1, face="bold"), axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), legend.position="none", axis.title.x=element_blank(), plot.title = element_text(size = 20, face = "bold"))
     t3 <- ggtitle(name)
     t4 <- theme(legend.position="none")
     t6 <- stat_summary(fun.y=mean, geom="point", shape=23, fill="blue", size=3)
     t6h <- stat_summary(fun.x=mean, geom="point", shape=23, fill="blue", size=3)
-    t7 <- theme(axis.text.x = element_text(size=10), axis.text.y = element_text(size=10, face="bold"), legend.position="none", axis.title.y=element_blank())
+    t7 <- theme(axis.text.x = element_text(size=15), axis.text.y = element_text(size=15, face="bold"),  axis.title.x = element_text(size=15), legend.position="none", axis.title.y=element_blank(), plot.title = element_text(size = 20, face = "bold"))
     l1 <- labs(y=metric.name)
     l2 <- labs(y=paste0("log2(", metric.name, ")"))
     l3 <- labs(x=metric.name)
@@ -118,7 +118,7 @@ generatePlotsPG <- function(project) {
   generatePlots(results.dir, dataset, project)
 }
 
-PATH <- "/ahg/regevdata/projects/scqc/"
+PATH <- "/Volumes/scqc/"
 for (prj in list.files(paste0(PATH, "figure1_data/"))) {
   generatePlotsPG(prj)
 }

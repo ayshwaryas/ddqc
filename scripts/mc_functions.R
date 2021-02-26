@@ -2,14 +2,25 @@ tasks.per.tiss <<- 4 #How many different res/methods per one tissue
 
 
 #plots
-ggsave1 <- function(filename, plot, n.clusters=30) {
-  n.clusters <- max(20, n.clusters)
+ggsave1 <- function(filename, plot, n.clusters=30, type="h") {
+  if (type == "h") {
+    height = 10
+    width = 14 / 30 * max(n.clusters, 30)
+  }
+  if (type == "v") {
+    height = 10 / 30 * max(n.clusters, 30)
+    width = 14
+  }
+  if (type == "u") {
+    height = 10
+    width = 10 + 2 * ceiling(n.clusters / 13)
+  }
   no_bkg <- theme(axis.line = element_line(colour = "black"),
                   panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank(),
                   panel.border = element_blank(),
                   panel.background = element_blank()) 
-  ggsave(filename = filename, plot = plot + no_bkg, width = 14 / 30 * n.clusters, height = 10) #saves plot with custom dimensions 
+  ggsave(filename = filename, plot = plot + no_bkg, width = width, height = height) #saves plot with custom dimensions 
 }
 
 GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE points for DimPlot
@@ -38,16 +49,16 @@ GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE 
 DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction, log2=FALSE) { #DimPlot with continious colors by metric
   name <- paste0(name, "_", reduction)
   data <- GetDimPlotPoints(obj, reduction, metric.name)
-  t <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
+  t <- theme(axis.text.x = element_text(size=15), axis.title.x = element_text(size=15), axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), plot.title = element_text(size = 20, face = "bold"), legend.title = element_text(size = 15), legend.text = element_text(size = 10)) 
   cols <- scale_colour_gradientn(colours=rev(c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")))
   if (log2) {
-    plot <- ggplot(data, aes(x=axis1, y=axis2, color=log2(color))) + geom_point(size = 1.5) + labs(color=paste0("log2(", metric.name, ")")) + t + cols + ggtitle(name)
+    plot <- ggplot(data, aes(x=axis1, y=axis2, color=log2(color), fill = cluster)) + geom_point(size = 1) + labs(color=paste0("log2(", metric.name, ")")) + t + cols + scale_fill_discrete(labels = lbls) + ggtitle(name) + labs(x = "UMAP1", y = "UMAP2")
   } else {
-    plot <- ggplot(data, aes(x=axis1, y=axis2, color=color)) + geom_point(size = 1.5) + labs(color=metric.name) + t + cols + ggtitle(name)
+    plot <- ggplot(data, aes(x=axis1, y=axis2, color=color, fill = cluster)) + geom_point(size = 1) + labs(color=metric.name) + t + cols + scale_fill_discrete(labels = lbls) + ggtitle(name) + labs(x = "UMAP1", y = "UMAP2")
   }
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
-    plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = lbls[as.numeric(cl) + 1], size = 3, fontface=2)
+    plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = cl, size = 7, fontface=2)
   } 
   return(plot)
 }
@@ -55,10 +66,11 @@ DimPlotContinuous <- function(obj, metric.name, lbls, name, reduction, log2=FALS
 DimPlotCluster <- function(obj, lbls, name, reduction) { #DimPlot colored by cluster
   name <- paste0(name, "_", reduction)
   data <- GetDimPlotPoints(obj, reduction, "seurat_clusters")
-  plot <- ggplot(data, aes(x=axis1, y=axis2, color=cluster)) + geom_point(size = 1.5) + guides(colour = guide_legend(override.aes = list(size=2))) + ggtitle(name) + theme(axis.title.x=element_blank(), axis.title.y=element_blank())
+  t <- theme(axis.text.x = element_text(size=15), axis.title.x = element_text(size=15), axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), plot.title = element_text(size = 20, face = "bold"))
+  plot <- ggplot(data, aes(x=axis1, y=axis2, color="Red")) + geom_point(size = 1) + ggtitle(name) + t + labs(x = "UMAP1", y = "UMAP2")
   for (cl in levels(obj$seurat_clusters)) { #add cluster labels
     cluster.red <- subset(data, cluster == cl)
-    plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), label = lbls[as.numeric(cl) + 1], size = 3, fontface=2)
+    plot <- plot + annotate("text", x = mean(cluster.red$axis1), y = mean(cluster.red$axis2), cl, size = 7, fontface=2)
   }
   return(plot)
 }
@@ -67,12 +79,13 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   #themes and axis labels for plots
   t <- scale_x_discrete(labels=lbls)
   t1 <- scale_y_discrete(labels=lbls)
-  t2 <- theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"), axis.text.y = element_text(size=10), legend.position="none", axis.title.x=element_blank())
+  t2 <- theme(axis.text.x = element_text(angle = 45, size=15, hjust=1, face="bold"), axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), legend.position="none", axis.title.x=element_blank(), plot.title = element_text(size = 20, face = "bold"))
   t3 <- ggtitle(name)
   t4 <- theme(legend.position="none")
   t5 <- facet_wrap(. ~ clusters, ncol=5, labeller = as_labeller(lbls))
   t6 <- stat_summary(fun.y=mean, geom="point", shape=23, fill="blue", size=3)
-  t7 <- theme(axis.text.x = element_text(size=10), axis.text.y = element_text(size=10, face="bold"), legend.position="none", axis.title.y=element_blank())
+  t6h <- stat_summary(fun.x=mean, geom="point", shape=23, fill="blue", size=3)
+  t7 <- theme(axis.text.x = element_text(size=15), axis.text.y = element_text(size=15, face="bold"),  axis.title.x = element_text(size=15), legend.position="none", axis.title.y=element_blank(), plot.title = element_text(size = 20, face = "bold"))
   l1 <- labs(y=metric.name)
   l2 <- labs(y=paste0("log2(", metric.name, ")"))
   l3 <- labs(x=metric.name)
@@ -82,13 +95,13 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   if (metric.name.seurat == "percent.mt") {
     a1 <- scale_y_continuous(breaks=seq(0, 80, 5))
     a2 <- scale_x_continuous(breaks=seq(0, 80, 5))
-    hl <- geom_hline(yintercept=10, color="red", size=1)
-    vl <- geom_vline(xintercept=10, color="red", size=1)
+    hl <- geom_hline(yintercept=10, color="red", size=0.5)
+    vl <- geom_vline(xintercept=10, color="red", size=0.5)
   }
   else {
     if (metric.name.seurat == "nFeature_RNA") {
-      hl <- geom_hline(yintercept=log2(200), color="red", size=1)
-      vl <- geom_vline(xintercept=log2(200), color="red", size=1)
+      hl <- geom_hline(yintercept=log2(200), color="red", size=0.5)
+      vl <- geom_vline(xintercept=log2(200), color="red", size=0.5)
     } else { 
       hl <- NULL
       vl <- NULL
@@ -105,32 +118,34 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
   
   data <- data.frame(metric=obj[[metric.name.seurat]], clusters=obj$seurat_clusters) 
   colnames(data) <- c("metric", "clusters") #rename data columns
-  data$clusters = with(data, reorder(clusters, -metric, median)) #order data by cluster median
   
   #all plots except combined density and tsne/umap are saved in to vesions: no trasformation and log2, if save.log2 is true
   
   name.prefix <- paste0(results.dir, add.dir)
   
   if (metric.name.seurat == "nCount_RNA" || metric.name.seurat == "nFeature_RNA") {
+    data$clusters = with(data, reorder(clusters, -log2(metric), mean)) #order data by cluster mean
     
     #boxplot by cluster
-    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2 + hl, n.clusters = n.clusters) 
+    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_boxplot(aes()) + t + t2 + t3 + t6 + c1 + c2 + l2 + hl, n.clusters = n.clusters) 
     #joyplot by cluster
-    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l4 + vl, n.clusters = n.clusters) 
+    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=clusters)) + geom_density_ridges(aes()) + t1 + t3 + t6h + t7 + c1 + c2 + l4 + vl, n.clusters = n.clusters, type = "v") 
     #violin plot by cluster
-    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l2 + hl, n.clusters = n.clusters)
+    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=clusters, y=log2(metric))) + geom_violin(aes()) + t + t2 + t3 + t6 + c1 + c2 + l2 + hl, n.clusters = n.clusters)
+    #umap
+    ggsave1(filename=paste0(name.prefix, "umap_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "umap", log2 = TRUE),  n.clusters = n.clusters, type = "u")
   } else {
+    data$clusters = with(data, reorder(clusters, -metric, median)) #order data by cluster mean
+    
     #boxplot by cluster
-    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1 + hl, n.clusters = n.clusters) 
+    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_boxplot(aes()) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1 + hl, n.clusters = n.clusters) 
     #joyplot by cluster
-    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes(fill=clusters)) + t1 + t3 + t7 + c1 + c2 + l3 + a2 + vl, n.clusters = n.clusters) 
+    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=clusters)) + geom_density_ridges(aes()) + t1 + t3 + t6h + t7 + c1 + c2 + l3 + a2 + vl, n.clusters = n.clusters, type = "v") 
     #violin plot by cluster
-    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes(fill=clusters)) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1 + hl, n.clusters = n.clusters)
+    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=clusters, y=metric)) + geom_violin(aes()) + t + t2 + t3 + t6 + c1 + c2 + l1 + a1 + hl, n.clusters = n.clusters)
+    #umap
+    ggsave1(filename=paste0(name.prefix, "umap_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "umap"), n.clusters = n.clusters, type = "u")
   }
-  
-  #tsne and umap continious dimplots
-  ggsave1(filename=paste0(name.prefix, "tsne_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "tsne"))
-  ggsave1(filename=paste0(name.prefix, "umap_", name.suffix, ".pdf"), plot=DimPlotContinuous(obj, metric.name.seurat, lbls, name, "umap"))
 }
 
 generatePlots <- function(obj, name, cell.types, annotations) { #main plots function
@@ -147,8 +162,7 @@ generatePlots <- function(obj, name, cell.types, annotations) { #main plots func
   generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo") #%ribo plots
   
   #cluster colored dimplots
-  ggsave1(filename=paste0(results.dir, "/tsne_clusters.pdf"), plot=DimPlotCluster(obj, lbls, name, "tsne"))
-  ggsave1(filename=paste0(results.dir, "/umap_clusters.pdf"), plot=DimPlotCluster(obj, lbls, name, "umap"))
+  ggsave1(filename=paste0(results.dir, "/umap_clusters.pdf"), plot=DimPlotCluster(obj, lbls, name, "umap"), n.clusters = length(unique(obj$seurat_clusters)), type = "u")
 }
 
 generateMarkerPlots <- function(obj, top.markers) { #generate plots of top marker genes. Does not work properly

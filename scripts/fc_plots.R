@@ -60,10 +60,10 @@ generateFCPlots <- function(obj, clusters) {
   
   name <- paste0(res, "-", metric, "-", tissue)
   
-  generatePlotsByMetric(obj, name, lbls, "nCount_RNA", "Number of UMIS", "count", "additional_plots/") #nUMI plots
-  generatePlotsByMetric(obj, name, lbls, "nFeature_RNA", "Number of Genes", "genes", "additional_plots/") #nGenes plots
-  generatePlotsByMetric(obj, name, lbls, "percent.mt", "percent.mt", "mito", "additional_plots/") #%mito plots
-  generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo", "additional_plots/") #%ribo plots
+  generatePlotsByMetric(obj, name, lbls, "nCount_RNA", "Number of UMIS", "count") #nUMI plots
+  generatePlotsByMetric(obj, name, lbls, "nFeature_RNA", "Number of Genes", "genes") #nGenes plots
+  generatePlotsByMetric(obj, name, lbls, "percent.mt", "percent.mt", "mito") #%mito plots
+  generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo") #%ribo plots
   
   #extract UMAP coordinates for plotting
   if (!exists("data.from.pg")) {
@@ -73,21 +73,22 @@ generateFCPlots <- function(obj, clusters) {
     data <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
   }
   
-  plot.cols <- c("C10 only" = "#E3191C", "MAD2 and C10" = "#E1C7A7", "Outlier and C10" = "#974FA2", "MAD2 only" = "#367EB8",
-                 "Outlier only" = "#FA9A99", "MAD2 and Outlier" = "#A7CEE2", "All" = "#A65527" , "Did not pass" = "#FFFFFF") #to keep consistent plot colors
+  plot.cols <- c("Cutoff only" = "#4A3933", "MAD2 only" = "#16697A","All" = "#FFA62B" , "Neither" = "#AAAAAA") #to keep consistent plot colors
   
   
   data <- data.frame(UMAP_1 = data$UMAP_1, UMAP_2 = data$UMAP_2, cluster = obj$seurat_clusters, color=obj$color, annotation=obj$annotations)
   
-  t1 <- theme(axis.title.x=element_blank(), axis.title.y=element_blank())
+  t1 <- theme(axis.text.x = element_text(size=15), axis.title.x = element_text(size=15), axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), plot.title = element_text(size = 20, face = "bold"), legend.title = element_text(size = 15), legend.text = element_text(size = 10))
   t2 <- guides(colour = guide_legend(override.aes = list(size=2)))
+  t3 <- scale_color_discrete(labels = lbls)
+  t4 <- scale_fill_discrete(labels = lbls)
   
-  plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color)) + geom_point(size = 1.5) + t1 + t2 + scale_fill_manual(values = plot.cols) + scale_color_manual(values = plot.cols) #umap colored by filtering category
-  plot2 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=cluster)) + geom_point(size = 1.5) + t1 + t2 #umap colored by cluster
+  plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color, fill=cluster)) + geom_point(size = 1) + t1 + t2 + t3 + t4 + scale_color_manual(values = plot.cols) + ggtitle(name) #umap colored by filtering category
+  plot2 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=cluster)) + geom_point(size = 1) + t1 + t2 + t3 + t4 + ggtitle(name) #umap colored by cluster
   for (cl in levels(obj$seurat_clusters)) { #add labels to plots
     cluster.umap <- subset(data, cluster == cl)
-    plot1 <- plot1 + annotate("text", x = mean(cluster.umap$UMAP_1), y = mean(cluster.umap$UMAP_2), label = lbls[(as.numeric(cl) + 1)], size = 3, fontface=2)
-    plot2 <- plot2 + annotate("text", x = mean(cluster.umap$UMAP_1), y = mean(cluster.umap$UMAP_2), label = lbls[(as.numeric(cl) + 1)], size = 3, fontface=2)
+    plot1 <- plot1 + annotate("text", x = mean(cluster.umap$UMAP_1), y = mean(cluster.umap$UMAP_2), label = cl, size = 7, fontface=2)
+    plot2 <- plot2 + annotate("text", x = mean(cluster.umap$UMAP_1), y = mean(cluster.umap$UMAP_2), label = cl, size = 7, fontface=2)
   }
   
   #create barplot which shows category distribution
@@ -105,24 +106,14 @@ generateFCPlots <- function(obj, clusters) {
   data1 <- data.frame(color=table.color, cluster = as.factor(table.cluster), freq=as.double(as.character(table.freq)) * 100)
   
   plot3 <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + 
-    scale_fill_manual(values = plot.cols) + scale_x_discrete(labels=lbls) + theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"),  axis.title.x=element_blank())
+    scale_fill_manual(values = plot.cols) + scale_x_discrete(labels=lbls) + theme(axis.text.x = element_text(angle = 45, size=15, hjust=1, face="bold"), legend.title = element_text(size = 15), legend.text = element_text(size = 10), axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), axis.title.x=element_blank(), plot.title = element_text(size = 20, face = "bold")) + ggtitle(name)
   
   
   #write plots
   n.clusters <- length(unique(obj$seurat_clusters))
-  ggsave1(filename = paste0(results.dir, res, "-!filterplot.pdf"), plot=plot1)
-  ggsave1(filename = paste0(results.dir, res, "-!clusterplot.pdf"), plot=plot2)
+  ggsave1(filename = paste0(results.dir, res, "-!filterplot.pdf"), plot=plot1, n.clusters = length(unique(obj$seurat_clusters)), type = "u")
+  ggsave1(filename = paste0(results.dir, res, "-!clusterplot.pdf"), plot=plot2, n.clusters = length(unique(obj$seurat_clusters)), type = "u")
   ggsave1(filename = paste0(results.dir, res, "-!barplot.pdf"), plot=plot3, n.clusters=n.clusters)
-  ggsave1(filename = paste0(results.dir, res, "-umap_counts.pdf"), plot=DimPlotContinuous(obj, "nCount_RNA", lbls, name, "umap", log2=TRUE))
-  ggsave1(filename = paste0(results.dir, res, "-umap_genes.pdf"), plot=DimPlotContinuous(obj, "nFeature_RNA", lbls, name, "umap", log2=TRUE))
-  ggsave1(filename = paste0(results.dir, res, "-umap_mito.pdf"), plot=DimPlotContinuous(obj, "percent.mt", lbls, name, "umap"))
-  ggsave1(filename = paste0(results.dir, res, "-umap_ribo.pdf"), plot=DimPlotContinuous(obj, "percent.rb", lbls, name, "umap"))
-  ggsave1(filename = paste0(results.dir, res, "-cd1.pdf"), plot=DimPlotContinuous(obj, "cd1", lbls, name, "umap"))
-  ggsave1(filename = paste0(results.dir, res, "-cd2.pdf"), plot= DimPlotContinuous(obj, "cd2", lbls, name, "umap"))
-  ggsave1(filename = paste0(results.dir, res, "-cd3.pdf"), plot=DimPlotContinuous(obj, "cd3", lbls, name, "umap"))
-  ggsave1(filename = paste0(results.dir, res, "-mito_genes.pdf"), plot=DimPlotContinuous(obj, "mito_genes", lbls, name, "umap"))
-  ggsave1(filename = paste0(results.dir, res, "-ribo_genes.pdf"), plot=DimPlotContinuous(obj, "ribo_genes", lbls, name, "umap"))
-  
 }
 
 

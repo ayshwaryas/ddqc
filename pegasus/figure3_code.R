@@ -5,13 +5,13 @@ source("../scripts/local_settings.R")
 
 
 #plots
-ggsave1 <- function(filename, plot, n.clusters=30, type="h") {
+ggsave1 <- function(filename, plot, n.clusters=30, type="h", custom.size=TRUE) {
   if (type == "h") {
     height = 10
     width = 14 / 30 * max(n.clusters, 30)
   }
   if (type == "v") {
-    height = 10 / 30 * max(n.clusters, 20)
+    height = 10 / 30 * max(n.clusters, 30)
     width = 14
   }
   no_bkg <- theme(axis.line = element_line(colour = "black"),
@@ -19,7 +19,11 @@ ggsave1 <- function(filename, plot, n.clusters=30, type="h") {
                   panel.grid.minor = element_blank(),
                   panel.border = element_blank(),
                   panel.background = element_blank()) 
-  ggsave(filename = filename, plot = plot + no_bkg, width = width, height = height) #saves plot with custom dimensions 
+  if (custom.size) {
+    ggsave(filename = filename, plot = plot + no_bkg, width = width, height = height) #saves plot with custom dimensions 
+  } else {
+    ggsave(filename = filename, plot = plot + no_bkg) #saves plot withput custom dimensions 
+  }
 }
 
 GetDimPlotPoints <- function(obj, reduction, metric.name) { #extracts UMAP/TSNE points for DimPlot
@@ -150,10 +154,10 @@ generatePlotsByMetric <- function(obj, name, lbls, metric.name.seurat, metric.na
 generatePlots <- function(obj, name, cell.types, annotations) { #main plots function
   message("Making Plots")
   lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
-  for (i in 1:length(cell.types)) {
-    lbls <- c(lbls, paste0(i - 1))
+  for (i in 1:length(clusters$cell.type)) {
+    lbls <- c(lbls, paste0((i - 1), " ", clusters$cell.type[i]))#, "\n", clusters$annotation[i]))
   }
-  names(lbls) <- 0:(length(lbls) - 1) #rename labels with cluster #
+  names(lbls) <- 0:(length(lbls) - 1)  #rename labels with cluster #
   
   generatePlotsByMetric(obj, name, lbls, "nCount_RNA", "Number of UMIS", "count") #nUMI plots
   generatePlotsByMetric(obj, name, lbls, "nFeature_RNA", "Number of Genes", "genes") #nGenes plots
@@ -165,7 +169,68 @@ generatePlots <- function(obj, name, cell.types, annotations) { #main plots func
 }
 
 
-PATH <- "~/Downloads/figure2_plots/"
+#function that makes filtered cells plots
+generateFCPlots <- function(obj, name, clusters) {
+  message("Making FC Plots")
+  lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
+  for (i in 1:length(clusters$cell.type)) {
+    lbls <- c(lbls, paste0((i - 1), " ", clusters$cell.type[i]))#, "\n", clusters$annotation[i]))
+  }
+  names(lbls) <- 0:(length(lbls) - 1)  #rename labels with cluster #
+  
+  generatePlotsByMetric(obj, name, lbls, "nCount_RNA", "Number of UMIS", "count") #nUMI plots
+  generatePlotsByMetric(obj, name, lbls, "nFeature_RNA", "Number of Genes", "genes") #nGenes plots
+  generatePlotsByMetric(obj, name, lbls, "percent.mt", "percent.mt", "mito") #%mito plots
+  generatePlotsByMetric(obj, name, lbls, "percent.rb", "percent.rb", "ribo") #%ribo plots
+  
+  #extract UMAP coordinates for plotting
+  if (!exists("data.from.pg")) {
+    cells <- colnames(obj)
+    data <- as.data.frame(Embeddings(obj$umap)[cells, c(1, 2)])
+  } else {
+    data <- data.frame(UMAP_1 = obj$umap1, UMAP_2 = obj$umap2)
+  }
+  
+  plot.cols <- c("C10 only" = "#DB6400", "MAD2 only" = "#16697A","All" = "#FFA62B" , "Neither" = "#99A8B2") #to keep consistent plot colors
+  
+  
+  data <- data.frame(UMAP_1 = data$UMAP_1, UMAP_2 = data$UMAP_2, cluster = obj$seurat_clusters, color=obj$color, annotation=obj$annotations)
+  
+  t1 <- theme(axis.text.x = element_text(size=15), axis.title.x = element_text(size=15), axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), plot.title = element_text(size = 20, face = "bold"))
+  t2 <- guides(colour = guide_legend(override.aes = list(size=2)))
+  
+  plot1 <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color)) + geom_point(size = 1.5) + t1 + t2 + scale_fill_manual(values = plot.cols) + scale_color_manual(values = plot.cols) #umap colored by filtering category
+  for (cl in levels(obj$seurat_clusters)) { #add labels to plots
+    cluster.umap <- subset(data, cluster == cl)
+    plot1 <- plot1 + annotate("text", x = mean(cluster.umap$UMAP_1), y = mean(cluster.umap$UMAP_2), label = lbls[(as.numeric(cl) + 1)], size = 5, fontface=2)
+  }
+  
+  #create barplot which shows category distribution
+  table.color <- NULL
+  table.cluster <- NULL
+  table.freq <- NULL
+  for (cl in unique(data$cluster)) {
+    data.cluster <- subset(data, cluster == cl)
+    table.tmp <- as.data.frame(table(data.frame(color=factor(data.cluster$color), cluster = as.character(data.cluster$cluster))))
+    table.tmp$Freq <- table.tmp$Freq / sum(table.tmp$Freq)
+    table.color <- c(table.color, as.character(table.tmp$color))
+    table.cluster <- c(table.cluster, as.integer(as.character(table.tmp$cluster)))
+    table.freq <- c(table.freq, as.character(table.tmp$Freq))
+  }
+  data1 <- data.frame(color=table.color, cluster = as.factor(table.cluster), freq=as.double(as.character(table.freq)) * 100)
+  
+  plot3 <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + 
+    scale_fill_manual(values = plot.cols) + scale_x_discrete(labels=lbls) + theme(axis.text.x = element_text(angle = 45, size=10, hjust=1, face="bold"),  axis.title.x=element_blank())
+  
+  
+  #write plots
+  n.clusters <- length(unique(obj$seurat_clusters))
+  ggsave1(filename = paste0(results.dir, res, "-!filterplot.pdf"), plot=plot1)
+  ggsave1(filename = paste0(results.dir, res, "-!barplot.pdf"), plot=plot3, n.clusters=n.clusters)
+}
+
+
+PATH <- "~/Downloads/figure3_plots/"
 
 for (tissue in list.files(PATH)) {
   
@@ -179,6 +244,9 @@ for (tissue in list.files(PATH)) {
   tiss <- tiss %>% rename(nFeature_RNA = n_genes, nCount_RNA = n_counts, percent.mt = percent_mito, percent.rb = percent_ribo, seurat_clusters = louvain_labels)
   tiss$seurat_clusters <- factor(tiss$seurat_clusters - 1)
   
-  
-  generatePlots(tiss, tissue, clusters$cell.type, clusters$annotation)
+  if (grepl("joint", "lung_joint", fixed = TRUE)) {
+    generateFCPlots(tiss, tissue, clusters)
+  } else {
+    generatePlots(tiss, tissue, clusters$cell.type, clusters$annotation)
+  }
 }

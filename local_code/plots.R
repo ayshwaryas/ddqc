@@ -33,11 +33,21 @@ generatePlots <- function(results.dir, dataset, project) {
     if (metric.name.seurat == "percent.mt") {
       a1 <- scale_y_continuous(breaks=seq(0, 80, 5))
       a2 <- scale_x_continuous(breaks=seq(0, 80, 5))
+      hl <- geom_hline(yintercept=10, color="red", size=1)
+      vl <- geom_vline(xintercept=10, color="red", size=1)
     }
     else {
+      if (metric.name.seurat == "nFeature_RNA") {
+        hl <- geom_hline(yintercept=log2(200), color="red", size=1)
+        vl <- geom_vline(xintercept=log2(200), color="red", size=1)
+      } else { 
+        hl <- NULL
+        vl <- NULL
+      }
       a1 <- NULL
       a2 <- NULL
     }
+
     
     n.tissues <- length(unique(dataset$tissue))
     plot.cols <- scales::hue_pal(c = 100, l = 65, h.start = 0)(n.tissues)
@@ -47,34 +57,35 @@ generatePlots <- function(results.dir, dataset, project) {
     
     data <- data.frame(metric=dataset[[metric.name.seurat]], tissues=dataset$tissue) 
     colnames(data) <- c("metric", "tissues") #rename data columns
-    data$tissues = with(data, reorder(tissues, -metric, median)) #order data by tissue median
+    data$tissues = with(data, reorder(tissues, -metric, mean)) #order data by tissue median
     
     #all plots except combined density and tsne/umap are saved in to vesions: no trasformation and log2, if save.log2 is true
     
-    
     name.prefix <- paste0(results.dir, add.dir)
     
-    #boxplot by tissue
-    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=tissues, y=log2(metric))) + geom_boxplot(aes(fill=tissues)) + t2 + t3 + t6 + c1 + c2 + l2, n.tissues = n.tissues) 
-    #joyplot by tissue
-    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=tissues)) + geom_density_ridges(aes(fill=tissues)) + t3 + t7 + c1 + c2 + l4, n.tissues = n.tissues) 
-    #violin plot by tissue
-    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=tissues, y=log2(metric))) + geom_violin(aes(fill=tissues)) + t2 + t3 + t6 + c1 + c2 + l2, n.tissues = n.tissues)
-  
-    #boxplot by tissue
-    ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=tissues, y=metric)) + geom_boxplot(aes(fill=tissues)) + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.tissues = n.tissues) 
-    #joyplot by tissue
-    ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=tissues)) + geom_density_ridges(aes(fill=tissues)) + t3 + t7 + c1 + c2 + l3 + a2, n.tissues = n.tissues) 
-    #violin plot by tissue
-    ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=tissues, y=metric)) + geom_violin(aes(fill=tissues)) + t2 + t3 + t6 + c1 + c2 + l1 + a1, n.tissues = n.tissues)
+    if (metric.name.seurat == "nCount_RNA" || metric.name.seurat == "nFeature_RNA") {
+    
+      #boxplot by tissue
+      ggsave1(filename=paste0(name.prefix, "box_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=tissues, y=log2(metric))) + geom_boxplot() + t2 + t3 + t6 + c1 + c2 + l2 + hl, n.tissues = n.tissues) 
+      #joyplot by tissue
+      ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=log2(metric), y=tissues)) + geom_density_ridges() + t3 + t7 + c1 + c2 + l4 + vl, n.tissues = n.tissues) 
+      #violin plot by tissue
+      ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, "_log.pdf"), plot=ggplot(subset(data, metric > 0), aes(x=tissues, y=log2(metric))) + geom_violin() + t2 + t3 + t6 + c1 + c2 + l2 + hl, n.tissues = n.tissues)
+    } else {
+      #boxplot by tissue
+      ggsave1(filename=paste0(name.prefix, "box_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=tissues, y=metric)) + geom_boxplot() + t2 + t3 + t6 + c1 + c2 + l1 + a1 + hl, n.tissues = n.tissues) 
+      #joyplot by tissue
+      ggsave1(filename=paste0(name.prefix, "density2_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=metric, y=tissues)) + geom_density_ridges() + t3 + t7 + c1 + c2 + l3 + a2 + vl, n.tissues = n.tissues) 
+      #violin plot by tissue
+      ggsave1(filename=paste0(name.prefix, "violin_", name.suffix, ".pdf"), plot=ggplot(data, aes(x=tissues, y=metric)) + geom_violin() + t2 + t3 + t6 + c1 + c2 + l1 + a1 + hl, n.tissues = n.tissues)
+    }
   }
 }
 
-generatePlotsPG <- function() {
+generatePlotsPG <- function(project) {
   data.from.pg <<- TRUE
   source("../scripts/settings.R")
   source("../scripts/local_settings.R")
-  project <- "mc_hca"
   data.path <- paste0(source.dir.prefix, project, "/")
   dataset <- NULL
   for (directory in list.files(data.path)) {
@@ -92,6 +103,35 @@ generatePlotsPG <- function() {
   results.dir <- paste0(source.dir.prefix, "summary_plots/", project, "/")
   dir.create(paste0(source.dir.prefix, "summary_plots/"), showWarnings = FALSE)
   dir.create(paste0(results.dir), showWarnings = FALSE)
+  write.csv(dataset, paste0(results.dir, "!cells.csv"))
+  
+  generatePlots(results.dir, dataset, project)
+}
+
+generatePlotsSeurat <- function(project) {
+  source("../scripts/settings.R")
+  source("../scripts/local_settings.R")
+  data.path <- paste0(source.dir.prefix, project, "/")
+  dataset <- NULL
+  for (directory in list.files(data.path)) {
+    if (grepl(".csv", directory)) {
+      next
+    }
+    d <- read.csv(paste0(data.path, directory, "/1-none-0/!cells.csv"))
+    d$tissue <- directory
+    if (is.null(dataset)) {
+      dataset <- d
+    }
+    else {
+      dataset <- full_join(dataset, d)
+    }
+  }
+  # dataset <- dataset %>% rename(nFeature_RNA = n_genes, nCount_RNA = n_counts, percent.mt = percent_mito, percent.rb = percent_ribo, seurat_clusters = louvain_labels)
+  
+  results.dir <- paste0("~/Documents/primes_storage/output_pg/", "summary_plots/", project, "/")
+  # dir.create(paste0(source.dir.prefix, "summary_plots/"), showWarnings = FALSE)
+  dir.create(paste0(results.dir), showWarnings = FALSE)
+  write.csv(dataset, paste0(results.dir, "!cells.csv"))
   
   generatePlots(results.dir, dataset, project)
 }

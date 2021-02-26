@@ -1,0 +1,45 @@
+```{r}
+tissue <- "Heart_and_Aorta"
+dir.prefix <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/"
+pegasus.mad.dir <- paste0(dir.prefix, tissue, "/1.4-mad-2/")
+pegasus.joint.dir <- paste0(dir.prefix, tissue, "/filtered_cells_plots/no_outlier/")
+pegasus.dir <- paste0(dir.prefix, tissue, "/1.4-none-0/")
+```
+
+```{r}
+pegasus.all.cells.mad <- read.csv(paste0(pegasus.mad.dir, "!cells.csv"))
+pegasus.all.cells.mad$cluster <- pegasus.all.cells.mad$louvain_labels - 1
+rownames(pegasus.all.cells.mad) <- pegasus.all.cells.mad$barcodekey
+
+pegasus.all.cells.joint <- read.csv(paste0(pegasus.joint.dir, "!cells.csv"))
+pegasus.all.cells.joint$cluster <- pegasus.all.cells.joint$louvain_labels - 1
+rownames(pegasus.all.cells.joint) <- pegasus.all.cells.joint$barcodekey
+
+```
+
+```{r}
+joint.cluster <- 18
+mad.cluster <- 0
+max.cells <- 0
+for (cl in unique(pegasus.all.cells.mad$cluster)) {
+  c1 <- subset(pegasus.all.cells.joint, cluster == joint.cluster)$barcodekey
+  c2 <- subset(pegasus.all.cells.mad, cluster == cl)$barcodekey
+  # print(paste0("MAD Cluster: ", cl, ", Common Cells: ", length(intersect(c1, c2))))
+  if (length(intersect(c1, c2)) > max.cells) {
+    max.cells <- length(intersect(c1, c2))
+    mad.cluster <- cl
+  } 
+}
+
+print(paste0("MAD Cluster: ", mad.cluster))
+
+joint.cells <- subset(pegasus.all.cells.joint, cluster == joint.cluster)$barcodekey
+mad.cells <- subset(pegasus.all.cells.mad, cluster == mad.cluster)$barcodekey
+
+print(paste0("Cells in MAD: ", length(mad.cells)))
+print(paste0("Cells in Joint: ", length(joint.cells)))
+print(paste0("Cells in Intersection: ", length(intersect(joint.cells, mad.cells))))
+print(paste0("MAD Cells in Joint percentage: ", round(length(intersect(joint.cells, mad.cells)) / (length(joint.cells)), 3) * 100))
+
+```
+

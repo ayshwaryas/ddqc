@@ -13,7 +13,8 @@ else:  # for debug outside of cluster
         DATA_DIR = "/Volumes/easystore/primes_storage/data/"
     elif LOC == "cluster":
         DATA_DIR = "/Volumes/scqc/data/"
-    OUTPUT_DIR = "/Users/michaelalperovich/Documents/primes_storage/output_pg/"
+    #OUTPUT_DIR = "/Users/michaelalperovich/Documents/primes_storage/output_pg/"
+    OUTPUT_DIR = "/Volumes/scqc/output_pg/"
 SOURCE_DIR_PREFIX = OUTPUT_DIR  # for fc plots, do not change
 
 CELLS_FILTER = 3  # basic nCells filter (performed for all methods)

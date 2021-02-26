@@ -1,5 +1,9 @@
 N_TISSUES_PROJ = {"mc_tm": 12, "mc_ts24": 15, "mc_ts30": 10, "mc_ebi_tm": 22, "mc_ebi": 13, "mc_mca": 24,
-                  "mc_other_10X": 5, "mc_hca": 35, "mc_other": 5, "mc_PanglaoDB": 8}
+                  "mc_other_10X": 5, "mc_hca": 35, "mc_other": 4, "mc_PanglaoDB": 8, "mc_brain": 1, "mc_blood": 1,
+                  "mc_olfactory_epithelium": 1, "mc_heart_circulation": 1}
+IS_HUMAN_PROJ = {"mc_tm": False, "mc_ts24": False, "mc_ts30": False, "mc_ebi_tm": False, "mc_ebi": True, "mc_mca": False,
+                 "mc_other_10X": True, "mc_hca": True, "mc_other": True, "mc_PanglaoDB": True, "mc_brain": True,
+                 "mc_blood": True, "mc_olfactory_epithelium": True, "mc_heart_circulation": True}
 
 
 def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
@@ -29,7 +33,7 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
     elif dataset == "mc_other_10X" or dataset == "other_10X":
         tissues = ("adipose", "ASD_snRNAseq", "liver", "kidney2", "skin")
     elif dataset == "mc_other" or dataset == "other":
-        tissues = ("colon-epi", "colon-fib", "colon-imm", "retina")
+        tissues = ("colon-epi_human", "colon-fib_human", "colon-imm_human", "retina_human")
     elif dataset == "mc_hca" or dataset == "hca":
         tissues = ("Adipose", "Adrenal-Gland", "Artery", "Ascending-Colon", "Bladder", "Bone-Marrow", "Cerebellum",
                     "Cervix", "Duodenum", "Epityphlon", "Esophagus", "Fallopian-Tube", "Gall-Bladder", "Heart", "Ileum",

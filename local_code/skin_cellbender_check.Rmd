@@ -1,0 +1,80 @@
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+skin.original.cells <- read.csv("/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_human/skin/filtered_cells_plots/no_outlier/!cells.csv")
+skin.original.clusters <- read.csv("/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_human/skin/filtered_cells_plots/no_outlier/!clusters.csv")
+skin.original.cells$clusters <- skin.original.cells$louvain_labels - 1 
+```
+
+```{r}
+skin.cellbender.cells <- read.csv("/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_skin_cellbender/Skin_Cellbender/filtered_cells_plots/no_outlier/!cells.csv")
+skin.cellbender.clusters <- read.csv("/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_skin_cellbender/Skin_Cellbender/filtered_cells_plots/no_outlier/!clusters.csv")
+skin.cellbender.cells$clusters <- skin.cellbender.cells$louvain_labels - 1 
+```
+
+```{r}
+skin.cellbender.barcodes <- gsub("skin003_l/skin003_l_out_FPR_0.1.h5", "skin_003_unsorted_liberaseTM", skin.cellbender.cells$barcodekey)
+skin.cellbender.barcodes <- gsub("skin003_m/skin003_m_out_FPR_0.1.h5", "skin_003_unsorted_MACS", skin.cellbender.barcodes)
+skin.cellbender.barcodes <- gsub("skin_02_l/skin_02_l_out_FPR_0.1.h5", "skin_liberase", skin.cellbender.barcodes)
+skin.cellbender.barcodes <- gsub("skin_02_m/skin_02_m_out_FPR_0.1.h5", "skin_MACS", skin.cellbender.barcodes)
+skin.cellbender.cells$barcodekey <- skin.cellbender.barcodes
+```
+
+```{r}
+original.cluster <- 24
+cellbender.cluster <- 0
+max.cells <- 0
+for (cl in unique(skin.cellbender.cells$clusters)) {
+  c1 <- subset(skin.original.cells, clusters == original.cluster)$barcodekey
+  c2 <- subset(skin.cellbender.cells, clusters == cl)$barcodekey
+  if (length(intersect(c1, c2)) > max.cells) {
+    max.cells <- length(intersect(c1, c2))
+    cellbender.cluster <- cl
+  } 
+}
+
+print(paste0("Cellbender Cluster: ", cellbender.cluster))
+
+original.cells <- subset(skin.original.cells, clusters == original.cluster)$barcodekey
+cellbender.cells <- subset(skin.cellbender.cells, clusters == cellbender.cluster)$barcodekey
+
+print(paste0("Cells in Cellbender: ", length(cellbender.cells)))
+print(paste0("Cells in Original: ", length(original.cells)))
+print(paste0("Cells in Intersection: ", length(intersect(original.cells, cellbender.cells))))
+print(paste0("Cells in Intersection percentage (from Original): ", round(length(intersect(original.cells, cellbender.cells)) / (length(original.cells)), 3) * 100))
+```
+```{r}
+cellbender.cluster <- 16
+original.cluster <- 0
+max.cells <- 0
+for (cl in unique(skin.original.cells$clusters)) {
+  c1 <- subset(skin.cellbender.cells, clusters == cellbender.cluster)$barcodekey
+  c2 <- subset(skin.original.cells, clusters == cl)$barcodekey
+  if (length(intersect(c1, c2)) > max.cells) {
+    max.cells <- length(intersect(c1, c2))
+    original.cluster <- cl
+  } 
+}
+
+print(paste0("Original Cluster: ", original.cluster))
+
+cellbender.cells <- subset(skin.cellbender.cells, clusters == cellbender.cluster)$barcodekey
+original.cells <- subset(skin.original.cells, clusters == original.cluster)$barcodekey
+
+print(paste0("Cells in Cellbender: ", length(cellbender.cells)))
+print(paste0("Cells in Original: ", length(original.cells)))
+print(paste0("Cells in Intersection: ", length(intersect(original.cells, cellbender.cells))))
+print(paste0("Cells in Intersection percentage (from Cellbender): ", round(length(intersect(original.cells, cellbender.cells)) / (length(cellbender.cells)), 3) * 100))
+```
+```{r}
+common.cells <- intersect(skin.original.cells$barcodekey, skin.cellbender.cells$barcodekey)
+skin.original.cells$is_common <- (skin.original.cells$barcodekey %in% common.cells)
+```
+
+```{r}
+ggplot(data = skin.original.cells, aes(x=umap1, y=umap2, color=is_common)) + geom_point(size = 1.5)
+```
+

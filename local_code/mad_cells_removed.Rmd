@@ -1,0 +1,54 @@
+```{r}
+directory <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_human/liver/"
+joint.cells <- read.csv(paste0(directory, "filtered_cells_plots/no_outlier/!cells.csv"))
+joint.cells$louvain_labels <- joint.cells$louvain_labels - 1
+rownames(joint.cells) <- joint.cells$barcodekey
+joint.clusters <- read.csv(paste0(directory, "filtered_cells_plots/no_outlier/!clusters.csv"))
+rownames(joint.clusters) <- joint.clusters$cluster
+```
+
+```{r}
+mad2.counts.filtered <- read.csv(paste0(directory, "1.4-mad-2/!filtered_counts.csv"))
+mad2.genes.filtered <- read.csv(paste0(directory, "1.4-mad-2/!filtered_genes.csv"))
+mad2.mito.filtered <- read.csv(paste0(directory, "1.4-mad-2/!filtered_mito.csv"))
+mad2.ribo.filtered <- read.csv(paste0(directory, "1.4-mad-2/!filtered_ribo.csv"))
+
+write("", "~/Downloads/joint_cluster_composition_removed.csv")
+
+```
+
+```{r}
+for (cl in 0:28) {
+  cluster.cells <- subset(joint.cells, louvain_labels==cl)
+  removed.counts <- 0
+  removed.genes <- 0
+  removed.mito <- 0
+  removed.ribo <- 0
+  removed.total <- 0
+  for (cell in cluster.cells$barcodekey){
+    #print(cell)
+    f <- FALSE
+    if (cell %in% mad2.counts.filtered$barcodekey) {
+      removed.counts <- removed.counts + 1
+      f <- TRUE
+    }
+    if (cell %in% mad2.genes.filtered$barcodekey) {
+      removed.genes <- removed.genes + 1
+      f <- TRUE
+    }
+    if (cell %in% mad2.mito.filtered$barcodekey) {
+      removed.mito <- removed.mito + 1
+      f <- TRUE
+    }
+    if (cell %in% mad2.ribo.filtered$barcodekey) {
+      removed.ribo <- removed.ribo + 1
+      f <- TRUE
+    }
+    if (f) {
+      removed.total <- removed.total + 1
+    }
+  }
+  write(paste0("counts: ", removed.counts, "; genes: ", removed.genes, "; mito: ", removed.mito, "; ribo: ", removed.ribo, "; total: ", removed.total, ","), "~/Downloads/joint_cluster_composition_removed.csv", append = TRUE)
+}
+```
+

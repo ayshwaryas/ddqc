@@ -1,5 +1,3 @@
-data.from.pg <- TRUE
-
 source("scripts/readers.R")
 source("scripts/mc_functions.R")
 source("scripts/fc_plots.R")
@@ -9,7 +7,7 @@ tasks.per.tiss <<- 1
 
 
 project <- "mc_tm"
-tissue <- "Kidney"
+tissue <- "Lung"
 
 
 readFilterCsvMethod <- function(method, all.cells) {
@@ -17,7 +15,7 @@ readFilterCsvMethod <- function(method, all.cells) {
   line <- method
   for (metric in c("counts", "genes", "mito", "ribo")) {
     filtered.cells <- tryCatch({
-      as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric, ".csv"))[["X"]])}, 
+      as.character(read.csv(paste0(source.dir, res, "-", method, "/!filtered_", metric, ".csv"))[["barcodekey"]])}, 
       error = function(e) {warning(paste(method, metric, "filtered cells not found"))})
     filtered.cells.all <- union(filtered.cells.all, filtered.cells)
     line <- paste(line, length(all.cells) - length(filtered.cells), paste0(
@@ -34,7 +32,7 @@ readFilterCsvMethod <- function(method, all.cells) {
 res <<- 1.4 #0.5 * (1 + (task.id %% tasks.per.tiss) %/% tasks.per.res) #clustering resolution
 source.dir <<- paste0(source.dir.prefix, project, "/", tissue, "/") #directory where csv with filtered cells are located
 
-all.cells = as.character(read.csv(paste0(source.dir, res, "-none-0/!cells.csv"))$X)
+all.cells = as.character(read.csv(paste0(source.dir, res, "-none-0/!cells.csv"))$barcodekey)
 
 write("method,counts cells,counts %,genes cells,genes %,mito cells,mito %,ribo cells,ribo %,all cells,all %", file=paste0(source.dir, "fc_table.csv"))
 

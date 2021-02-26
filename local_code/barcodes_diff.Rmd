@@ -73,7 +73,7 @@ merge.filtered.dfs <- function(all.cells, clusters, filtered, filtered.other, co
 
 
 ```{r}
-tissue <- "Tongue"
+tissue <- "Trachea"
 dir.prefix <- "/Users/michaelalperovich/Documents/primes_storage/output_pg/mc_tm/"
 seurat.dir <- "/Users/michaelalperovich/Documents/primes_storage/results/mc_tm/Kidney/1-mad-2/"
 seurat.dir2 <- "/Users/michaelalperovich/Documents/primes_storage/results/mc_tm/Kidney/1-none-0/"
@@ -147,5 +147,8 @@ cutoff.unique <- pegasus.all.cells.cutoff[sapply(setdiff(cutoff.15and17$X, mad.0
 mad.c13 <- subset(pegasus.all.cells.mad, cluster == 13)
 mad.c19 <- subset(pegasus.all.cells.mad, cluster == 19)
 mad.c25 <- subset(pegasus.all.cells.mad, cluster == 25)
+
+length(setdiff(rownames(pegasus.all.cells.cutoff), rownames(pegasus.all.cells.mad)))
+length(setdiff(rownames(pegasus.all.cells.cutoff), rownames(pegasus.all.cells.mad))) / length(rownames(pegasus.all.cells))
 ```
 
