@@ -1,0 +1,15 @@
+dataset,tissue,is_human,annotations
+tabula_muris,Bladder,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Heart_and_Aorta,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Kidney,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Limb_Muscle,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Liver,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Lung,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Mammary_Gland,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Marrow,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Spleen,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Thymus,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Trachea,False,/ahg/regevdata/projects/scqc/data/mouse/tabula_muris/annotations_droplet.csv
+
+
+

@@ -13,12 +13,17 @@ else:  # for debug outside of cluster
         DATA_DIR = "/Volumes/easystore/primes_storage/data/"
     elif LOC == "cluster":
         DATA_DIR = "/Volumes/scqc/data/"
-    #OUTPUT_DIR = "/Users/michaelalperovich/Documents/primes_storage/output_pg/"
-    OUTPUT_DIR = "/Volumes/scqc/output_pg/"
+    OUTPUT_DIR = "/Users/michaelalperovich/Documents/primes_storage/output_pg/"
+
 SOURCE_DIR_PREFIX = OUTPUT_DIR  # for fc plots, do not change
 
-CELLS_FILTER = 3  # basic nCells filter (performed for all methods)
-FEATURES_FILTER = 100  # basic nGenes filter (performed for all methods)
+basic_genes_filter = 100  # basic nGenes filter (performed for all methods)
+basic_mito_filter = 80
+resolution = 1.4  # this resolution gives results closest to seurat
+
+mito_prefixes = {"human": "MT-", "mouse": "Mt-"}  # prefixes of mitochondrial genes
+# TODO: check ribo prefix
+ribo_prefixes = {"human": "^Rp[sl]\d", "mouse": "^Rp[sl]\d"}  # prefixes of ribosomal genes
 
 # if true, filtering will be done for the selected metric
 do_counts = True
