@@ -2,12 +2,11 @@ import subprocess
 import sys
 
 import pandas as pd
-import pegasus as pg
 
 import paths
 from config import OUTPUT_DIR, SOURCE_DIR_PREFIX
 from filters import initial_qc
-from local_config import local
+from config.local_config import local
 from mc import write_markers, save_to_csv
 from readers import auto_reader
 from utils import cluster_data, safe_mkdir, add_cd_scores

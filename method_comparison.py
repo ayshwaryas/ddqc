@@ -32,9 +32,12 @@ def mc_main(project, task_id, tissue=None):
     adata = read_tissue(project, tissue)
 
     method, param = MC_METHODS[task_id % MC_TASKS_PER_TISSUE]
-    print(
-        "task.id:{} - tissue:{}, res:{}, method:{}, param:{}, project:{}, do.counts:{}, do.genes:{}, do.mito:{}, do.ribo:{}".format(
-            task_id, tissue, resolution, method, param, project, do_counts, do_genes, do_mito, do_ribo))
+    print("Method comparison task_id:{} - tissue:{}, res:{}, method:{}, param:{}, project:{}".format(task_id, tissue,
+                                                                                                     resolution, method,
+                                                                                                     param, project,
+                                                                                                     do_counts,
+                                                                                                     do_genes, do_mito,
+                                                                                                     do_ribo))
 
     task_directory, task_name, results_dir = create_dirs(project, tissue, resolution, method, param)
 
@@ -49,6 +52,7 @@ def mc_main(project, task_id, tissue=None):
     adata = add_cd_scores(adata, is_human)  # add cell death scores
 
     # write the results
+    print("Writing results")
     write_markers(marker_dict, results_dir)
     save_to_csv(adata, results_dir)
 

@@ -4,7 +4,7 @@ import pandas as pd
 import pegasus as pg
 
 import paths
-from config import OUTPUT_DIR
+from config.config import OUTPUT_DIR
 from filters import initial_qc
 from mc import write_markers, save_to_csv
 from readers import auto_reader
