@@ -37,7 +37,14 @@ def mc_main(project, task_id, tissue=None):
             task_id, tissue, resolution, method, param, project, do_counts, do_genes, do_mito, do_ribo))
 
     task_directory, task_name, results_dir = create_dirs(project, tissue, resolution, method, param)
-    adata = filter_cells(adata, resolution, method, param, is_human, do_counts, do_genes, do_mito, do_ribo)
+
+    # filtering
+    mito_prefix = MITO_PREFIXES["human"] if is_human else MITO_PREFIXES["mouse"]
+    ribo_prefix = RIBO_PREFIXES["human"] if is_human else RIBO_PREFIXES["mouse"]
+    adata = filter_cells(adata, resolution, method, param, basic_n_genes=basic_genes_filter,
+                         basic_percent_mito=basic_mito_filter, mito_prefix=mito_prefix, ribo_prefix=ribo_prefix,
+                         do_counts=do_counts, do_genes=do_genes, do_mito=do_mito, do_ribo=do_ribo)
+
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=resolution)
     adata = add_cd_scores(adata, is_human)  # add cell death scores
 

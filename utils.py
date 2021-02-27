@@ -1,9 +1,9 @@
 import os
 
-import pegasus as pg
 import pandas as pd
+import pegasus as pg
 
-from config import DATA_DIR
+from config.config import DATA_DIR
 
 
 # check if the dir exists, if not - create it
@@ -12,16 +12,51 @@ def safe_mkdir(path):
         os.mkdir(path)
 
 
+# save all relevant cell info to csv for plots in seurat
+def save_to_csv(adata, path):
+    df = adata.obs
+
+    # add dimensional reductions to data frame
+    df["pca1"] = [t[0] for t in list(adata.obsm["X_pca"])]
+    df["pca2"] = [t[1] for t in list(adata.obsm["X_pca"])]
+
+    # tsne is turned off for now
+    df["umap1"] = [t[0] for t in list(adata.obsm["X_umap"])]
+    df["umap2"] = [t[1] for t in list(adata.obsm["X_umap"])]
+
+    with open(path + "!cells.csv", "w") as fout:
+        fout.write(df.to_csv())  # write df to csv
+
+
+# write markers to csv
+def write_markers(marker_dict, path, min_log_fc=0.25, min_pct=25, max_pval=0.05):
+    frames = []
+    # iterate through all keys in the markers dict
+    for cl in marker_dict.keys():
+        for d in marker_dict[cl].keys():
+            df = marker_dict[cl][d]
+            df['cluster'] = cl
+            df['up/down'] = d
+
+            # filter markers based on log_fc and pct
+            df = df[(df["t_pval"] <= max_pval) & (df["log2FC"] >= min_log_fc) & (
+                    (df["percentage"] >= min_pct) | (df["percentage_other"] >= min_pct))]
+
+            frames.append(df)
+    result = pd.concat(frames)  # merge all marker data frames together
+    with open(path + "!markers.csv", "w") as fout:
+        fout.write(result.to_csv())
+
+
 # function that performs clustering; does dimensional reductions and finds DE genes if specified
 def cluster_data(adata, resolution, compute_markers=False, compute_reductions=False):
     pg.log_norm(adata)
     pg.highly_variable_features(adata, consider_batch=False)
     pg.pca(adata)
-    pg.neighbors(adata, K=20)
+    pg.neighbors(adata, K=20)  # TODO: should we keep K changed
     pg.louvain(adata, resolution=resolution)
 
     if compute_reductions:
-        # pg.fitsne(adata)
         pg.umap(adata)
 
     if compute_markers:
@@ -32,13 +67,13 @@ def cluster_data(adata, resolution, compute_markers=False, compute_reductions=Fa
         return adata
 
 
-def title(s):
+def title(s):  # convert string to title case
     if len(s) == 1:
         return s[0].upper()
     return s[0].upper() + s[1:].lower()
 
 
-def add_cd_scores(adata, is_human):
+def add_cd_scores(adata, is_human):  # add cell death signatures
     if is_human:
         cd1 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd1_signatures.csv").readlines()]
         cd2 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd2_signatures.csv").readlines()]
