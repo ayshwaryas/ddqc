@@ -14,8 +14,9 @@ from utils import safe_mkdir
 def prepare_joint_dir(project, tissue, res):
     # directory with unfiltered clustering
     source_dir = OUTPUT_DIR + project + "/" + tissue + "/" + str(res) + "-none-0/"
-    # directory for saving output
-    results_dir = OUTPUT_DIR + project + "/" + tissue + "/" + str(res) + "-joint_clustering/"
+    task_directory = "{}-joint_clustering".format(res)  # name of the directory for this task
+    task_name = tissue + "-" + task_directory  # task name to put on plots
+    results_dir = OUTPUT_DIR + project + "/" + tissue + "/" + task_directory + "/"  # directory for saving output
 
     # create all the directories, if they dont exist
     print("Creating Joint Directories")
@@ -26,7 +27,7 @@ def prepare_joint_dir(project, tissue, res):
         assert os.path.isfile(source_dir + "!cells.csv")  # check if file exists
         shutil.copyfile(source_dir + file, results_dir + file)
 
-    return results_dir
+    return task_directory, task_name, results_dir
 
 
 # assign colors for joint clustering plot based on which methods retained which cells
@@ -46,7 +47,7 @@ def joint_main(project, task_id, tissue=None):
 
     print("joint clustering task.id:{} - tissue:{}, res:{}, project:{}".format(task_id, tissue, resolution, project))
 
-    results_dir = prepare_joint_dir(project, tissue, resolution)
+    task_directory, task_name, results_dir = prepare_joint_dir(project, tissue, resolution)
     adata = pd.read_csv(results_dir + "!cells.csv")
     adata.set_index(adata["barcodekey"], inplace=True)
     assign_colors(adata, project, tissue, resolution)
@@ -55,9 +56,9 @@ def joint_main(project, task_id, tissue=None):
     with open(results_dir + "!cells.csv", "w") as fout:
         fout.write(adata.to_csv())
 
-    # launch seurat plot script
-    print(subprocess.check_output("Rscript r_fc_plots.R {} {} {} {}".format(project, tissue, resolution, "y"),
-                                  shell=True).decode('UTF-8'))
+    print(
+        subprocess.check_output("Rscript plots/JC_plots.R {} {}".format(task_directory, task_name), shell=True).decode(
+            'UTF-8'))
 
 
 if __name__ == '__main__':

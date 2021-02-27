@@ -57,8 +57,9 @@ def mc_main(project, task_id, tissue=None):
     save_to_csv(adata, results_dir)
 
     # launch R plot script
-    print(subprocess.check_output("Rscript r_plots.R {} {} {} {} {}".format(project, tissue, resolution, method, param),
-                                  shell=True).decode('UTF-8'))
+    print(
+        subprocess.check_output("Rscript plots/MC_plots.R {} {}".format(task_directory, task_name), shell=True).decode(
+            'UTF-8'))
 
 
 if __name__ == '__main__':

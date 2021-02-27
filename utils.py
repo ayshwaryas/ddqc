@@ -102,3 +102,6 @@ def load_markers_dict():
     for index, row in markers.iterrows():
         markers_dict[row["official gene symbol"]] = row["cell type"]
     return markers_dict
+
+
+# TODO: rewrite cell type prediction from python to R
