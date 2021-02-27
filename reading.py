@@ -12,15 +12,15 @@ def get_project_info(project, task_id=None, tissue=None):  # function that parse
     project_tissues = projects[projects['project'] == project]  # subset tissues for the project
     if task_id:  # get info based on task_id
         assert task_id < len(project_tissues['project'])
-        tissue = project_tissues['tissue'][task_id]
-        is_human = project_tissues['is_human'][task_id]
-        annotations = project_tissues['annotations'][task_id]
+        tissue = project_tissues['tissue'][task_id + 1]
+        is_human = project_tissues['is_human'][task_id + 1]
+        annotations = project_tissues['annotations'][task_id + 1]
         return tissue, is_human, annotations
     elif tissue:  # get info based on tissue
-        assert tissue in project_tissues['tissue']
+        assert tissue in set(project_tissues['tissue'])
         tissue_info = projects[project_tissues['tissue'] == tissue]
-        is_human = tissue_info['is_human'][0]
-        annotations = tissue_info['annotations'][0]
+        is_human = tissue_info['is_human'][1]
+        annotations = tissue_info['annotations'][1]
         return is_human, annotations
     else:  # if no tissue or task_id provided return pandas project with project info
         return project_tissues

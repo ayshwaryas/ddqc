@@ -34,10 +34,7 @@ def mc_main(project, task_id, tissue=None):
     method, param = MC_METHODS[task_id % MC_TASKS_PER_TISSUE]
     print("Method comparison task_id:{} - tissue:{}, res:{}, method:{}, param:{}, project:{}".format(task_id, tissue,
                                                                                                      resolution, method,
-                                                                                                     param, project,
-                                                                                                     do_counts,
-                                                                                                     do_genes, do_mito,
-                                                                                                     do_ribo))
+                                                                                                     param, project))
 
     task_directory, task_name, results_dir = create_dirs(project, tissue, resolution, method, param)
 
@@ -68,7 +65,8 @@ if __name__ == '__main__':
         t_id = int(input("Task ID (-1 to input specific tissue): ").strip())
         if t_id == -1:
             tiss = input("Tissue: ").strip()
-            mc_main(proj, 0, tissue=tiss)
+            t_id = input("Method ID (0-3):").strip()
+            mc_main(proj, t_id, tissue=tiss)
         else:
             mc_main(proj, t_id)
     else:  # project and task id are provided as commandline args

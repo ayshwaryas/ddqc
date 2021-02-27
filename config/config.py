@@ -1,4 +1,4 @@
-from local_config import local
+from config.local_config import local
 
 
 LOCAL = local  # needed for running outside the cluster
