@@ -12,9 +12,9 @@ def get_project_info(project, task_id=None, tissue=None):  # function that parse
     project_tissues = projects[projects['project'] == project]  # subset tissues for the project
     if task_id:  # get info based on task_id
         assert task_id < len(project_tissues['project'])
-        tissue = project_tissues['tissue'][task_id + 1]
-        is_human = project_tissues['is_human'][task_id + 1]
-        annotations = project_tissues['annotations'][task_id + 1]
+        tissue = project_tissues['tissue'][task_id]
+        is_human = project_tissues['is_human'][task_id]
+        annotations = project_tissues['annotations'][task_id]
         return tissue, is_human, annotations
     elif tissue:  # get info based on tissue
         assert tissue in set(project_tissues['tissue'])

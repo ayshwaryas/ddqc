@@ -4,7 +4,7 @@ import sys
 from config.config import *
 from filtering import filter_cells
 from reading import read_tissue, get_project_info
-from utils import cluster_data, safe_mkdir, add_cd_scores, write_markers, save_to_csv
+from utils import cluster_data, safe_mkdir, add_cd_scores, marker_dict_to_df, adata_to_df, assign_cell_types
 
 
 # function that creates all the relevant directories
@@ -47,15 +47,20 @@ def mc_main(project, task_id, tissue=None):
 
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=resolution)
     adata = add_cd_scores(adata, is_human)  # add cell death scores
+    markers = marker_dict_to_df(marker_dict)
+    clusters = assign_cell_types(adata, markers)
 
     # write the results
     print("Writing results")
-    write_markers(marker_dict, results_dir)
-    save_to_csv(adata, results_dir)
+    adata_to_df(adata, results_dir)
+    with open(results_dir + "!clusters.csv", "w") as fout:
+        fout.write(clusters.to_csv())
+    with open(results_dir + "!markers.csv", "w") as fout:
+        fout.write(markers.to_csv())
 
     # launch R plot script
     print(
-        subprocess.check_output("Rscript plots/MC_plots.R {} {}".format(task_directory, task_name), shell=True).decode(
+        subprocess.check_output("Rscript plots/MC_plots.R {} {}".format(task_name, results_dir), shell=True).decode(
             'UTF-8'))
 
 
