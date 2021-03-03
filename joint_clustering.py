@@ -57,8 +57,8 @@ def joint_main(project, task_id, tissue=None):
         fout.write(adata.to_csv())
 
     print(
-        subprocess.check_output("Rscript plots/JC_plots.R {} {}".format(task_name, results_dir), shell=True).decode(
-            'UTF-8'))
+        subprocess.check_output("Rscript plots/plotting.R {} {} {}".format(task_name, results_dir, "joint"),
+                                shell=True).decode('UTF-8'))
 
 
 if __name__ == '__main__':

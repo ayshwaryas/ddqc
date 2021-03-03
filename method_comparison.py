@@ -4,12 +4,12 @@ import sys
 from config.config import *
 from filtering import filter_cells
 from reading import read_tissue, get_project_info
-from utils import cluster_data, safe_mkdir, add_cd_scores, marker_dict_to_df, adata_to_df, assign_cell_types
+from utils import cluster_data, safe_mkdir, add_cd_scores, marker_dict_to_df, save_to_csv, assign_cell_types
 
 
 # function that creates all the relevant directories
 def create_dirs(project, tissue, res, method, param):
-    task_directory = "{}-{}-{}".format(res, param, method)  # name of the directory for this task
+    task_directory = "{}-{}-{}".format(res, method, param)  # name of the directory for this task
     task_name = tissue + "-" + task_directory  # task name to put on plots
     results_dir = OUTPUT_DIR + project + "/" + tissue + "/" + task_directory + "/"  # directory for saving output
 
@@ -52,7 +52,7 @@ def mc_main(project, task_id, tissue=None):
 
     # write the results
     print("Writing results")
-    adata_to_df(adata, results_dir)
+    save_to_csv(adata, results_dir)
     with open(results_dir + "!clusters.csv", "w") as fout:
         fout.write(clusters.to_csv())
     with open(results_dir + "!markers.csv", "w") as fout:
@@ -60,8 +60,8 @@ def mc_main(project, task_id, tissue=None):
 
     # launch R plot script
     print(
-        subprocess.check_output("Rscript plots/MC_plots.R {} {}".format(task_name, results_dir), shell=True).decode(
-            'UTF-8'))
+        subprocess.check_output("Rscript plots/plotting.R {} {} {}".format(task_name, results_dir, "mc"),
+                                shell=True).decode('UTF-8'))
 
 
 if __name__ == '__main__':

@@ -107,7 +107,7 @@ def format_markers(markers, n=25):  # take top 25 markers from the list, and sep
 # assign cell types, annotations, and calculate cluster statistics
 # min_sg is how many score genes are required to call the cell type for the cluster
 def assign_cell_types(adata, markers, min_sg=3):
-    print("Assigning Annotations and Cell Types to Clusters")
+    print("Assigning annotations and cell types to clusters")
     genes = pd.read_csv(DATA_DIR + "markers.tsv", sep="\t")  # read panglaoDB genes to cell types table
     colnames = ["cluster", "annotation", "annotation2", "%annotation", "%annotation2", "cell_type", "cell_type2",
                 "n_cells", "genes_mean", "genes_median", "mito_mean", "mito_median", "ribo_mean", "ribo_median",
@@ -179,5 +179,7 @@ def assign_cell_types(adata, markers, min_sg=3):
         clusters_dict["ribo_median"].append(np.median(cluster.obs.percent_ribo))
 
         clusters_dict["markers"].append(format_markers(list(cluster_markers.index)))
+
+        print("Cluster {} finished".format(cl))
 
     return pd.DataFrame.from_dict(clusters_dict)  # convert dict to pandas df

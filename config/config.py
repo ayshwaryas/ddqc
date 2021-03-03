@@ -24,7 +24,7 @@ resolution = 1.4  # this resolution gives results closest to seurat
 # FILTERING
 basic_genes_filter = 100  # basic nGenes filter (performed for all methods)
 basic_mito_filter = 80
-MITO_PREFIXES = {"human": "MT-", "mouse": "Mt-"}  # prefixes of mitochondrial genes
+MITO_PREFIXES = {"human": "MT-", "mouse": "mt-"}  # prefixes of mitochondrial genes
 # TODO: check ribo prefix
 RIBO_PREFIXES = {"human": "^Rp[sl]\d", "mouse": "^Rp[sl]\d"}  # prefixes of ribosomal genes
 
