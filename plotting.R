@@ -5,6 +5,9 @@ library(cowplot)
 theme_horizontal <- theme(axis.text.x = element_text(angle = 45, size=15, hjust=1, face="bold"), 
                           axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), 
                           legend.position="none", axis.title.x=element_blank(), plot.title = element_text(size = 20, face = "bold"))
+theme_horizontal_with_legend <- theme(axis.text.x = element_text(angle = 45, size=15, hjust=1, face="bold"), 
+                          axis.text.y = element_text(size=15), axis.title.y = element_text(size=15), 
+                          axis.title.x=element_blank(), plot.title = element_text(size = 20, face = "bold"))
 theme_vertical <- theme(axis.text.x = element_text(size=15), axis.text.y = element_text(size=15, face="bold"), 
                         axis.title.x = element_text(size=15), legend.position="none", axis.title.y=element_blank(), 
                         plot.title = element_text(size = 20, face = "bold"))
@@ -129,7 +132,7 @@ generateFCPlots <- function(obj, lbls) {
   data <- data.frame(UMAP1 = obj$umap1, UMAP2 = obj$umap2, cluster = obj$louvain_labels, color=obj$color, annotation=obj$annotations)
   
   
-  fltplot <- ggplot(data, aes(x=UMAP_1, y=UMAP_2, color=color, fill=cluster)) + geom_point(size = 1) + 
+  fltplot <- ggplot(data, aes(x=UMAP1, y=UMAP2, color=color, fill=cluster)) + geom_point(size = 1) + 
     theme_umap + guides(colour = guide_legend(override.aes = list(size=2))) + 
     scale_fill_discrete(labels = lbls) + scale_color_manual(values = plot.cols) + ttl
    
@@ -152,12 +155,12 @@ generateFCPlots <- function(obj, lbls) {
   }
   data1 <- data.frame(color=table.color, cluster = as.factor(table.cluster), freq=as.double(as.character(table.freq)) * 100)
   
-  freqplot <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + theme_horizontal + ttl
+  freqplot <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + theme_horizontal_with_legend + ttl
   
   #write plots
   n.clusters <- length(levels(obj$louvain_labels))
-  ggsave1(filename = paste0(results.dir, "!filterplot.pdf"), plot=fltplot, n.clusters = n.clusters, type = "u")
-  ggsave1(filename = paste0(results.dir, "!barplot.pdf"), plot=freqplot, n.clusters=n.clusters, type = "h")
+  ggsave1(filename = paste0(results.dir, "!p_filterplot.pdf"), plot=fltplot, n.clusters = n.clusters, type = "u")
+  ggsave1(filename = paste0(results.dir, "!p_barplot.pdf"), plot=freqplot, n.clusters=n.clusters, type = "h")
 }
 
 generatePlots <- function(obj, cell.types, joint=FALSE) { #main plots function

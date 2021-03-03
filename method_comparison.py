@@ -60,7 +60,7 @@ def mc_main(project, task_id, tissue=None):
 
     # launch R plot script
     print(
-        subprocess.check_output("Rscript plots/plotting.R {} {} {}".format(task_name, results_dir, "mc"),
+        subprocess.check_output("Rscript plotting.R {} {} {}".format(task_name, results_dir, "mc"),
                                 shell=True).decode('UTF-8'))
 
 

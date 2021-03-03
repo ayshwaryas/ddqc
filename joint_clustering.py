@@ -35,9 +35,9 @@ def assign_colors(adata, project, tissue, res):
     mad_cells = pd.read_csv(OUTPUT_DIR + project + "/" + tissue + "/" + str(res) + "-mad-2/!cells.csv")
     cutoff_cells = pd.read_csv(OUTPUT_DIR + project + "/" + tissue + "/" + str(res) + "-cutoff-10/!cells.csv")
     adata["color"] = "Neither"
-    adata["color"][mad_cells["barcodekey"]] = "MAD2 only"
-    adata["color"][cutoff_cells["barcodekey"]] = "Cutoff only"
-    adata["color"][list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"])))] = "All"
+    adata.loc[mad_cells["barcodekey"], "color"] = "MAD2 only"
+    adata.loc[cutoff_cells["barcodekey"], "color"] = "Cutoff only"
+    adata.loc[list(set(cutoff_cells["barcodekey"]).intersection(set(mad_cells["barcodekey"]))), "color"] = "All"
     return adata
 
 
@@ -57,7 +57,7 @@ def joint_main(project, task_id, tissue=None):
         fout.write(adata.to_csv())
 
     print(
-        subprocess.check_output("Rscript plots/plotting.R {} {} {}".format(task_name, results_dir, "joint"),
+        subprocess.check_output("Rscript plotting.R {} {} {}".format(task_name, results_dir, "joint"),
                                 shell=True).decode('UTF-8'))
 
 
