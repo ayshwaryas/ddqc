@@ -30,7 +30,7 @@ renaming_dict = {
 with open(path + "projects.csv", "w") as fout:
     fout.write("project,tissue,is_human,annotations\n")
 
-for project in ["mc_tm"]:  # N_TISSUES_PROJ.keys():
+for project in N_TISSUES_PROJ.keys():
     new_project = renaming_dict[project]
     safe_mkdir(path + new_project)
     for task_id in range(N_TISSUES_PROJ[project]):
