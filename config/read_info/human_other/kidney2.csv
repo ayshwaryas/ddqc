@@ -1,0 +1,4 @@
+Sample,Location,Reference
+kidney2,human/other/kidney2/kidney2/matrix.mtx,GRCh38
+kidney3,human/other/kidney2/kidney3/matrix.mtx,GRCh38
+kidney1,human/other/kidney2/kidney1/matrix.mtx,GRCh38

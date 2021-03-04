@@ -1,0 +1,15 @@
+project,tissue,is_human,annotations
+tabula_muris,Bladder,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Heart_and_Aorta,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Kidney,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Limb_Muscle,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Liver,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Lung,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Mammary_Gland,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Marrow,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Spleen,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Thymus,False,mouse/tabula_muris/annotations_droplet.csv
+tabula_muris,Trachea,False,mouse/tabula_muris/annotations_droplet.csv
+
+
+

@@ -18,7 +18,7 @@ def get_project_info(project, task_id=None, tissue=None):  # function that parse
         return tissue, is_human, annotations
     elif tissue:  # get info based on tissue
         assert tissue in set(project_tissues['tissue'])
-        tissue_info = projects[project_tissues['tissue'] == tissue]
+        tissue_info = project_tissues[project_tissues['tissue'] == tissue]
         is_human = tissue_info['is_human'][1]
         annotations = tissue_info['annotations'][1]
         return is_human, annotations
@@ -39,7 +39,10 @@ def read_tissue(project, tissue, annotations="Unknown"):  # function that reads 
 
     # add annotations to adata
     if annotations != 'Unknown':  # TODO: Add Annotations Support
-        adata.obs['annotations'] = 'Unknown'
+        ann_df = pd.read_csv(DATA_DIR + annotations)
+        ann_df = ann_df.reindex(adata.obs.index)["annotations"]
+        ann_df = ann_df.fillna("Unknown")
+        adata.obs["annotations"] = ann_df
     else:
         adata.obs['annotations'] = 'Unknown'
     return adata
