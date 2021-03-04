@@ -54,16 +54,16 @@ def marker_dict_to_df(marker_dict, min_log_fc=0.25, min_pct=25, max_pval=0.05):
 # function that performs clustering; does dimensional reductions and finds DE genes if specified
 def cluster_data(adata, resolution, compute_markers=False, compute_reductions=False):
     pg.log_norm(adata)
-    pg.highly_variable_features(adata, consider_batch=False)
-    pg.pca(adata)
-    pg.neighbors(adata, K=20)  # TODO: should we keep K changed
-    pg.louvain(adata, resolution=resolution)
+    pg.highly_variable_features(adata, consider_batch=False, random_state=29)
+    pg.pca(adata, random_state=29)
+    pg.neighbors(adata, K=20, random_state=29)  # TODO: should we keep K changed
+    pg.louvain(adata, resolution=resolution, random_state=29)
 
     if compute_reductions:
-        pg.umap(adata)
+        pg.umap(adata, random_state=29)
 
     if compute_markers:
-        pg.de_analysis(adata, cluster='louvain_labels', t=True, fisher=False, temp_folder="/tmp")
+        pg.de_analysis(adata, cluster='louvain_labels', t=True, fisher=False, temp_folder="/tmp", random_state=29)
         marker_dict = pg.markers(adata, alpha=1)
         return adata, marker_dict
     else:
