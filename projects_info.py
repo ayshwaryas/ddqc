@@ -1,9 +1,9 @@
 N_TISSUES_PROJ = {"mc_tm": 12, "mc_ts24": 15, "mc_ts30": 10, "mc_ebi_tm": 22, "mc_ebi": 13, "mc_mca": 24,
                   "mc_other_10X": 5, "mc_hca": 35, "mc_other": 4, "mc_PanglaoDB": 8, "mc_brain": 1, "mc_blood": 1,
-                  "mc_olfactory_epithelium": 1, "mc_heart_circulation": 1}
+                  "mc_olfactory_epithelium": 1, "mc_heart_circulation": 1, "mc_krasnow_lung": 1}
 IS_HUMAN_PROJ = {"mc_tm": False, "mc_ts24": False, "mc_ts30": False, "mc_ebi_tm": False, "mc_ebi": True, "mc_mca": False,
                  "mc_other_10X": True, "mc_hca": True, "mc_other": True, "mc_PanglaoDB": True, "mc_brain": True,
-                 "mc_blood": True, "mc_olfactory_epithelium": True, "mc_heart_circulation": True}
+                 "mc_blood": True, "mc_olfactory_epithelium": True, "mc_heart_circulation": True, "mc_krasnow_lung": True}
 
 
 def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
@@ -51,6 +51,8 @@ def get_tissue_by_task_id(dataset, task_id, tasks_per_tiss):
         tissues = ("olfactory_epithelium",)
     elif dataset == "mc_heart_circulation" or dataset == "heart_circulation":
         tissues = ("Heart_Circulation",)
+    elif dataset == "mc_krasnow_lung" or dataset == "krasnow_lung":
+        tissues = ("krasnow_lung",)
     else:
         return None
     return tissues[task_id // tasks_per_tiss]
