@@ -27,12 +27,11 @@ renaming_dict = {
     "mc_krasnow_lung": "human_other",
 }
 
-with open(path + "projects.csv", "w") as fout:
-    fout.write("project,tissue,is_human,annotations\n")
+# with open(path + "projects.csv", "w") as fout:
+#    fout.write("project,tissue,is_human,annotations\n")
 
 for project in N_TISSUES_PROJ.keys():
-    if project in ["ebi_sc_experiment", "human_tissue_atlas", "mouse_cell_atlas", "tabula_muris",
-                   "tabula_muris_smartseq2", "tabula_senis_24m", "tabula_senis_30m"]:
+    if project not in ["mc_olfactory_epithelium", "mc_heart_circulation", "mc_krasnow_lung"]:
         continue
     new_project = renaming_dict[project]
     safe_mkdir(path + new_project)
