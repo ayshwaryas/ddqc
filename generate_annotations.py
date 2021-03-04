@@ -31,6 +31,9 @@ with open(path + "projects.csv", "w") as fout:
     fout.write("project,tissue,is_human,annotations\n")
 
 for project in N_TISSUES_PROJ.keys():
+    if project in ["ebi_sc_experiment", "human_tissue_atlas", "mouse_cell_atlas", "tabula_muris",
+                   "tabula_muris_smartseq2", "tabula_senis_24m", "tabula_senis_30m"]:
+        continue
     new_project = renaming_dict[project]
     safe_mkdir(path + new_project)
     for task_id in range(N_TISSUES_PROJ[project]):
