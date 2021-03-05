@@ -29,7 +29,7 @@ def mc_main(project, task_id, tissue=None):
     else:
         is_human, annotations = get_project_info(project, tissue=tissue)
 
-    adata = read_tissue(project, tissue)
+    adata = read_tissue(project, tissue, annotations)
 
     method, param = MC_METHODS[task_id % MC_TASKS_PER_TISSUE]
     print("Method comparison task_id:{} - tissue:{}, res:{}, method:{}, param:{}, project:{}".format(task_id, tissue,
@@ -43,7 +43,8 @@ def mc_main(project, task_id, tissue=None):
     ribo_prefix = RIBO_PREFIXES["human"] if is_human else RIBO_PREFIXES["mouse"]
     adata = filter_cells(adata, resolution, method, param, basic_n_genes=basic_genes_filter,
                          basic_percent_mito=basic_mito_filter, mito_prefix=mito_prefix, ribo_prefix=ribo_prefix,
-                         do_counts=do_counts, do_genes=do_genes, do_mito=do_mito, do_ribo=do_ribo)
+                         do_counts=do_counts, do_genes=do_genes, do_mito=do_mito, do_ribo=do_ribo,
+                         record_path=results_dir)
 
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=resolution)
     adata = add_cd_scores(adata, is_human)  # add cell death scores

@@ -60,7 +60,7 @@ DimPlotContinuous <- function(obj, metric.name.pg, metric.name, lbls, log2=FALSE
 
 DimPlotCluster <- function(obj, lbls) { #DimPlot colored by cluster
   data <- data.frame(UMAP1 = obj$umap1, UMAP2 = obj$umap2, cluster = obj$louvain_labels)
-  plot <- ggplot(data, aes(x=UMAP1, y=UMAP2, color=cluster)) + geom_point(size = 1) + theme_umap + ttl
+  plot <- ggplot(data, aes(x=UMAP1, y=UMAP2, color=cluster, fill=cluster)) + geom_point(size = 1) + theme_umap + ttl + scale_fill_discrete(labels = lbls)
   for (cl in levels(obj$louvain_labels)) { #add cluster labels
     cluster.data <- subset(data, cluster == cl)
     plot <- plot + annotate("text", x = mean(cluster.data$UMAP1), y = mean(cluster.data$UMAP2), label=cl, size = 7, fontface=2)
@@ -127,8 +127,7 @@ generatePlotsByMetric <- function(obj, lbls, metric.name.pg, metric.name, name.s
 }
 
 generateFCPlots <- function(obj, lbls) {
-  plot.cols <- c("Cutoff only" = "#4A3933", "MAD2 only" = "#16697A",
-                 "All" = "#FFA62B" , "Neither" = "#AAAAAA") #to keep consistent plot colors
+  plot.cols <- c("Cutoff only" = "#DB6400", "MAD2 only" = "#16697A","All" = "#FFA62B" , "Neither" = "#99A8B2") #to keep consistent plot colors
   data <- data.frame(UMAP1 = obj$umap1, UMAP2 = obj$umap2, cluster = obj$louvain_labels, color=obj$color, annotation=obj$annotations)
   
   
@@ -155,7 +154,7 @@ generateFCPlots <- function(obj, lbls) {
   }
   data1 <- data.frame(color=table.color, cluster = as.factor(table.cluster), freq=as.double(as.character(table.freq)) * 100)
   
-  freqplot <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + theme_horizontal_with_legend + ttl
+  freqplot <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + theme_horizontal_with_legend + ttl + scale_fill_manual(values = plot.cols)
   
   #write plots
   n.clusters <- length(levels(obj$louvain_labels))
@@ -170,6 +169,7 @@ generatePlots <- function(obj, cell.types, joint=FALSE) { #main plots function
     lbls <- c(lbls, paste0(i, " ", cell.types[i]))
   }
   ttl <<- ggtitle(task.name)
+  names(lbls) <- 1:(length(lbls))
   
   generatePlotsByMetric(obj, lbls, "n_counts", "Number of UMIS", "count") #nUMI plots
   generatePlotsByMetric(obj, lbls, "n_genes", "Number of Genes", "genes") #nGenes plots

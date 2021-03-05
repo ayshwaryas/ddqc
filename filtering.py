@@ -95,7 +95,7 @@ def metric_filter(adata, method, param, metric_name, do_lower_co=False, do_upper
     if record_path is not None:
         with open(record_path + "!filtered_" + metric_name[metric_name.find("_") + 1:] + ".csv", "w") as file:
             # write the cells that failed the filtering to the csv
-            file.write(adata[adata.obs[metric_name + "_qc_pass"] is False].obs.to_csv())
+            file.write(adata[adata.obs[metric_name + "_qc_pass"] == False].obs.to_csv())
     return adata
 
 

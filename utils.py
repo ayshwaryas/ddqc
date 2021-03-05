@@ -54,7 +54,7 @@ def marker_dict_to_df(marker_dict, min_log_fc=0.25, min_pct=25, max_pval=0.05):
 # function that performs clustering; does dimensional reductions and finds DE genes if specified
 def cluster_data(adata, resolution, compute_markers=False, compute_reductions=False):
     pg.log_norm(adata)
-    pg.highly_variable_features(adata, consider_batch=False, random_state=29)
+    pg.highly_variable_features(adata, consider_batch=False)
     pg.pca(adata, random_state=29)
     pg.neighbors(adata, K=20, random_state=29)  # TODO: should we keep K changed
     pg.louvain(adata, resolution=resolution, random_state=29)
@@ -63,7 +63,7 @@ def cluster_data(adata, resolution, compute_markers=False, compute_reductions=Fa
         pg.umap(adata, random_state=29)
 
     if compute_markers:
-        pg.de_analysis(adata, cluster='louvain_labels', t=True, fisher=False, temp_folder="/tmp", random_state=29)
+        pg.de_analysis(adata, cluster='louvain_labels', t=True, fisher=False, temp_folder="/tmp")
         marker_dict = pg.markers(adata, alpha=1)
         return adata, marker_dict
     else:
@@ -99,9 +99,9 @@ def add_cd_scores(adata, is_human):  # add cell death signatures
 
 def format_markers(markers, n=25):  # take top 25 markers from the list, and separate them with ;
     if len(markers) > 0:
-        return "; ".join(markers[:max(n, len(markers))])
+        return "; ".join(markers[:min(n, len(markers))])
     else:  # if markers list is empty return empty string
-        return ""
+        return [""]
 
 
 # assign cell types, annotations, and calculate cluster statistics
@@ -160,10 +160,10 @@ def assign_cell_types(adata, markers, min_sg=3):
         cl_anno = list(cluster.obs.annotations)
         most_common = Counter(cl_anno).most_common()
         clusters_dict["annotation"].append(most_common[0][0])
-        clusters_dict["%annotation"].append(most_common[0][1] / len(cl_anno))
+        clusters_dict["%annotation"].append(round(most_common[0][1] / len(cl_anno), 3))
         if len(most_common) > 1:  # more than one annotation
             clusters_dict["annotation2"].append(most_common[1][0])
-            clusters_dict["%annotation2"].append(most_common[1][1] / len(cl_anno))
+            clusters_dict["%annotation2"].append(round(most_common[1][1] / len(cl_anno), 3))
         else:  # only one annotation
             clusters_dict["annotation2"].append("")
             clusters_dict["%annotation2"].append(0)
@@ -171,12 +171,12 @@ def assign_cell_types(adata, markers, min_sg=3):
         # record cluster statistics and markers
         clusters_dict["cluster"].append(cl)
         clusters_dict["n_cells"].append(len(cl_anno))
-        clusters_dict["genes_mean"].append(np.mean(cluster.obs.n_genes))
-        clusters_dict["genes_median"].append(np.median(cluster.obs.n_genes))
-        clusters_dict["mito_mean"].append(np.mean(cluster.obs.percent_mito))
-        clusters_dict["mito_median"].append(np.median(cluster.obs.percent_mito))
-        clusters_dict["ribo_mean"].append(np.mean(cluster.obs.percent_ribo))
-        clusters_dict["ribo_median"].append(np.median(cluster.obs.percent_ribo))
+        clusters_dict["genes_mean"].append(round(float(np.mean(cluster.obs.n_genes)), 3))
+        clusters_dict["genes_median"].append(round(float(np.median(cluster.obs.n_genes)), 3))
+        clusters_dict["mito_mean"].append(round(float(np.mean(cluster.obs.percent_mito)), 3))
+        clusters_dict["mito_median"].append(round(float(np.median(cluster.obs.percent_mito)), 3))
+        clusters_dict["ribo_mean"].append(round(float(np.mean(cluster.obs.percent_ribo)), 3))
+        clusters_dict["ribo_median"].append(round(float(np.median(cluster.obs.percent_ribo)), 3))
 
         clusters_dict["markers"].append(format_markers(list(cluster_markers.index)))
 

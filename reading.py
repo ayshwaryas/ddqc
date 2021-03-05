@@ -12,15 +12,15 @@ def get_project_info(project, task_id=None, tissue=None):  # function that parse
     project_tissues = projects[projects['project'] == project]  # subset tissues for the project
     if task_id:  # get info based on task_id
         assert task_id < len(project_tissues['project'])
-        tissue = project_tissues['tissue'][task_id]
-        is_human = project_tissues['is_human'][task_id]
-        annotations = project_tissues['annotations'][task_id]
+        tissue = list(project_tissues['tissue'])[task_id]
+        is_human = list(project_tissues['is_human'])[task_id]
+        annotations = list(project_tissues['annotations'])[task_id]
         return tissue, is_human, annotations
     elif tissue:  # get info based on tissue
         assert tissue in set(project_tissues['tissue'])
         tissue_info = project_tissues[project_tissues['tissue'] == tissue]
-        is_human = tissue_info['is_human'][1]
-        annotations = tissue_info['annotations'][1]
+        is_human = list(tissue_info['is_human'])[0]
+        annotations = list(tissue_info['annotations'])[0]
         return is_human, annotations
     else:  # if no tissue or task_id provided return pandas project with project info
         return project_tissues
@@ -38,11 +38,13 @@ def read_tissue(project, tissue, annotations="Unknown"):  # function that reads 
     os.remove(read_info_filename)  # remove current read info copy
 
     # add annotations to adata
-    if annotations != 'Unknown':  # TODO: Add Annotations Support
+    if annotations != 'Unknown':
         ann_df = pd.read_csv(DATA_DIR + annotations)
-        ann_df = ann_df.reindex(adata.obs.index)["annotations"]
-        ann_df = ann_df.fillna("Unknown")
-        adata.obs["annotations"] = ann_df
+        annotations_cell_type = ann_df["annotations"]
+        annotations_cell_type.index = ann_df["barcodekey"]
+        annotations_cell_type = annotations_cell_type.reindex(adata.obs.index)
+        annotations_cell_type = annotations_cell_type.fillna("Unknown")
+        adata.obs["annotations"] = annotations_cell_type
     else:
         adata.obs['annotations'] = 'Unknown'
     return adata
