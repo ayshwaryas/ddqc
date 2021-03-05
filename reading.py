@@ -33,6 +33,8 @@ def read_tissue(project, tissue, annotations="Unknown"):  # function that reads 
     read_info_filename = "read_info_{}_{}.csv".format(project, tissue)  # filename of a current read info copy
     assert os.path.isfile(dataset_list_path)  # check if tissue read info exists
     dataset_list = pd.read_csv(dataset_list_path)
+    if annotations == "Absolute":  # if data is stored outside DATA_DIR and csv had a direct path
+        pass
     dataset_list['Location'] = [DATA_DIR + t for t in dataset_list['Location']]  # update location with relevant directory prefix
     with open(read_info_filename, "w") as fout:  # write modified csv
         fout.write(dataset_list.to_csv())
