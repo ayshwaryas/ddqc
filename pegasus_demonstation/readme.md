@@ -1,19 +1,37 @@
-### This directory contains all relevant files for implementation of the data-driven filtering approach in Pegasus.
+### filtering.py contains all code for Data-Driven QC
 
-Desription of the files:
-filtering_notebook.ipynb: contains all functions for data-driven aproach. Functions and Parameters:
-- cluster_data: function that performs clustering; does dimensional reductions and finds DE genes if specified.
--mad: calculates median absolute deviation on a numpy array. Constant is to make it behave similar to R MAD
-- calculate_percent_ribo: calculates percent ribo for adata. This code is taken from PG calculation of percent mito
-- initial_qc: basic qc that is performed for each method
-- metric_filter: function that performs filtering on the specified metric
-- filter_cells: wrapper function that filters data for the metrics selected
-- res: parameter for clustering resolution
-- method: parameter for filtering method (none - no additional filtering; cutoff - min 200 genes, max 10% mito; outlier and mad - data driven methods)
-- param: parameter for filtering method parameter (only relevant for mad, determines how many MADs from median is allowed)
-- path: path to the data
-
-Instructions for running:
-Have pegasus and numpy installed. Set the parameters and run each cell of the notebook. As a result you will get filtered and clustered adata object and 4 files with the list of the cells filtered out based on each metric (counts, genes, mito, ribo).
-
-
+####Description of functions:
+ - cluster_data: performs default clustering(log normalization, HVG, PCA, neighbours, and louvain). Parameters:
+   - adata: AnnData or MultimodalData Object
+   - resolution: clustering resolution used in louvain
+ - mad: finds Median Absolute Deviation for a numpy array
+ - calculate_percent_ribo: calculates percent_ribo similar to how pegasus calculates percent mito. Parameters:
+   - adata: AnnData or MultimodalData Object
+   - ribo_prefix: string of regular expressions for ribosomal genes, separated by comma
+ - initial_qc: does basic threshold QC based on number of genes and percent_mito. Also, identifies robust genes. Parameters:
+   - adata: AnnData or MultimodalData Object
+   - n_genes: lower threshold for n_genes
+   - percent_mito: upper threshold for percent_mito
+   - mito_prefix: mitochondrial genes prefix
+   - ribo_prefix: ribosomal genes prefix
+ - metric_filter: performs filtering on a specified metric. Data must be clustered and metric must exist in obs. Parameters:
+   - adata: AnnData or MultimodalData Object
+   - method: method name for filtering (mad, outlier, cutoff)
+   - param: parameter for the selected method
+   - metric_name: name of the metric (must be in adata.obs)
+   - do_upper_co and do_lower_co: whether to do upper and lower cutoff (default: False)
+   - record_path: path for recording filtered cells CSVs (keep it None if not needed) (default: None)
+ - filter_cells: performs DDQC for selected metrics. Parameters:
+   - adata: AnnData or MultimodalData Object
+   - res: clustering resolution (default 1.3)  
+   - method: method name for filtering (mad, outlier, cutoff) (default mad)
+   - threshold: parameter for the selected method (default 2)
+   - basic_n_genes: cutoff for basic filtering of n_genes (default 100)
+   - basic_percent_mito: cutoff for basic filtering of n_genes (default 80)
+   - mito_prefix: mitochondrial genes prefix (default "MT-")
+   - ribo_prefix: ribosomal genes prefix (default "^Rp[sl]\d")
+   - do_metric - set to true, if you want to filter the data based on metric (lower filtering for n_counts and n_genes, and higher filtering for percent_mito and percent_ribo)
+   - record_path: path for recording filtered cells CSVs (keep it None if not needed) (default: None) 
+    
+Requirements:
+Pegasus, numpy
