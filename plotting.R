@@ -154,7 +154,7 @@ generateFCPlots <- function(obj, lbls) {
   }
   data1 <- data.frame(color=table.color, cluster = as.factor(table.cluster), freq=as.double(as.character(table.freq)) * 100)
   
-  freqplot <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + theme_horizontal_with_legend + ttl + scale_fill_manual(values = plot.cols)
+  freqplot <- ggplot(data1, aes(x=cluster, y=freq, fill=color)) + geom_bar(stat="identity") + theme_horizontal_with_legend + ttl + scale_fill_manual(values = plot.cols) + scale_x_discrete(labels=lbls)
   
   #write plots
   n.clusters <- length(levels(obj$louvain_labels))

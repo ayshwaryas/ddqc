@@ -56,7 +56,7 @@ def cluster_data(adata, resolution, compute_markers=False, compute_reductions=Fa
     pg.log_norm(adata)
     pg.highly_variable_features(adata, consider_batch=False)
     pg.pca(adata, random_state=29)
-    pg.neighbors(adata, K=20, random_state=29)  # TODO: should we keep K changed
+    pg.neighbors(adata, K=20, random_state=29)
     pg.louvain(adata, resolution=resolution, random_state=29)
 
     if compute_reductions:
@@ -77,23 +77,21 @@ def title(s):  # convert string to title case
 
 
 def add_cd_scores(adata, is_human):  # add cell death signatures
-    if is_human:
-        cd1 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd1_signatures.csv").readlines()]
-        cd2 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd2_signatures.csv").readlines()]
-        cd3 = [t.strip().upper() for t in open(DATA_DIR + "signatures/cd3_signatures.csv").readlines()]
-        mito = "mitochondrial_genes_human"
-        ribo = "ribosomal_genes_human"
-    else:
-        cd1 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd1_signatures.csv").readlines()]
-        cd2 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd2_signatures.csv").readlines()]
-        cd3 = [title(t.strip()) for t in open(DATA_DIR + "signatures/cd3_signatures.csv").readlines()]
-        mito = "mitochondrial_genes_mouse"
-        ribo = "ribosomal_genes_mouse"
-    signatures = {"cd1": cd1, "cd2": cd2, "cd3": cd3}
-
+    signature_dir = DATA_DIR + "signatures/"
+    signature_list = pd.read_csv(signature_dir + "signatures_info.csv")
+    signatures = dict()
+    for i, row in signature_list.iterrows():
+        if is_human and row["do_human"]:
+            if row["name"].startswith("pg_"):
+                pg.calc_signature_score(adata, row["file"])
+            else:
+                signatures[row["name"]] = [t.strip().upper() for t in open(signature_dir + row["file"]).readlines()]
+        elif not is_human and row["do_mouse"]:
+            if row["name"].startswith("pg_"):
+                pg.calc_signature_score(adata, row["file"])
+            else:
+                signatures[row["name"]] = [title(t.strip()) for t in open(signature_dir + row["file"]).readlines()]
     pg.calc_signature_score(adata, signatures)
-    pg.calc_signature_score(adata, mito)
-    pg.calc_signature_score(adata, ribo)
     return adata
 
 

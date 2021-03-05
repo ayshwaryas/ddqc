@@ -6,8 +6,10 @@ import pegasusio as io
 from config.config import DATA_DIR
 
 
-def get_project_info(project, task_id=None, tissue=None):  # function that parses projects.csv and returns relevant info
+def get_project_info(project=None, task_id=None, tissue=None):  # function that parses projects.csv and returns relevant info
     projects = pd.read_csv("config/read_info/projects.csv")
+    if project is None:
+        return projects
     assert project in set(projects['project'])  # check if project exists in project list
     project_tissues = projects[projects['project'] == project]  # subset tissues for the project
     if task_id:  # get info based on task_id
