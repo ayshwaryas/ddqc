@@ -113,7 +113,7 @@ generatePlotsByMetric <- function(obj, lbls, metric.name.pg, metric.name, name.s
   #boxplot by cluster
   boxplot <- ggplot(subset(data, metric > 0), aes(x=clusters, y=metric)) + geom_boxplot() + theme_horizontal + mean_plot + labels_horizontal + horizontal_line + axis_breaks_horizontal + ttl
   #joyplot by cluster
-  joyplot <- ggplot(subset(data, metric > 0), aes(x=metric, y=clusters)) + geom_density_ridges(aes()) + theme_vertical + mean_plot + labels_vertical + vertical_line + axis_breaks_vertical + ttl
+  joyplot <- ggplot(subset(data, metric > 0), aes(x=metric, y=clusters)) + geom_density_ridges(aes()) + theme_vertical + labels_vertical + vertical_line + axis_breaks_vertical + ttl
   #violin plot by cluster
   vnlplot <- ggplot(subset(data, metric > 0), aes(x=clusters, y=metric)) + geom_violin(aes()) + theme_horizontal + mean_plot + labels_horizontal + horizontal_line + axis_breaks_horizontal + ttl
   #umap
