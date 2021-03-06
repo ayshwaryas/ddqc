@@ -35,14 +35,15 @@ def read_tissue(project, tissue, annotations="Unknown"):  # function that reads 
     dataset_list = pd.read_csv(dataset_list_path)
     if annotations == "Absolute":  # if data is stored outside DATA_DIR and csv had a direct path
         pass
-    dataset_list['Location'] = [DATA_DIR + t for t in dataset_list['Location']]  # update location with relevant directory prefix
+    else:
+        dataset_list['Location'] = [DATA_DIR + t for t in dataset_list['Location']]  # update location with relevant directory prefix
     with open(read_info_filename, "w") as fout:  # write modified csv
         fout.write(dataset_list.to_csv())
     adata = io.aggregate_matrices(read_info_filename)
     os.remove(read_info_filename)  # remove current read info copy
 
     # add annotations to adata
-    if annotations != 'Unknown':
+    if annotations != 'Unknown' and annotations != "Absolute":
         ann_df = pd.read_csv(DATA_DIR + annotations)
         annotations_cell_type = ann_df["annotations"]
         annotations_cell_type.index = ann_df["barcodekey"]
