@@ -152,3 +152,4 @@ human_other,Blood,TRUE,Absolute
 human_other,Olfactory_Epithelium,TRUE,Unknown
 human_other,Heart_Circulation,TRUE,human/other/heart/annotations_pg.csv
 human_other,krasnow_lung,TRUE,Unknown
+human_other,skin_cellbender,TRUE,Unknown
