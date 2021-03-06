@@ -12,7 +12,7 @@ def check_finished(prj, tiss):
     return os.path.isdir(results_dir)
 
 
-def run_htapp():
+def run_panglao():
     log = open("log.txt", "w+")
     for i, row in get_project_info(project="PanglaoDB").iterrows():
         project = row["project"]
@@ -37,4 +37,4 @@ def run_htapp():
     log.close()
 
 
-run_htapp()
+run_panglao()
