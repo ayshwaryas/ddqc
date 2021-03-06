@@ -35,7 +35,7 @@ def run_all(organism):
         try:
             joint_main(project, 0, tissue=tissue)
         except Exception as e:
-            print("FAILED JC {} {}:\n".format(project, tissue, traceback.format_exc(), file=log))
+            print("FAILED JC {} {}:\n".format(project, tissue, traceback.format_exc()), file=log)
 
         print("Finished {} {}".format(project, tissue))
 
