@@ -26,7 +26,7 @@ def run_panglao():
             try:
                 mc_main(project, task_id=method, tissue=tissue)
             except Exception as e:
-                print("FAILED MC {} {} method {}:\n".format(project, tissue, method, traceback.format_exc()), file=log)
+                print("FAILED MC {} {} method {}:\n{}\n".format(project, tissue, method, traceback.format_exc()), file=log)
         try:
             joint_main(project, 0, tissue=tissue)
         except Exception as e:
