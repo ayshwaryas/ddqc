@@ -14,7 +14,7 @@ def check_finished(prj, tiss):
 
 def run_ebi_tm():
     log = open("log.txt", "w+")
-    for i, row in get_project_info(project="htapp").iterrows():
+    for i, row in get_project_info(project="tabula_muris_smartseq2").iterrows():
         project = row["project"]
         tissue = row["tissue"]
 
