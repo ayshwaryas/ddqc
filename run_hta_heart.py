@@ -12,9 +12,9 @@ def check_finished(prj, tiss):
     return os.path.isdir(results_dir)
 
 
-def run_htapp():
+def run_hta_heart():
     log = open("log.txt", "w+")
-    for i, row in get_project_info(project="htapp").iterrows():
+    for i, row in get_project_info(project="hta_heart").iterrows():
         project = row["project"]
         tissue = row["tissue"]
 
@@ -37,4 +37,4 @@ def run_htapp():
     log.close()
 
 
-run_htapp()
+run_hta_heart()

@@ -43,7 +43,7 @@ def read_tissue(project, tissue, annotations="Unknown"):  # function that reads 
     os.remove(read_info_filename)  # remove current read info copy
 
     # add annotations to adata
-    if annotations != 'Unknown' and annotations != "Absolute":
+    if annotations != 'Unknown' and annotations != "Absolute" and os.path.isfile(DATA_DIR + annotations):
         ann_df = pd.read_csv(DATA_DIR + annotations)
         annotations_cell_type = ann_df["annotations"]
         annotations_cell_type.index = ann_df["barcodekey"]

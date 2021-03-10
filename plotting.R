@@ -113,9 +113,11 @@ generatePlotsByMetric <- function(obj, lbls, metric.name.pg, metric.name, name.s
   #boxplot by cluster
   boxplot <- ggplot(subset(data, metric > 0), aes(x=clusters, y=metric)) + geom_boxplot() + theme_horizontal + mean_plot + labels_horizontal + horizontal_line + axis_breaks_horizontal + ttl
   #joyplot by cluster
-  joyplot <- ggplot(subset(data, metric > 0), aes(x=metric, y=clusters)) + geom_density_ridges(aes()) + theme_vertical + labels_vertical + vertical_line + axis_breaks_vertical + ttl
+  joyplot <- ggplot(subset(data, metric > 0), aes(x=metric, y=clusters)) + geom_density_ridges(jittered_points = TRUE,
+                                                                                               position = position_points_jitter(width = 0.05, height = 0),
+                                                                                               point_shape = '|', point_size = 1, point_alpha = 0.5, alpha = 0.7) + theme_vertical+ mean_plot + labels_vertical + vertical_line + axis_breaks_vertical + ttl
   #violin plot by cluster
-  vnlplot <- ggplot(subset(data, metric > 0), aes(x=clusters, y=metric)) + geom_violin(aes()) + theme_horizontal + mean_plot + labels_horizontal + horizontal_line + axis_breaks_horizontal + ttl
+  vnlplot <- ggplot(subset(data, metric > 0), aes(x=clusters, y=metric)) + geom_violin() + theme_horizontal + mean_plot + labels_horizontal + horizontal_line + axis_breaks_horizontal + ttl
   #umap
   umapplot <- DimPlotContinuous(obj, metric.name.pg, metric.name, lbls, log2 = is.log2)
   
@@ -162,11 +164,15 @@ generateFCPlots <- function(obj, lbls) {
   ggsave1(filename = paste0(results.dir, "!p_barplot.pdf"), plot=freqplot, n.clusters=n.clusters, type = "h")
 }
 
-generatePlots <- function(obj, cell.types, joint=FALSE) { #main plots function
+generatePlots <- function(obj, cell.types, joint=FALSE, no.ct.labels=FALSE) { #main plots function
   message("Making Plots")
   lbls <- NULL #create labels in the following format: cluster #, Panglao Cell Type \n annotated Cell Type
   for (i in 1:length(cell.types)) {
-    lbls <- c(lbls, paste0(i, " ", cell.types[i]))
+    if (no.ct.labels) {
+      lbls <- c(lbls, i)
+    } else {
+      lbls <- c(lbls, paste0(i, " ", cell.types[i]))
+    }
   }
   ttl <<- ggtitle(task.name)
   names(lbls) <- 1:(length(lbls))
@@ -188,10 +194,12 @@ task.name <- commandArgs(trailingOnly = TRUE)[1]
 results.dir <- commandArgs(trailingOnly = TRUE)[2]
 script.type <- commandArgs(trailingOnly = TRUE)[3]
 
-message("Starting R script to generate plots")
-
-tiss <- read.csv(paste0(results.dir, "!cells.csv"))
-tiss$louvain_labels <- as.factor(tiss$louvain_labels)
-clusters <- read.csv(paste0(results.dir, "!clusters.csv"))
-
-generatePlots(tiss, clusters$cell_type, script.type == "joint") #make plots
+if (!is.na(task.name)) {
+  message("Starting R script to generate plots")
+  
+  tiss <- read.csv(paste0(results.dir, "!cells.csv"))
+  tiss$louvain_labels <- as.factor(tiss$louvain_labels)
+  clusters <- read.csv(paste0(results.dir, "!clusters.csv"))
+  
+  generatePlots(tiss, clusters$cell_type, script.type == "joint") #make plots
+}

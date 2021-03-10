@@ -1,0 +1,3 @@
+Sample,Location,Reference
+GSM4186990_CY128_nuclei_channel1,human/HTAPP/melanoma_nuclei_V2/GSM4186990_CY128_nuclei_channel1_raw_feature_bc_matrix.h5,GRCh38
+GSM4186991_CY112_nuclei_channel2,human/HTAPP/melanoma_nuclei_V2/GSM4186991_CY112_nuclei_channel2_raw_feature_bc_matrix.h5,GRCh38

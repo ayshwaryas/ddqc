@@ -108,11 +108,12 @@ def filter_cells(adata, res, method, threshold, basic_n_genes=100, basic_percent
                  ribo_prefix="^Rp[sl]\d", do_counts=True, do_genes=True, do_mito=True, do_ribo=True, record_path=None):
     adata = initial_qc(adata, basic_n_genes, basic_percent_mito, mito_prefix,
                        ribo_prefix)  # perform initial qc with min 100 genes and min 3 cells
-    adata_copy = adata.copy()  # make a copy of adata, so the clustering results won't affect future downstream analysis
-    adata_copy = cluster_data(adata_copy, res)  # do initial clustering of adata
 
     if method == "none":  # no filtering option
         return adata
+
+    adata_copy = adata.copy()  # make a copy of adata, so the clustering results won't affect future downstream analysis
+    adata_copy = cluster_data(adata_copy, res)  # do initial clustering of adata
 
     # for each metric if do_metric is true, the filtering will be performed
     if do_counts:
