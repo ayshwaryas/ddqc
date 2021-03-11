@@ -17,4 +17,4 @@ use R-3.5
 source /home/unix/malperov/myenv3.8/bin/activate
 
 cd /ahg/regevdata/projects/scqc/code
-python run_jc_old.py $1 $2
+python run_tissue.py $1 $2

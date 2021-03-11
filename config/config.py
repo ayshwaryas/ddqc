@@ -31,7 +31,7 @@ RIBO_PREFIXES = {"human": "^Rp[sl]\d", "mouse": "^Rp[sl]\d"}  # prefixes of ribo
 do_counts = True
 do_genes = True
 do_mito = True
-do_ribo = True
+do_ribo = False
 
 # METHOD COMPARISON SCRIPTS
 # none - no additional filtering; cutoff - min 200 genes, max 10% mito; outlier and mad - data driven methods
