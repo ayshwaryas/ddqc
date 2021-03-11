@@ -107,7 +107,7 @@ def metric_filter(adata, method, param, metric_name, do_lower_co=False, do_upper
 def filter_cells(adata, res, method, threshold, basic_n_genes=100, basic_percent_mito=80, mito_prefix="MT-",
                  ribo_prefix="^Rp[sl]\d", do_counts=True, do_genes=True, do_mito=True, do_ribo=True, record_path=None):
     adata = initial_qc(adata, basic_n_genes, basic_percent_mito, mito_prefix,
-                       ribo_prefix)  # perform initial qc with min 100 genes and min 3 cells
+                       ribo_prefix)  # perform initial qc
 
     if method == "none":  # no filtering option
         return adata
