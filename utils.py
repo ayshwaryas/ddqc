@@ -102,9 +102,22 @@ def format_markers(markers, n=25):  # take top 25 markers from the list, and sep
         return [""]
 
 
+def cell_type_replacements(cell_type, tissue):
+    if cell_type == "Hepatocytes" and "liver" not in tissue.lower():
+        return "Epithelial cells"
+    elif cell_type == "Hepatic stellate cells" and "liver" not in tissue.lower():
+        return "Epithelial cells"
+    elif cell_type == "Keratinocytes" and "skin" not in tissue.lower():
+        return "Epithelial cells"
+    elif cell_type == "Luminal epithelial cells":
+        return "Epithelial/Luminal epithelial cells"
+    else:
+        return cell_type
+
+
 # assign cell types, annotations, and calculate cluster statistics
 # min_sg is how many score genes are required to call the cell type for the cluster
-def assign_cell_types(adata, markers, min_sg=3):
+def assign_cell_types(adata, markers, tissue, min_sg=3):
     print("Assigning annotations and cell types to clusters")
     genes = pd.read_csv(DATA_DIR + "markers.tsv", sep="\t")  # read panglaoDB genes to cell types table
     colnames = ["cluster", "annotation", "annotation2", "%annotation", "%annotation2", "cell_type", "cell_type2",
@@ -124,7 +137,7 @@ def assign_cell_types(adata, markers, min_sg=3):
             marker = index.upper()
             gene_info = genes[genes["official gene symbol"] == marker]  # find marker in PanglaoDB table
             for gene, info in gene_info.iterrows():  # iterate through  cell types for the marker
-                ct = info["cell type"]
+                ct = cell_type_replacements(info["cell type"], tissue)
                 if ct not in possible_cell_types:  # if we didn't encounter this cell type yet, add it to dicts
                     possible_cell_types[ct] = 0
                     score_genes[ct] = []
@@ -141,8 +154,8 @@ def assign_cell_types(adata, markers, min_sg=3):
                 clusters_dict["cell_type2"].append(srt_cell_types[1])
                 clusters_dict["score_genes"].append(format_markers(sg))
                 called = True
-        elif possible_cell_types == 1:  # only one cell type
-            ct = possible_cell_types[list(possible_cell_types.keys())[0]]
+        elif len(possible_cell_types) == 1:  # only one cell type
+            ct = list(possible_cell_types.keys())[0]
             sg = score_genes[ct]
             if len(sg) >= min_sg:  # if number of score genes satisfies the minimum requirement call the cell type
                 clusters_dict["cell_type"].append(ct)

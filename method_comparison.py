@@ -49,7 +49,7 @@ def mc_main(project, task_id, tissue=None):
     adata, marker_dict = cluster_data(adata, compute_markers=True, compute_reductions=True, resolution=resolution)
     adata = add_cd_scores(adata, is_human)  # add cell death scores
     markers = marker_dict_to_df(marker_dict)
-    clusters = assign_cell_types(adata, markers)
+    clusters = assign_cell_types(adata, markers, tissue)
 
     # write the results
     print("Writing results")

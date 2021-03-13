@@ -107,7 +107,7 @@ def metric_filter(adata, method, param, metric_name, do_lower_co=False, do_upper
 # record_path - path for recording filtered cells CSVs (keep it None if not needed)
 def filter_cells(adata, res, method, threshold, basic_n_genes=100, basic_percent_mito=80, mito_prefix="MT-",
                  ribo_prefix="^Rp[sl]\d", do_counts=True, do_genes=True, do_mito=True, do_ribo=False, record_path=None,
-                 n_genes_lower_bound=200):
+                 n_genes_lower_bound=200, percent_mito_upper_bound=10):
     adata = initial_qc(adata, basic_n_genes, basic_percent_mito, mito_prefix,
                        ribo_prefix)  # perform initial qc
 
@@ -128,7 +128,7 @@ def filter_cells(adata, res, method, threshold, basic_n_genes=100, basic_percent
     else:
         adata_copy.obs["n_genes_qc_pass"] = True
     if do_mito:
-        adata_copy = metric_filter(adata_copy, method, threshold, "percent_mito", do_upper_co=True,
+        adata_copy = metric_filter(adata_copy, method, threshold, "percent_mito", do_upper_co=True, upper_bound=percent_mito_upper_bound,
                                    record_path=record_path)
     else:
         adata_copy.obs["percent_mito_qc_pass"] = True
