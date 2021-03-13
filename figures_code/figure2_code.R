@@ -36,9 +36,9 @@ for (tissue in tissues) {
   file.copy(paste0(source.dir, "!clusters.csv"), paste0(results.dir, "!clusters.csv"))
   file.copy(paste0(source.dir, "!markers.csv"), paste0(results.dir, "!markers.csv"))
   
-  #cells <- read.csv(paste0(source.dir, "!cells.csv"))
-  #cells$louvain_labels <- as.factor(cells$louvain_labels)
-  #clusters <- read.csv(paste0(source.dir, "!clusters.csv"))
+  cells <- read.csv(paste0(source.dir, "!cells.csv"))
+  cells$louvain_labels <- as.factor(cells$louvain_labels)
+  clusters <- read.csv(paste0(source.dir, "!clusters.csv"))
   
-  #generatePlots(cells, clusters$cell_type, no.ct.labels=TRUE)
+  generatePlots(cells, clusters$cell_type, no.ct.labels=TRUE)
 }
