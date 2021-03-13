@@ -95,7 +95,7 @@ mouse_cell_atlas,Testis,FALSE,mouse/mca/Testis/annotations_pg.csv
 mouse_cell_atlas,Thymus,FALSE,mouse/mca/Thymus/annotations_pg.csv
 mouse_cell_atlas,TrophoblastStemCells,FALSE,mouse/mca/TrophoblastStemCells/annotations_pg.csv
 mouse_cell_atlas,Uterus,FALSE,mouse/mca/Uterus/annotations_pg.csv
-human_other,adipose,TRUE,Unknown
+human_other,adipose,TRUE,/human/other/adipose/annotations_pg.csv
 human_other,ASD_snRNAseq,TRUE,Unknown
 human_other,liver,TRUE,Unknown
 human_other,kidney2,TRUE,Unknown
