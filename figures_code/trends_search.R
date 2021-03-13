@@ -2,18 +2,21 @@ results.dir <- "/ahg/regevdata/projects/scqc/output_pg/"
 fout_ng_lower <- "trends_n_genes_lower.csv"
 fout_ng_upper <- "trends_n_genes_upper.csv"
 fout_mito <- "trends_mito_upper.csv"
-fout_ribo <- "trends_ribo_upper.csv"
+fout_ribo_upper <- "trends_ribo_upper.csv"
+fout_ribo_lower <- "trends_ribo_lower.csv"
 
 n_genes_lower_bound <- 200
 n_genes_upper_bound <- 2000
-mito_upper_bound <- 20
-ribo_upper_bound <- 30
+mito_upper_bound <- 10
+ribo_upper_bound <- 20
+ribo_lower_bound <- 10
 
 HEADER <- "project,tissue,cluster,annotation,cell_type,n_cells,genes_mean,genes_median,mito_mean,mito_median,ribo_mean,ribo_median,markers"
 write(HEADER, fout_ng_lower)
 write(HEADER, fout_ng_upper)
 write(HEADER, fout_mito)
-write(HEADER, fout_ribo)
+write(HEADER, fout_ribo_upper)
+write(HEADER, fout_ribo_lower)
 
 for (project in dir(results.dir, recursive=FALSE)) {
   for (tissue in dir(paste0(results.dir, project, "/"), recursive=FALSE)) {
@@ -45,7 +48,10 @@ for (project in dir(results.dir, recursive=FALSE)) {
           write(info, file=fout_mito, append = TRUE)
         }
         if (clusters[cl,]$ribo_median >= ribo_upper_bound) {
-          write(info, file=fout_ribo, append = TRUE)
+          write(info, file=fout_ribo_upper, append = TRUE)
+        }
+        if (clusters[cl,]$ribo_median <= ribo_lower_bound) {
+          write(info, file=fout_ribo_lower, append = TRUE)
         }
       }
     }
