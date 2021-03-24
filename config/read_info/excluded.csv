@@ -1,0 +1,7 @@
+tabula_senis_24m,BAT,FALSE,mouse/tabula_senis/24_month/BAT/annotations_pg.csv
+tabula_senis_24m,GAT,FALSE,mouse/tabula_senis/24_month/GAT/annotations_pg.csv
+tabula_senis_24m,Lung,FALSE,mouse/tabula_senis/24_month/Lung/annotations_pg.csv
+tabula_senis_24m,MAT,FALSE,mouse/tabula_senis/24_month/MAT/annotations_pg.csv
+tabula_senis_24m,SCAT,FALSE,mouse/tabula_senis/24_month/SCAT/annotations_pg.csv
+human_tissue_atlas,Ureter,TRUE,human/HTA/Ureter/annotations_pg.csv
+htapp,sarcoma_nuclei_V3,True,human/HTAPP/sarcoma_nuclei_V3/annotations_pg.csv
