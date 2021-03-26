@@ -161,8 +161,6 @@ htapp,ovarian_cells_V2,True,human/HTAPP/ovarian_cells_V2/annotations_pg.csv
 htapp,ovarian_cells_V3,True,human/HTAPP/ovarian_cells_V3/annotations_pg.csv
 htapp,ovarian_nuclei_V2,True,human/HTAPP/ovarian_nuclei_V2/annotations_pg.csv
 htapp,sarcoma_nuclei_V2,True,human/HTAPP/sarcoma_nuclei_V2/annotations_pg.csv
-htapp,sarcoma_nuclei_V3_4652_CST,True,Unknown
-htapp,sarcoma_nuclei_V3_4771_TST,True,Unknown
-htapp,sarcoma_nuclei_V3_combined,True,Unknown
-hta_heart,Heart1,TRUE,Unknown
-hta_heart,Heart2,TRUE,Unknown
+htapp,sarcoma_nuclei_V3,True,human/HTAPP/sarcoma_nuclei_V3/annotations_pg.csv
+mouse_other,bipolar_mouse,False,Unknown
+mouse_other,retina_mouse,False,Unknown
