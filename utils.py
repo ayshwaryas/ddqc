@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pegasus as pg
 
-from config.config import DATA_DIR
+from config.config import DATA_DIR, do_batch_correction
 
 
 # check if the dir exists, if not - create it
@@ -54,10 +54,17 @@ def marker_dict_to_df(marker_dict, min_log_fc=0.25, min_pct=25, max_pval=0.05):
 # function that performs clustering; does dimensional reductions and finds DE genes if specified
 def cluster_data(adata, resolution, compute_markers=False, compute_reductions=False):
     pg.log_norm(adata)
-    pg.highly_variable_features(adata, consider_batch=False)
-    pg.pca(adata, random_state=29)
-    pg.neighbors(adata, K=20, random_state=29)
-    pg.louvain(adata, resolution=resolution, random_state=29)
+    if do_batch_correction:
+        pg.highly_variable_features(adata, consider_batch=True)
+        pg.pca(adata, random_state=29)
+        pca_key = pg.run_harmony(adata, random_state=29)
+        pg.neighbors(adata, K=20, rep=pca_key, random_state=29)
+        pg.louvain(adata, resolution=resolution, rep=pca_key, random_state=29)
+    else:
+        pg.highly_variable_features(adata, consider_batch=False)
+        pg.pca(adata, random_state=29)
+        pg.neighbors(adata, K=20, random_state=29)
+        pg.louvain(adata, resolution=resolution, random_state=29)
 
     if compute_reductions:
         pg.umap(adata, random_state=29)

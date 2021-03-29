@@ -20,6 +20,7 @@ else:  # for debug outside of cluster
 
 # CLUSTERING
 resolution = 1.4  # this resolution gives results closest to seurat
+do_batch_correction = False
 
 # FILTERING
 basic_genes_filter = 100  # basic nGenes filter (performed for all methods)

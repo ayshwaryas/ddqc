@@ -112,6 +112,7 @@ def filter_cells(adata, res, method, threshold, basic_n_genes=100, basic_percent
                        ribo_prefix)  # perform initial qc
 
     if method == "none":  # no filtering option
+        assert len(adata.obs.index) > 0
         return adata
 
     adata_copy = adata.copy()  # make a copy of adata, so the clustering results won't affect future downstream analysis
@@ -150,4 +151,6 @@ def filter_cells(adata, res, method, threshold, basic_n_genes=100, basic_percent
 
     adata.obs["passed_qc"] = adata_copy.obs.passed_qc  # transfer array from the copy to actual object
     pg.filter_data(adata)  # perform filtering
+
+    assert len(adata.obs.index) > 0
     return adata
