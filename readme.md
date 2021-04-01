@@ -8,4 +8,4 @@
 2. In the root directory run the following command:
    
     `pip install .`
-3. For the usage instructions refer to tutorials/ddqc_tutorial.html
+3. For the usage instructions refer to tutorials/ddqc_tutorial.ipunb
