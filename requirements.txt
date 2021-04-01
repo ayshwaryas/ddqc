@@ -1,0 +1,5 @@
+numpy
+matplotlib>=2.0.0
+pandas>=1.2.0
+pegasuspy>=1.0.0
+seaborn
