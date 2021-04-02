@@ -1,4 +1,4 @@
-# DDQC - data-driven quality control for single cell/nucleus RNA sequencing
+# ddqc - Biology-centered data-driven quality control for single cell/nucleus RNA sequencing
 ## Required packages
 - numpy
 - matplotlib>=2.0.0
