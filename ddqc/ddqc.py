@@ -27,8 +27,10 @@ def _calculate_percent_ribo(data: MultimodalData, ribo_prefix) -> None:
 def _cluster_data(data: MultimodalData, n_genes: int, percent_mito: float, mito_prefix: str, ribo_prefix: str,
                   norm_count: float = 1e5, n_components: int = 50, K: int = 20, resolution: float = 1.3,
                   random_state: int = 29) -> Tuple[pd.DataFrame, pd.DataFrame, dict]:
-    pg.qc_metrics(data, min_genes=n_genes, mito_prefix=mito_prefix,
+    pg.qc_metrics(data, mito_prefix=mito_prefix, min_umis=-10 ** 10, max_umis=10 ** 10, min_genes=n_genes,
+                  max_genes=10 ** 10,
                   percent_mito=percent_mito)  # default PG filtering with custom cutoffs
+
     _calculate_percent_ribo(data, ribo_prefix)  # calculate percent ribo
     pg.filter_data(data)  # filtering based on the parameters from qc_metrics
     pg.identify_robust_genes(data)
