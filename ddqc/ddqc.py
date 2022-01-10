@@ -134,15 +134,16 @@ def _boxplot_sorted(df, column, by, hline_x=None, log=False):
 # n_genes_lower_bound - maximum cutoff for n genes
 # percent_mito_upper_bound - minimum cutoff for percent mito
 # return_df_qc: return a dataframe with cluster labels and thresholds for each metric
-def ddqc_metrics(data: MultimodalData, res=1.3, method="mad", threshold=2, basic_n_genes=100, basic_percent_mito=80,
-                 mito_prefix="MT-",
+def ddqc_metrics(data: MultimodalData, res=1.3, n_components=50, K=20, method="mad", threshold=2, basic_n_genes=100,
+                 basic_percent_mito=80, mito_prefix="MT-",
                  ribo_prefix="^RP[SL][[:digit:]]|^RPLP[[:digit:]]|^RPSA", do_counts=True, do_genes=True, do_mito=True,
                  do_ribo=False, n_genes_lower_bound=200, percent_mito_upper_bound=10, random_state=29,
                  return_df_qc=False,
                  display_plots=True) -> Union[None, pd.DataFrame]:
     assert isinstance(data, MultimodalData)
     obs_copy, var_copy, uns_copy = _cluster_data(data, basic_n_genes, basic_percent_mito, mito_prefix, ribo_prefix,
-                                                 resolution=res, random_state=random_state)
+                                                 resolution=res, n_components=n_components, K=K,
+                                                 random_state=random_state)
 
     df_qc = pd.DataFrame({"cluster_labels": data.obs["louvain_labels"].values}, index=data.obs_names)
 
