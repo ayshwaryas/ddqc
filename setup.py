@@ -3,7 +3,7 @@ from pathlib import Path
 
 setup(
     name='ddqc',
-    version='0.1.1',
+    version='0.2.0',
     description='Description',
     url='https://github.com/ayshwaryas/ddqc',
     author='Author',
