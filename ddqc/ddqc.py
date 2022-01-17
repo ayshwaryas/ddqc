@@ -23,14 +23,13 @@ def _calculate_percent_ribo(data: MultimodalData, ribo_prefix) -> None:
                                                                                   1.0)) * 100  # calculate percent ribo
 
 
-# function that performs initial qc & clustering; does dimensional reductions and finds DE genes if specified (?)
+# function that performs initial qc & clustering
 def _cluster_data(data: MultimodalData, n_genes: int, percent_mito: float, mito_prefix: str, ribo_prefix: str,
-                  norm_count: float = 1e5, n_components: int = 50, K: int = 20, resolution: float = 1.3,
-                  random_state: int = 29) -> Tuple[pd.DataFrame, pd.DataFrame, dict]:
+                  norm_count: float = 1e5, n_components: int = 50, K: int = 20, clustering_method: str = "louvain",
+                  resolution: float = 1.3, random_state: int = 29) -> Tuple[pd.DataFrame, pd.DataFrame, dict]:
     pg.qc_metrics(data, mito_prefix=mito_prefix, min_umis=-10 ** 10, max_umis=10 ** 10, min_genes=n_genes,
                   max_genes=10 ** 10,
                   percent_mito=percent_mito)  # default PG filtering with custom cutoffs
-
     _calculate_percent_ribo(data, ribo_prefix)  # calculate percent ribo
     pg.filter_data(data)  # filtering based on the parameters from qc_metrics
     pg.identify_robust_genes(data)
@@ -45,8 +44,19 @@ def _cluster_data(data: MultimodalData, n_genes: int, percent_mito: float, mito_
     pg.highly_variable_features(data, consider_batch=False)
     pg.pca(data, n_components=n_components, random_state=random_state)
     pg.neighbors(data, K=K, random_state=random_state)
-    pg.louvain(data, resolution=resolution, random_state=random_state)
+    if clustering_method == "louvain":
+        pg.louvain(data, resolution=resolution, random_state=random_state)
+    elif clustering_method == "leiden":
+        pg.leiden(data, resolution=resolution, random_state=random_state)
+    elif clustering_method == "spectral_louvain":
+        pg.spectral_louvain(data, resolution=resolution, random_state=random_state)
+    elif clustering_method == "spectral_leiden":
+        pg.spectral_leiden(data, resolution=resolution, random_state=random_state)
+    else:
+        raise KeyError(f"Unknown clustering method {clustering_method}")
 
+    data.obs["cluster_labels"] = data.obs[clustering_method + "_labels"]
+    data.obs[clustering_method + "_labels"] = None
     return obs_copy, var_copy, uns_copy
 
 
@@ -67,8 +77,8 @@ def _metric_filter(data: MultimodalData, method: str, param: float, metric_name:
         df_qc[f"{metric_name}_lower_co"] = None
         df_qc[f"{metric_name}_upper_co"] = None
 
-    for cl in data.obs["louvain_labels"].cat.categories:  # iterate through all clusters
-        idx = data.obs["louvain_labels"] == cl
+    for cl in data.obs["cluster_labels"].cat.categories:  # iterate through all clusters
+        idx = data.obs["cluster_labels"] == cl
         values = data.obs.loc[idx, metric_name]
 
         if method == "mad":  # calculate MAD cutoffs, which are median ± param * MAD
@@ -134,18 +144,17 @@ def _boxplot_sorted(df, column, by, hline_x=None, log=False):
 # n_genes_lower_bound - maximum cutoff for n genes
 # percent_mito_upper_bound - minimum cutoff for percent mito
 # return_df_qc: return a dataframe with cluster labels and thresholds for each metric
-def ddqc_metrics(data: MultimodalData, res=1.3, n_components=50, K=20, method="mad", threshold=2, basic_n_genes=100,
-                 basic_percent_mito=80, mito_prefix="MT-",
+def ddqc_metrics(data: MultimodalData, res=1.3, clustering_method="louvain", n_components=50, K=20, method="mad",
+                 threshold=2, basic_n_genes=100, basic_percent_mito=80, mito_prefix="MT-",
                  ribo_prefix="^RP[SL][[:digit:]]|^RPLP[[:digit:]]|^RPSA", do_counts=True, do_genes=True, do_mito=True,
                  do_ribo=False, n_genes_lower_bound=200, percent_mito_upper_bound=10, random_state=29,
-                 return_df_qc=False,
-                 display_plots=True) -> Union[None, pd.DataFrame]:
+                 return_df_qc=False, display_plots=True) -> Union[None, pd.DataFrame]:
     assert isinstance(data, MultimodalData)
     obs_copy, var_copy, uns_copy = _cluster_data(data, basic_n_genes, basic_percent_mito, mito_prefix, ribo_prefix,
-                                                 resolution=res, n_components=n_components, K=K,
-                                                 random_state=random_state)
+                                                 resolution=res, clustering_method=clustering_method,
+                                                 n_components=n_components, K=K, random_state=random_state)
 
-    df_qc = pd.DataFrame({"cluster_labels": data.obs["louvain_labels"].values}, index=data.obs_names)
+    df_qc = pd.DataFrame({"cluster_labels": data.obs["cluster_labels"].values}, index=data.obs_names)
 
     passed_qc = np.ones(data.shape[0], dtype=bool)
     # for each metric if do_metric is true, the filtering will be performed
