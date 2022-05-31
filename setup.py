@@ -3,11 +3,11 @@ from pathlib import Path
 
 setup(
     name='ddqc',
-    version='0.2.0',
+    version='0.3.0',
     description='Description',
     url='https://github.com/ayshwaryas/ddqc',
-    author='Author',
-    author_email='email@example.gov',
+    author='Mikhail Alperovich and Ayshwarya Subramanian',
+    author_email='subraman@broadinstitute.org',
     license='BSD 2-clause',
     packages=find_packages(),
     install_requires=[r.strip() for r in Path("requirements.txt").read_text("utf-8").splitlines()],

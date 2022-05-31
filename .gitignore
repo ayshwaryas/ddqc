@@ -10,3 +10,5 @@ old_code
 __pycache__
 .ipynb_checkpoints/
 config/local_config.py
+*.h5ad
+*.zarr.zip
