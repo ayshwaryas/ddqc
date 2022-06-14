@@ -15,7 +15,8 @@ def ddqc_metrics(data: MultimodalData,
                  res: float = 1.3, clustering_method: str = "louvain", n_components: int = 50, k: int = 20,
                  method: str = "mad", threshold: float = 2.0, threshold_counts: Union[int, None] = 0,
                  threshold_genes: Union[int, None] = 0, threshold_mito: Union[float, None] = 0,
-                 threshold_ribo: Union[float, None] = 0, basic_n_genes: int = 100, basic_percent_mito: float = 80.0,
+                 threshold_ribo: Union[float, None] = 0, basic_n_counts: int = 0,
+                 basic_n_genes: int = 100, basic_percent_mito: float = 80.0,
                  mito_prefix: str = "MT-", ribo_prefix: str = "^RP[SL][[:digit:]]|^RPLP[[:digit:]]|^RPSA",
                  n_genes_lower_bound: int = 200, percent_mito_upper_bound: float = 10.0, random_state: int = 29,
                  return_df_qc: bool = False, display_plots: bool = True) -> Union[None, pd.DataFrame]:
@@ -38,6 +39,7 @@ def ddqc_metrics(data: MultimodalData,
         threshold_genes (int, None): Same as above, but for number of genes.
         threshold_mito (float, None): Same as above, but for percent of mitochondrial transcripts.
         threshold_ribo (float, None): Same as above, but for percent of ribosomal transcripts.
+        basic_n_counts (int): parameter for the initial QC n_counts filtering (default is 0).
         basic_n_genes (int): parameter for the initial QC n_genes filtering (default is 100).
         basic_percent_mito (float): parameter for the initial QC percent_mito filtering (default is 80.0).
         mito_prefix (str): gene prefix used to calculate percent_mito in a cell (default is "MT-").
@@ -54,7 +56,8 @@ def ddqc_metrics(data: MultimodalData,
             if return_df_qc was True.
     """
     assert isinstance(data, MultimodalData)
-    obs_copy, var_copy, uns_copy = cluster_data(data, basic_n_genes, basic_percent_mito, mito_prefix, ribo_prefix,
+    obs_copy, var_copy, uns_copy = cluster_data(data, basic_n_counts, basic_n_genes, basic_percent_mito, mito_prefix,
+                                                ribo_prefix,
                                                 resolution=res, clustering_method=clustering_method,
                                                 n_components=n_components, k=k, random_state=random_state)
     passed_qc, df_qc, _ = perform_ddqc(data, method, threshold,
