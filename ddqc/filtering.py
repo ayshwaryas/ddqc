@@ -2,7 +2,7 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-from pegasusio import UnimodalData, MultimodalData
+from pegasusio import MultimodalData
 
 from ddqc.utils import mad
 
@@ -79,6 +79,7 @@ def perform_ddqc(data: MultimodalData, method: str, threshold: float,
         passed_qc &= metric_filter(data, method, threshold_ribo, "percent_ribo", do_upper_co=True, df_qc=df_qc)
 
     if filtering_stats is not None:
+        cl_filtering_stats = []
         for cl in data.obs.cluster_labels.cat.categories:
             idx = data.obs["cluster_labels"] == cl
             unique, counts = np.unique(passed_qc[idx], return_counts=True)
@@ -86,5 +87,6 @@ def perform_ddqc(data: MultimodalData, method: str, threshold: float,
             n_filtered_cells_pct = n_filtered_cells / len(passed_qc[idx]) * 100
             row = {"threshold": threshold, "cluster": cl, "filtered_cells": n_filtered_cells,
                    "filtered_cells_pct": n_filtered_cells_pct}
-            filtering_stats = filtering_stats.append(row, ignore_index=True)
+            cl_filtering_stats.append(row)
+        filtering_stats = pd.concat([filtering_stats, pd.DataFrame.from_records(cl_filtering_stats)])
     return passed_qc, df_qc, filtering_stats
