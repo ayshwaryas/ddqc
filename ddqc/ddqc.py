@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from pegasusio import UnimodalData, MultimodalData
+from pegasusio import MultimodalData
+import pegasus as pg
 
 from ddqc.filtering import perform_ddqc
 from ddqc.plotting import filtering_facet_plot, boxplot_sorted, calculate_filtering_stats
-from ddqc.utils import reverse_to_raw_matrix, cluster_data
+from ddqc.utils import cluster_data, calculate_percent_ribo
 
 
 def ddqc_metrics(data: MultimodalData,
@@ -56,11 +57,19 @@ def ddqc_metrics(data: MultimodalData,
             if return_df_qc was True.
     """
     assert isinstance(data, MultimodalData)
-    obs_copy, var_copy, uns_copy = cluster_data(data, basic_n_counts, basic_n_genes, basic_percent_mito, mito_prefix,
-                                                ribo_prefix,
-                                                resolution=res, clustering_method=clustering_method,
-                                                n_components=n_components, k=k, random_state=random_state)
-    passed_qc, df_qc, _ = perform_ddqc(data, method, threshold,
+
+    # initial qc
+    pg.qc_metrics(data, mito_prefix=mito_prefix, min_umis=basic_n_counts, max_umis=10 ** 10, min_genes=basic_n_genes,
+                  max_genes=10 ** 10,
+                  percent_mito=basic_percent_mito)  # default PG filtering with custom cutoffs
+    calculate_percent_ribo(data, ribo_prefix)  # calculate percent ribo
+    pg.filter_data(data)  # filtering based on the parameters from qc_metrics
+
+    data_copy = data.copy()
+    cluster_data(data_copy, basic_n_counts, basic_n_genes, basic_percent_mito, mito_prefix, ribo_prefix,
+                 resolution=res, clustering_method=clustering_method,
+                 n_components=n_components, k=k, random_state=random_state)
+    passed_qc, df_qc, _ = perform_ddqc(data_copy, method, threshold,
                                        threshold_counts, threshold_genes, threshold_mito, threshold_ribo,
                                        n_genes_lower_bound, percent_mito_upper_bound)
 
@@ -69,18 +78,18 @@ def ddqc_metrics(data: MultimodalData,
         plt.show()
         boxplot_sorted(df_qc, "percent_mito", "cluster_labels", hline_x=10)
         plt.show()
-        if (threshold_counts == 0 or threshold_counts is None) \
-                and (threshold_genes == 0 or threshold_genes is None) \
-                and (threshold_mito == 0 or threshold_mito is None) \
-                and (threshold_ribo == 0 or threshold_ribo is None):
+        if ((threshold_counts == 0 or threshold_counts is None)
+                and (threshold_genes == 0 or threshold_genes is None)
+                and (threshold_mito == 0 or threshold_mito is None)
+                and (threshold_ribo == 0 or threshold_ribo is None)):
             if method == "mad":
-                fs = calculate_filtering_stats(data, threshold, n_genes_lower_bound, percent_mito_upper_bound)
+                fs = calculate_filtering_stats(data_copy, threshold, n_genes_lower_bound, percent_mito_upper_bound)
                 filtering_facet_plot(fs, threshold, pct=False)
                 plt.show()
                 filtering_facet_plot(fs, threshold, pct=True)
                 plt.show()
 
-    reverse_to_raw_matrix(data.current_data(), obs_copy, var_copy, uns_copy)
+    # reverse_to_raw_matrix(data.current_data(), obs_copy, var_copy, uns_copy)
     data.obs["passed_qc"] = passed_qc
     df_qc["passed_qc"] = data.obs["passed_qc"]
 
